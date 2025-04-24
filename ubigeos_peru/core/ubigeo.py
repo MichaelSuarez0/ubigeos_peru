@@ -1,33 +1,27 @@
 import os
 from typing import Literal
-from ..resources import DEPARTAMENTOS, DISTRITOS, PROVINCIAS, MACRORREGIONES
+import unicodedata
+from ..resources import DEPARTAMENTOS, DISTRITOS, PROVINCIAS, MACRORREGIONES, EQUIVALENCIAS
 
 script_dir = os.path.dirname(__file__)
 databases = os.path.join(script_dir, "..", "databases", "otros")
 
-departamentos_path = os.path.join(databases, "ubigeo_peru_2016_departamentos.csv")
-provincias_path = os.path.join(databases, "ubigeo_peru_2016_provincias.csv")
-distritos_path = os.path.join(databases, "ubigeo_peru_2016_distritos.csv")
-
-import unicodedata
 
 def eliminar_acentos(texto: str)-> str:
-    # Normaliza el texto en la forma NFKD (descompone los caracteres acentuados)
     texto_normalizado = unicodedata.normalize('NFKD', texto)
-    # Filtra solo los caracteres que no son signos diacríticos
     texto_sin_acentos = ''.join(c for c in texto_normalizado if not unicodedata.combining(c))
     return texto_sin_acentos
 
 
 # TODO: Guardar los datos de ubigeos en dataclasses y ponerlas en Ubigeo como dependencias con lazy loading
-# TODO: Los métodos, por ejemplo departamento, deberían aceptar o dos caracteres o seis 
 # TODO: También colocar métodos para exportar las bases de datos
 class Ubigeo:
-    departamentos: dict = DEPARTAMENTOS
-    provincias: dict = PROVINCIAS
-    distritos: dict = DISTRITOS
-    macrorregiones: dict = MACRORREGIONES
-    otros = None
+    _departamentos: dict = DEPARTAMENTOS
+    _provincias: dict = PROVINCIAS
+    _distritos: dict = DISTRITOS
+    _macrorregiones: dict = MACRORREGIONES
+    _equivalencias: dict = EQUIVALENCIAS
+    _otros = None
 
     def _load_database(self):
         pass
@@ -49,23 +43,42 @@ class Ubigeo:
         
         return codigo
     
-    # @classmethod
-    # def _normalize_departamento(cls, nombre_departamento: str) -> str:
-    #     """Normaliza y valida el nombre del departamento"""
-    #     for dpto in cls._DATA.keys():
-    #         if eliminar_acentos(nombre_departamento).strip().lower() == eliminar_acentos(dpto).strip().lower():
-    #             return dpto
+    @classmethod
+    def normalize_departamento(cls, nombre_departamento: str) -> str:
+        """"""
+        nombre_departamento = eliminar_acentos(nombre_departamento).strip().upper()
+        try:
+            departamento = cls._equivalencias["departamentos"][nombre_departamento]
+        except KeyError:
+            raise ValueError(f"No se ha encontrado el departamento {nombre_departamento}")
         
-    #     raise ValueError(
-    #         f"Departamento no encontrado: '{nombre_departamento}'. "
-    #         f"Opciones válidas: {list(cls._DATA.keys())}"
-    #     )
+        return departamento
+    
+    @classmethod
+    def normalize_ubicacion(cls, nombre_ubicacion: str, ignore_errors: bool = False) -> str:
+        """"""
+        nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
+        try:
+            resultado = cls._equivalencias["departamentos"][nombre_ubicacion]
+        except KeyError:
+            try:
+                resultado = cls._equivalencias["provincias"][nombre_ubicacion]
+            except KeyError:
+                try:
+                    resultado = cls._equivalencias["distritos"][nombre_ubicacion]
+                except KeyError:
+                    if not ignore_errors:
+                        raise ValueError(f"No se encontró el lugar {nombre_ubicacion} en la base de datos de departamentos, provincias o distritos")
+                    else:
+                        resultado = nombre_ubicacion
+                    
+        return resultado
 
     @classmethod
     def get_departamento(cls, codigo: str | int, institucion: Literal["inei", "reniec", "sunat"] = "inei", normalize: bool = True):
         codigo = cls._validate_codigo(codigo)
         
-        result = cls.departamentos[institucion][codigo[-2:]]
+        result = cls._departamentos[institucion][codigo[-2:]]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -79,7 +92,7 @@ class Ubigeo:
         if len(codigo) < 4:
             raise ValueError("No se aceptan ubigeos con menos de 4 caracteres para provincias")
 
-        result = cls.provincias[institucion][codigo[-4:]]
+        result = cls._provincias[institucion][codigo[-4:]]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -93,7 +106,7 @@ class Ubigeo:
         if len(codigo) != 6:
             raise ValueError("No se aceptan ubigeos que no tengan exactamente 6 caracteres para distritos")
 
-        result = cls.distritos[institucion][codigo]
+        result = cls._distritos[institucion][codigo]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -108,7 +121,7 @@ class Ubigeo:
         
         departamento = eliminar_acentos(departamento).lower().strip()
         
-        return eliminar_acentos(cls.macrorregiones[institucion][departamento])
+        return eliminar_acentos(cls._macrorregiones[institucion][departamento])
 
     @classmethod
     def get_ubigeo(cls, lugar: str, level: Literal["departamento", "distrito", "provincia"] = "departamento", institucion: Literal["inei", "reniec", "sunat"] = "inei", normalize: bool = False):
