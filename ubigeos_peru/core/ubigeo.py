@@ -1,13 +1,18 @@
 import os
-from typing import Literal
+from typing import Literal, Any
 import unicodedata
-from ..resources import (
-    DEPARTAMENTOS,
-    DISTRITOS,
-    PROVINCIAS,
-    MACRORREGIONES,
-    EQUIVALENCIAS,
-)
+import orjson
+
+# Configuración de recursos
+BASE_DIR = os.path.dirname(__file__)
+RESOURCE_DIR = os.path.join(BASE_DIR, '..', 'resources')
+_RESOURCE_FILES = {
+    'departamentos': "departamentos.json",
+    'provincias': "provincias.json",
+    'distritos': "distritos.json",
+    'macrorregiones': "macrorregiones.json",
+    'equivalencias': "equivalencias.json",
+}
 
 def eliminar_acentos(texto: str) -> str:
     texto_normalizado = unicodedata.normalize("NFKD", texto)
@@ -20,15 +25,59 @@ def eliminar_acentos(texto: str) -> str:
 # TODO: Guardar los datos de ubigeos en dataclasses y ponerlas en Ubigeo como dependencias con lazy loading
 # TODO: También colocar métodos para exportar las bases de datos
 class Ubigeo:
-    _DEPARTAMENTOS: dict = DEPARTAMENTOS
-    _PROVINCIAS: dict = PROVINCIAS
-    _DISTRITOS: dict = DISTRITOS
-    _MACRORREGIONES: dict = MACRORREGIONES
-    _EQUIVALENCIAS: dict = EQUIVALENCIAS
+    _instance = None
+    _resources_loaded = {
+        'departamentos': False,
+        'provincias': False,
+        'distritos': False,
+        'macrorregiones': False,
+        'equivalencias': False,
+        'global': False
+    }
+    
+    _DEPARTAMENTOS = None
+    _PROVINCIAS = None
+    _DISTRITOS = None
+    _MACRORREGIONES = None
+    _EQUIVALENCIAS = None
     _GLOBAL = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Ubigeo, cls).__new__(cls)
+        return cls._instance
 
-    def _load_database(self):
-        pass
+    @classmethod
+    def _load_resource(cls, resource_name: str) -> None:
+        """
+        Carga un recurso JSON desde el directorio de recursos con cache.
+        
+        Args:
+            resource_name: Nombre clave del recurso (debe estar en _RESOURCE_FILES)
+        
+        Returns:
+            Diccionario con los datos del JSON
+        
+        Raises:
+            FileNotFoundError: Si el recurso no existe
+            json.JSONDecodeError: Si el archivo no es JSON válido
+        """
+        file_path = os.path.join(RESOURCE_DIR, _RESOURCE_FILES[resource_name])
+        try:
+            with open(file_path, 'rb') as f:
+                resource_data = orjson.loads(f.read())
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Recurso no encontrado: {file_path}") from e
+        
+        setattr(cls, f"_{resource_name.upper()}", resource_data)
+        
+    @classmethod
+    def _load_resource_if_needed(cls, resource_name: str) -> None:
+        """Carga un recurso si aún no ha sido cargado"""
+        if not cls._resources_loaded.get(resource_name.lower(), False):
+            cls._load_resource(resource_name)
+            cls._resources_loaded[resource_name.lower()] = True
+
 
     @classmethod
     def _validate_codigo(cls, codigo: str | int) -> str:
@@ -50,6 +99,11 @@ class Ubigeo:
     @classmethod
     def normalize_departamento(cls, nombre_departamento: str, upper: bool = True) -> str:
         """"""
+        cls._load_resource_if_needed('equivalencias')
+        
+        # if cls._EQUIVALENCIAS is None:
+        #     raise RuntimeError("No se pudieron cargar las equivalencias")
+        
         nombre_departamento = eliminar_acentos(nombre_departamento).strip().upper()
         try:
             departamento = cls._EQUIVALENCIAS["departamentos"][nombre_departamento]
@@ -127,6 +181,7 @@ class Ubigeo:
         - El subcódigo para departamento se toma de los últimos 2 caracteres del código validado.
         - Se recomienda utilizar strings de 2 o 6 caracteres.
         """
+        cls._load_resource_if_needed('departamentos')
         codigo = cls._validate_codigo(codigo)
 
         try:
@@ -178,7 +233,9 @@ class Ubigeo:
         - El subcódigo para provincia se toma de los últimos 4 caracteres del código validado.
         - Se recomienda utilizar strings de 4 o 6 caracteres.
         """
+        cls._load_resource_if_needed('provincia')
         codigo = cls._validate_codigo(codigo)
+        
         if len(codigo) < 4:
             raise ValueError(
                 "No se aceptan ubigeos con menos de 4 caracteres para provincias"
@@ -227,7 +284,9 @@ class Ubigeo:
         -----
         -
         """
+        cls._load_resource_if_needed('distrito')
         codigo = cls._validate_codigo(codigo)
+        
         if len(codigo) != 6:
             raise ValueError(
                 "No se aceptan ubigeos que no tengan exactamente 6 caracteres para distritos"
@@ -240,7 +299,7 @@ class Ubigeo:
         else:
             return result
 
-    # TODO: Corregir mayúsculas en resources
+
     @classmethod
     def get_macrorregion(
         cls,
