@@ -15,6 +15,8 @@ EQUIVALENCIAS = {
         "LA LIBERTAD": "La Libertad",
         "LAMBAYEQUE": "Lambayeque",
         "LIMA": "Lima",
+        "LIMA METROPOLITANA": "Lima Metropolitana",
+        "LIMA REGION": "Lima Región",
         "LORETO": "Loreto",
         "MADRE DE DIOS": "Madre de Dios",
         "MOQUEGUA": "Moquegua",
@@ -1948,3 +1950,4 @@ EQUIVALENCIAS = {
         "ZARUMILLA": "Zarumilla",
     },
 }
+
