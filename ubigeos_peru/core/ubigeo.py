@@ -12,6 +12,8 @@ _RESOURCE_FILES = {
     'distritos': "distritos.json",
     'macrorregiones': "macrorregiones.json",
     'equivalencias': "equivalencias.json",
+    'global': "global.json",
+    'inverted': "inverted.json",
 }
 
 def eliminar_acentos(texto: str) -> str:
@@ -32,7 +34,8 @@ class Ubigeo:
         'distritos': False,
         'macrorregiones': False,
         'equivalencias': False,
-        'global': False
+        'global': False,
+        'inverted': False
     }
     
     _DEPARTAMENTOS = None
@@ -41,6 +44,7 @@ class Ubigeo:
     _MACRORREGIONES = None
     _EQUIVALENCIAS = None
     _GLOBAL = None
+    _INVERTED = None
     
     def __new__(cls):
         if cls._instance is None:
@@ -96,6 +100,17 @@ class Ubigeo:
 
         return codigo
 
+    @classmethod
+    def _validate_level(cls, level: str) -> str:
+        if not isinstance(level, str):
+            raise ValueError('Solo se aceptan "departamentos", "distritos", "provincias" como argumentos para el nivel (level)')
+        
+        if isinstance(level, str) and not level.endswith("s"):
+            level += "s"
+        
+        return level
+
+    
     @classmethod
     def normalize_departamento(cls, nombre_departamento: str, upper: bool = True) -> str:
         """"""
@@ -305,7 +320,6 @@ class Ubigeo:
         cls,
         codigo_o_departamento: str | int,
         institucion: Literal["inei", "minsa", "ceplan"] = "inei",
-        normalize: bool = True,
     )-> str:
         """
         Obtiene el nombre de una macrorregión a partir de su código o nombre de departamento.
@@ -336,23 +350,54 @@ class Ubigeo:
         - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
         - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
         """
-        if isinstance(codigo_o_departamento, str) and codigo_o_departamento[0] not in list(range(0, 10)):
-            departamento = codigo_o_departamento
+        cls._load_resource_if_needed("macrorregiones")
+        
+        if isinstance(codigo_o_departamento, str):
+            if not codigo_o_departamento[0].isdigit():
+                # Se asume que es el input es un string con el nombre del departamento
+                departamento = cls.normalize_departamento(codigo_o_departamento, upper=False)
+            else:
+            # Se asume que es el input es un string con el código de ubigeo
+                departamento = cls.get_departamento(codigo_o_departamento, normalize=False)
+            
+        elif isinstance(codigo_o_departamento, int):
+            # Se asume que es el input es el código en formato string
+            departamento = cls.get_departamento(codigo_o_departamento, normalize=False)
+        else:
+            raise ValueError("Solo se acepta el nombre del departamento o su código de ubigeo")
 
-        departamento = eliminar_acentos(departamento).lower().strip()
-
-        return eliminar_acentos(cls._MACRORREGIONES[institucion][departamento])
+        return cls._MACRORREGIONES[institucion][departamento]
 
 
     @classmethod
     def get_ubigeo(
         cls,
         lugar: str,
-        level: Literal["departamento", "distrito", "provincia"] = "departamento",
+        level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
-        normalize: bool = False,
-    ):
-        pass
+    )-> str:
+        cls._load_resource_if_needed("inverted")
+        
+        level = cls._validate_level(level)
+        
+        if not isinstance(lugar, str):
+            try:
+                lugar = str(lugar)
+            except ValueError:
+                raise ValueError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
+        if isinstance(lugar, str):
+            lugar_normalized = eliminar_acentos(lugar).upper().strip()
+            try:
+                lugar_clean = cls.normalize_ubicacion(lugar_normalized)
+                result = eliminar_acentos(cls._INVERTED[level][institucion][lugar_clean]) 
+            except KeyError:
+                raise KeyError(f"El lugar '{lugar}' no se encontró en la base de datos de '{level}s'")
+            else:
+                return result
+
+        departamento = eliminar_acentos(departamento).lower().strip()
+
+        return eliminar_acentos(cls._MACRORREGIONES[institucion][departamento])
 
     @classmethod
     def get_otros(
