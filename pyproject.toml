@@ -1,10 +1,14 @@
 [project]
 name = "ubigeos_peru"
-version = "0.1.0"
+version = "0.1.1"
+readme = "README.md"
 
 [build-system]
-requires = ["setuptools>=42"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["ubigeos_peru"]
+[tool.setuptools]
+packages = ["ubigeos_peru"]
+
+[tool.setuptools.package-data]
+"ubigeos_peru" = ["resources/*.json"]
