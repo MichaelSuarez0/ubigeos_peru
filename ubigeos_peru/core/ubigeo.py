@@ -96,7 +96,7 @@ class Ubigeo:
             elif len(codigo) > 6:
                 raise ValueError("No se aceptan ubigeos con más de 6 caracteres")
         else:
-            raise ValueError("No se aceptan valores que no sean string o integers")
+            raise TypeError("No se aceptan valores que no sean str o int")
 
         return codigo
 
@@ -112,25 +112,33 @@ class Ubigeo:
 
     
     @classmethod
-    def normalize_departamento(cls, nombre_departamento: str, upper: bool = True) -> str:
+    def normalize_departamento(cls, nombre_departamento: str, upper: bool = True, ignore_errors: bool = False) -> str:
         """"""
         cls._load_resource_if_needed('equivalencias')
         
         # if cls._EQUIVALENCIAS is None:
         #     raise RuntimeError("No se pudieron cargar las equivalencias")
-        
-        nombre_departamento = eliminar_acentos(nombre_departamento).strip().upper()
+        if not isinstance(nombre_departamento, str):
+            try:
+                str(nombre_departamento)
+            except TypeError:
+                raise TypeError(f"No se permiten otros tipos de datos que no sean str, se insertó {type(nombre_departamento)}")
+
+        departamento = eliminar_acentos(nombre_departamento).strip().upper()
         try:
-            departamento = cls._EQUIVALENCIAS["departamentos"][nombre_departamento]
+            resultado = cls._EQUIVALENCIAS["departamentos"][departamento]
         except KeyError:
-            raise ValueError(
-                f"No se ha encontrado el departamento {nombre_departamento}"
-            )
+            if ignore_errors:
+               resultado = nombre_departamento
+            else: 
+                raise KeyError(
+                    f"No se ha encontrado el departamento {nombre_departamento}"
+                )
         
         if not upper:
-            return departamento
+            return resultado
         else:
-            return eliminar_acentos(departamento).strip().upper()
+            return eliminar_acentos(resultado).strip().upper()
 
     @classmethod
     def normalize_ubicacion(
@@ -237,8 +245,10 @@ class Ubigeo:
 
         Raises
         ------
+        TypeError
+            Si el código .no es str/int
         ValueError
-            Si el código tiene menos de 4 caracteres o supera los 6 caracteres, o no es str/int.
+            Si el código tiene menos de 4 caracteres o supera los 6 caracteres.
         KeyError
             Si el código no existe en la base de datos.
 
