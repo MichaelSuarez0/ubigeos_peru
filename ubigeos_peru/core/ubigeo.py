@@ -54,7 +54,7 @@ class Ubigeo:
     @classmethod
     def _load_resource(cls, resource_name: str) -> None:
         """
-        Carga un recurso JSON desde el directorio de recursos con cache.
+        Carga un recurso JSON desde el directorio de recursos con lazy loading
         
         Args:
             resource_name: Nombre clave del recurso (debe estar en _RESOURCE_FILES)
@@ -110,10 +110,59 @@ class Ubigeo:
         
         return level
 
-    
     @classmethod
-    def normalize_departamento(cls, nombre_departamento: str, upper: bool = True, ignore_errors: bool = False) -> str:
-        """"""
+    def validate_departamento(cls, nombre_departamento: str, no_sp_chars: bool = False, ignore_errors: bool = False) -> str:
+        """
+        Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
+
+        Parameters
+        ----------
+        nombre_departamento : str
+            Nombre del departamento que se busca validar y normalizar
+        no_sp_chars : bool, optional
+            Si es True, devuelve el departamento sin acentos y sin mayúsculas. Por defecto `False`.
+        ignore_errors : bool, optional
+            Si es True, ignora los nombres que no coinciden con nombres de departamentos sin generar error, 
+            útil si se aplica para conjuntos de datos que no solo contienen departamentos, por defecto `False`.
+
+        Returns
+        -------
+        str
+            Nombre oficial del departamento.
+
+        Raises
+        ------
+        TypeError
+            Si nombre_departamento no es un str
+        KeyError
+            Si nombre_departamento no coincide con ningún nombre en los recursos e ignore_errors = `False`
+
+        Notes
+        -----
+        - Para códigos de longitud impar (1, 3 o 5), se asume que falta un cero inicial y se añadirá.
+        - El subcódigo para departamento se toma de los últimos 2 caracteres del código validado.
+        - Se recomienda utilizar strings de 2 o 6 caracteres.
+     
+        Examples
+        --------
+        >>> # Estandarización básica de nombres
+        >>> validate_departamento("HUÁNUCO")
+        'Huánuco'
+
+        >>> validate_departamento("HUÁNUCO", no_sp_chars = True)
+        'huanuco'
+
+        >>> validate_departamento("HUÁNUCO", no_sp_chars = True).upper()
+        'HUANUCO'
+        >>> # Integración con Pandas 
+        >>> # Aplicar la función de forma simple (con valores por defecto)
+        >>> df["DEPARTAMENTO"].apply(ubg.validate_departamento)
+        >>> # Aplicar la función con parámetros para ignorar filas que no contienen departamentos
+        >>> df["DEPARTAMENTO"].apply(lambda x: ubg.validate_departamento(str(x), ignore_errors=True))
+        >>> # Aplicar la función con parámetros para personalizar el output (mayúsculas sin acentos)
+        >>> df["DEPARTAMENTO"].apply(lambda x: ubg.validate_departamento(str(x), no_sp_chars = False, ignore_errors=True).upper())
+        
+        """
         cls._load_resource_if_needed('equivalencias')
         
         # if cls._EQUIVALENCIAS is None:
@@ -135,7 +184,7 @@ class Ubigeo:
                     f"No se ha encontrado el departamento {nombre_departamento}"
                 )
         
-        if not upper:
+        if not no_sp_chars:
             return resultado
         else:
             return eliminar_acentos(resultado).strip().upper()
@@ -147,6 +196,7 @@ class Ubigeo:
         ignore_errors: bool = False
     ) -> str:
         """"""
+        cls._load_resource_if_needed("equivalencias")
         nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
         try:
             resultado = cls._EQUIVALENCIAS["departamentos"][nombre_ubicacion]
@@ -171,7 +221,7 @@ class Ubigeo:
         cls,
         codigo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
-        normalize: bool = True,
+        no_sp_chars: bool = False,
     ) -> str:
         """
         Obtiene el nombre de un departamento a partir de su código de ubigeo.
@@ -203,19 +253,56 @@ class Ubigeo:
         - Para códigos de longitud impar (1, 3 o 5), se asume que falta un cero inicial y se añadirá.
         - El subcódigo para departamento se toma de los últimos 2 caracteres del código validado.
         - Se recomienda utilizar strings de 2 o 6 caracteres.
+
+         Examples
+        --------
+        >>> # Estandarización básica de nombres
+        >>> ubg.get_departamento("1") 
+        "Amazonas"
+        >>> ubg.get_departamento(10101)
+        "Amazonas"
+        >>> ubg.get_departamento(10101, no_sp_chars=True)
+        "amazonas"
+        
+        >>> # Integración con Pandas
+        >>> # Ejemplo básico con DataFrame
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({
+        ...     "UBIGEO": [10101, 50101, 110101, 150101, 210101],
+        ...     "P1144": [1, 1, 0, 1, 0]
+        ... })
+        >>> df
+              UBIGEO  P1144
+        0      10101     1
+        1      50101     1
+        2     110101     0
+        3     150101     1
+        4     210101	 0
+        >>> df["DEPT"] = df["UBIGEO"].apply(get_departamento)
+        >>> df
+              UBIGEO  P1144    DEPT
+        0      10101     1     Amazonas
+        1      50101     1     Ayacucho
+        2     110101     0     Ica
+        3     150101     1     Lima
+        4     210101	 0     Puno
+
+
+        >>> validate_departamento("HUÁNUCO", no_sp_chars = True).upper()
+        'HUANUCO'
+
         """
         cls._load_resource_if_needed('departamentos')
         codigo = cls._validate_codigo(codigo)
-
         try:
-            result = cls._DEPARTAMENTOS[institucion][codigo[-2:]]
+            result = cls._DEPARTAMENTOS[institucion][codigo[:2]]
         except KeyError:
             raise KeyError(
                 f"El código de ubigeo {codigo} no se encontró en la base de datos"
             )
 
-        if normalize:
-            return eliminar_acentos(result).upper()
+        if no_sp_chars:
+            return eliminar_acentos(result).lower()
         else:
             return result
 
@@ -224,7 +311,7 @@ class Ubigeo:
         cls,
         codigo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
-        normalize: bool = True,
+        no_sp_chars: bool = False,
     ) -> str:
         """
         Obtiene el nombre de una provincia a partir de su código de ubigeo.
@@ -236,7 +323,7 @@ class Ubigeo:
         institucion : str, optional
             Institución como fuente de datos. Opciones: 'inei', 'reniec', 'sunat' (por defecto 'inei').
         normalize : bool, optional
-            Si se cambia a False, retorna nombre oficial con gramática correcta (ex. Junín), por defecto True.
+            Si se cambia a True, retorna el nombre en mayúsculas sin acentos (ex. JUNIN), por defecto False.
 
         Returns
         -------
@@ -268,7 +355,7 @@ class Ubigeo:
 
         result = cls._PROVINCIAS[institucion][codigo[-4:]]
 
-        if normalize:
+        if no_sp_chars:
             return eliminar_acentos(result).upper()
         else:
             return result
@@ -278,7 +365,7 @@ class Ubigeo:
         cls,
         codigo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
-        normalize: bool = True,
+        no_sp_chars: bool = False,
     ) -> str:
         """
         Obtiene el nombre de un distrito a partir de su código de ubigeo.
@@ -291,7 +378,7 @@ class Ubigeo:
             Institución a utilizar como fuente de datos.
             Opciones: 'inei', 'reniec', 'sunat', por defecto 'inei'
         normalize : bool, optional
-            Si se cambia a False, retorna nombre oficial con gramática correcta (ex. Junín), por defecto True.
+            Si se cambia a True, retorna el nombre en mayúsculas sin acentos (ex. JUNIN), por defecto False.
 
         Returns
         -------
@@ -319,7 +406,7 @@ class Ubigeo:
 
         result = cls._DISTRITOS[institucion][codigo]
 
-        if normalize:
+        if no_sp_chars:
             return eliminar_acentos(result).upper()
         else:
             return result
@@ -330,6 +417,7 @@ class Ubigeo:
         cls,
         codigo_o_departamento: str | int,
         institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+        normalize: bool = False,
     )-> str:
         """
         Obtiene el nombre de una macrorregión a partir de su código o nombre de departamento.
@@ -341,7 +429,7 @@ class Ubigeo:
         institucion : str, optional
             Institución como fuente de datos. Opciones: 'inei', 'minsa', 'ceplan' (por defecto 'inei').
         normalize : bool, optional
-            Si se cambia a False, retorna nombre oficial con gramática correcta (ex. Junín), por defecto True.
+            Si se cambia a True, retorna el nombre en mayúsculas sin acentos (ex. JUNIN), por defecto False.
 
         Returns
         -------
@@ -365,18 +453,22 @@ class Ubigeo:
         if isinstance(codigo_o_departamento, str):
             if not codigo_o_departamento[0].isdigit():
                 # Se asume que es el input es un string con el nombre del departamento
-                departamento = cls.normalize_departamento(codigo_o_departamento, upper=False)
+                departamento = cls.validate_departamento(codigo_o_departamento, no_sp_chars=False)
             else:
             # Se asume que es el input es un string con el código de ubigeo
-                departamento = cls.get_departamento(codigo_o_departamento, normalize=False)
+                departamento = cls.get_departamento(codigo_o_departamento, no_sp_chars=False)
             
         elif isinstance(codigo_o_departamento, int):
             # Se asume que es el input es el código en formato string
-            departamento = cls.get_departamento(codigo_o_departamento, normalize=False)
+            departamento = cls.get_departamento(codigo_o_departamento, no_sp_chars=False)
         else:
             raise ValueError("Solo se acepta el nombre del departamento o su código de ubigeo")
 
-        return cls._MACRORREGIONES[institucion][departamento]
+        resultado = cls._MACRORREGIONES[institucion][departamento]
+        if not normalize:
+            return resultado
+        else:
+            return eliminar_acentos(resultado).upper()
 
 
     @classmethod
