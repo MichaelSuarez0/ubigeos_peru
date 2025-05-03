@@ -1,5 +1,5 @@
 GLOBAL = {
-    "departamento": {
+    "departamentos": {
         "AMAZONAS": {
             "altitud": "2338",
             "capital": "Chachapoyas",
@@ -176,7 +176,7 @@ GLOBAL = {
             "superficie": "102199.28",
         },
     },
-    "distrito": {
+    "distritos": {
         "ABANCAY": {
             "altitud": "2500",
             "capital": "Abancay",
@@ -6552,7 +6552,7 @@ GLOBAL = {
             "capital": "Miraflores",
             "latitud": "-12.2744444444444",
             "longitud": "-75.8502777777778",
-            "superficie": "226.24",
+            "superficie": "9.62",
         },
         "MIRGAS": {
             "altitud": "3147",
@@ -12218,7 +12218,7 @@ GLOBAL = {
             "superficie": "67.39",
         },
     },
-    "provincia": {
+    "provincias": {
         "ABANCAY": {
             "altitud": "2500",
             "capital": "Abancay",

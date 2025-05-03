@@ -7,7 +7,7 @@ from ubigeos_peru import Ubigeo as ubg
 def clean_dict(constant: dict)-> dict:
     for inst, details in constant.items():
         for codigo, ubicacion in details.items():
-            constant[inst][codigo] = ubg.normalize_ubicacion(ubicacion, ignore_errors=True)
+            constant[inst][codigo] = ubg.validate_ubicacion(ubicacion, ignore_errors=True)
     
     return constant
         

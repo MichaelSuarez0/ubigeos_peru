@@ -33,9 +33,9 @@ def global_creation():
     df2 = pd.read_csv(all_path.format(names[1]), encoding='utf-8', dtype=str)
     df3 = pd.read_csv(all_path.format(names[2]), encoding='utf-8', dtype=str)
     
-    departamentos = preprocess_dataframe(df1, names[0])
-    provincias = preprocess_dataframe(df2, names[1])
-    distritos = preprocess_dataframe(df3, names[2])
+    departamentos = preprocess_dataframe(df1, f"{names[0]}s")
+    provincias = preprocess_dataframe(df2, f"{names[1]}s")
+    distritos = preprocess_dataframe(df3, f"{names[2]}s")
     final_dict = join_dicts(departamentos, provincias, distritos)
     
     write_to_json(final_dict, "global")

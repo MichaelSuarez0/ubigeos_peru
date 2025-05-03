@@ -8,7 +8,7 @@ def clean_macrorregiones(macrorregiones: dict)-> dict:
     clean_dict = defaultdict(dict)
     for inst, details in macrorregiones.items():
         for dep, macrorregion in details.items():
-            clean_dict[inst][ubg.normalize_departamento(dep, upper=False)] = macrorregion
+            clean_dict[inst][ubg.validate_departamento(dep, no_sp_chars=False)] = macrorregion
 
     return dict(clean_dict)
 

@@ -39,6 +39,11 @@ def equivalencias_creation():
     write_to_json(equivalencias, "equivalencias")
     write_to_readable(equivalencias, "equivalencias")
         
+# TODO: Por agregar:
+equivalencias = {
+    'distritos':{
+        'COTABAMBA': 'Cotabambas'
+    }}
 
 if __name__ == "__main__":
     equivalencias_creation()
