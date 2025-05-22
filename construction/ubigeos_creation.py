@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import pprint
 from collections import defaultdict
-from _functions import DATABASES_PATH, write_to_readable, write_to_json
+from _functions import DATABASES_PATH, write_to_readable, write_to_resources
 
 all_path = os.path.join(DATABASES_PATH, "equivalencia-ubigeos-oti-concytec.csv")
 
@@ -37,9 +37,9 @@ def ubigeos_creation():
     departamentos = convert_to_dict(df, level= "dep")
     provincias = convert_to_dict(df, level="prov")
     distritos = convert_to_dict(df, level="ubigeo")   
-    write_to_json(departamentos, "departamentos")
-    write_to_json(provincias, "provincias")
-    write_to_json(distritos, "distritos")
+    write_to_resources(departamentos, "departamentos")
+    write_to_resources(provincias, "provincias")
+    write_to_resources(distritos, "distritos")
     
     write_to_readable(departamentos, "departamentos")
     write_to_readable(provincias, "provincias")

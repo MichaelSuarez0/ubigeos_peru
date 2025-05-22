@@ -1,7 +1,7 @@
 import os
 import orjson
 from collections import defaultdict
-from _functions import RESOURCES_PATH, write_to_json, write_to_readable
+from _functions import RESOURCES_PATH, write_to_resources, write_to_readable
 
 
 def read_dict(level: str):
@@ -40,7 +40,7 @@ def inverted_creation():
     final_dict = join_dicts([departamentos, provincias, distritos], names)
     final_dict = invert_dict(final_dict)
     
-    write_to_json(final_dict, "inverted")
+    write_to_resources(final_dict, "inverted")
     write_to_readable(final_dict, "inverted")
     
 

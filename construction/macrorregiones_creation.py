@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from collections import defaultdict
-from _functions import DATABASES_PATH, write_to_json, write_to_readable
+from _functions import DATABASES_PATH, write_to_resources, write_to_readable
 
 all_path = os.path.join(DATABASES_PATH, "ubigeo_provincia.csv")
 
@@ -75,7 +75,7 @@ def macrorregiones_creation():
     macrorregiones = preprocess_dataframe(df)
     macrorregiones = modify_macrorregiones(macrorregiones)
     macrorregiones = add_ceplan_macrorregiones(macrorregiones)
-    write_to_json(macrorregiones, "macrorregiones")
+    write_to_resources(macrorregiones, "macrorregiones")
     write_to_readable(macrorregiones, "macrorregiones")
 
 if __name__ == "__main__":

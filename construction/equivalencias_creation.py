@@ -3,7 +3,7 @@ import pandas as pd
 import unicodedata
 from collections import defaultdict
 from _functions import DATABASES_PATH, RESOURCES_PATH, RESOURCES_READABLE_PATH
-from _functions import write_to_json, write_to_readable
+from _functions import write_to_resources, write_to_readable
 
 base = "ubigeo_peru_2016_{}.csv"
 
@@ -36,14 +36,9 @@ def equivalencias_creation():
     equivalencias["distritos"] = dist_dict
     equivalencias = dict(equivalencias)
 
-    write_to_json(equivalencias, "equivalencias")
+    write_to_resources(equivalencias, "equivalencias")
     write_to_readable(equivalencias, "equivalencias")
         
-# TODO: Por agregar:
-equivalencias = {
-    'distritos':{
-        'COTABAMBA': 'Cotabambas'
-    }}
 
 if __name__ == "__main__":
     equivalencias_creation()

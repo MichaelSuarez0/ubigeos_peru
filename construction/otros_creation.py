@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from collections import defaultdict
-from _functions import DATABASES_PATH, write_to_readable, write_to_json
+from _functions import DATABASES_PATH, write_to_readable, write_to_resources
 
 all_path = os.path.join(DATABASES_PATH, "ubigeo_{}.csv")
 
@@ -38,7 +38,7 @@ def global_creation():
     distritos = preprocess_dataframe(df3, f"{names[2]}s")
     final_dict = join_dicts(departamentos, provincias, distritos)
     
-    write_to_json(final_dict, "global")
+    write_to_resources(final_dict, "global")
     write_to_readable(final_dict, "global")
 
 

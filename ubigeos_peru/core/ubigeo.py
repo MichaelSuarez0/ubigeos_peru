@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os
 from typing import Literal
 import unicodedata
@@ -117,7 +118,7 @@ class Ubigeo:
     @classmethod
     def get_departamento(
         cls,
-        codigo: str | int,
+        ubigeo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str:
@@ -126,13 +127,12 @@ class Ubigeo:
 
         Parameters
         ----------
-        codigo : str or int
+        ubigeo : str or int
             Código de ubigeo.
-        institucion : str, optional
-            Institución a utilizar como fuente de datos.
-            Opciones: 'inei', 'reniec', 'sunat', por defecto 'inei'
+        institucion : {"inei", "reniec", "sunat"}, optional
+            Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
         normalize : bool, optional
-            Si se cambia a False, retorna nombre oficial con gramática correcta (ex. Junín), por defecto True.
+            Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
         Returns
         -------
@@ -176,7 +176,7 @@ class Ubigeo:
         2     110101     0
         3     150101     1
         4     210101	 0
-        >>> df["DEPT"] = df["UBIGEO"].apply(get_departamento)
+        >>> df["DEPT"] = df["UBIGEO"].apply(ubg.get_departamento)
         >>> df
               UBIGEO  P1144    DEPT
         0      10101     1     Amazonas
@@ -195,12 +195,12 @@ class Ubigeo:
         4     210101	 0     PUNO
         """
         cls._load_resource_if_needed('departamentos')
-        codigo = cls._validate_codigo(codigo)
+        ubigeo = cls._validate_codigo(ubigeo)
         try:
-            result = cls._DEPARTAMENTOS[institucion][codigo[:2]]
+            result = cls._DEPARTAMENTOS[institucion][ubigeo[:2]]
         except KeyError:
             raise KeyError(
-                f"El código de ubigeo {codigo} no se encontró en la base de datos"
+                f"El código de ubigeo {ubigeo} no se encontró en la base de datos"
             )
 
         if normalize:
@@ -211,7 +211,7 @@ class Ubigeo:
     @classmethod
     def get_provincia(
         cls,
-        codigo: str | int,
+        ubigeo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str:
@@ -220,10 +220,10 @@ class Ubigeo:
 
         Parameters
         ----------
-        codigo : str or int
+        ubigeo : str or int
             Código de ubigeo (recomendado 4 o 6 caracteres).
-        institucion : str, optional
-            Institución como fuente de datos. Opciones: 'inei', 'reniec', 'sunat' (por defecto 'inei').
+        institucion : {"inei", "reniec", "sunat"}, optional
+            Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
@@ -246,16 +246,57 @@ class Ubigeo:
         - Para códigos de longitud impar (3 o 5), se asume que falta un cero inicial y se añadirá.
         - El subcódigo para provincia se toma de los últimos 4 caracteres del código validado.
         - Se recomienda utilizar strings de 4 o 6 caracteres.
+        Examples
+        --------
+        >>> # Estandarización básica de nombres
+        >>> ubg.get_departamento("010101") 
+        "Amazonas"
+        >>> ubg.get_departamento(10101)
+        "Amazonas"
+        >>> ubg.get_departamento(10101, normalize=True)
+        "amazonas" 
+        >>>
+        >>> # Integración con Pandas
+        >>> # Ejemplo básico con DataFrame
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({
+        ...     "UBIGEO": [10101, 50101, 110101, 150101, 210101],
+        ...     "P1144": [1, 1, 0, 1, 0]
+        ... })
+        >>> df
+              UBIGEO  P1144
+        0      10101     1
+        1      50101     1
+        2     110101     0
+        3     150101     1
+        4     210101	 0
+        >>> df["DEPT"] = df["UBIGEO"].apply(ubg.get_departamento)
+        >>> df
+              UBIGEO  P1144    DEPT
+        0      10101     1     Amazonas
+        1      50101     1     Ayacucho
+        2     110101     0     Ica
+        3     150101     1     Lima
+        4     210101	 0     Puno
+        >>> # Ejemplo con normalize (formato por defecto en la ENAHO)
+        >>> df["DEPT"] = df["UBIGEO"].apply(get_departamento, normalize = True)
+        >>> df
+              UBIGEO  P1144    DEPT
+        0      10101     1     AMAZONAS
+        1      50101     1     AYACUCHO
+        2     110101     0     ICA
+        3     150101     1     LIMA
+        4     210101	 0     PUNO
         """
-        cls._load_resource_if_needed('provincia')
-        codigo = cls._validate_codigo(codigo)
+        cls._load_resource_if_needed('provincias')
+        ubigeo = cls._validate_codigo(ubigeo)
         
-        if len(codigo) < 4:
+        if len(ubigeo) < 4:
             raise ValueError(
                 "No se aceptan ubigeos con menos de 4 caracteres para provincias"
             )
 
-        result = cls._PROVINCIAS[institucion][codigo[-4:]]
+        result = cls._PROVINCIAS[institucion][ubigeo[-4:]]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -265,7 +306,7 @@ class Ubigeo:
     @classmethod
     def get_distrito(
         cls,
-        codigo: str | int,
+        ubigeo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str:
@@ -274,11 +315,10 @@ class Ubigeo:
 
         Parameters
         ----------
-        codigo : str or int
-            Código de ubigeo (6 caracteres).
-        institucion : str, optional
-            Institución a utilizar como fuente de datos.
-            Opciones: 'inei', 'reniec', 'sunat', por defecto 'inei'
+        ubigeo : str or int
+            Código de ubigeo (5 o 6 caracteres).
+        institucion : {"inei", "reniec", "sunat"}, optional
+            Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
@@ -298,15 +338,15 @@ class Ubigeo:
         -----
         -
         """
-        cls._load_resource_if_needed('distrito')
-        codigo = cls._validate_codigo(codigo)
+        cls._load_resource_if_needed('distritos')
+        ubigeo = cls._validate_codigo(ubigeo)
         
-        if len(codigo) != 6:
+        if len(ubigeo) not in (5, 6):
             raise ValueError(
                 "No se aceptan ubigeos que no tengan exactamente 6 caracteres para distritos"
             )
 
-        result = cls._DISTRITOS[institucion][codigo]
+        result = cls._DISTRITOS[institucion][ubigeo]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -317,7 +357,7 @@ class Ubigeo:
     @classmethod
     def get_macrorregion(
         cls,
-        codigo_o_departamento: str | int,
+        departamento_o_ubigeo: str | int,
         institucion: Literal["inei", "minsa", "ceplan"] = "inei",
         normalize: bool = False,
     )-> str:
@@ -326,10 +366,10 @@ class Ubigeo:
 
         Parameters
         ----------
-        codigo_o_departamento : str or int
+        departamento_o_ubigeo : str or int
             Código de ubigeo (recomendado 2 o 6 caracteres) o nombre del departamento.
-        institucion : str, optional
-            Institución como fuente de datos. Opciones: 'inei', 'minsa', 'ceplan' (por defecto 'inei').
+        institucion : {"inei", "reniec", "sunat"}, optional
+            Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
@@ -352,17 +392,17 @@ class Ubigeo:
         """
         cls._load_resource_if_needed("macrorregiones")
         
-        if isinstance(codigo_o_departamento, str):
-            if not codigo_o_departamento[0].isdigit():
+        if isinstance(departamento_o_ubigeo, str):
+            if not departamento_o_ubigeo[0].isdigit():
                 # Se asume que es el input es un string con el nombre del departamento
-                departamento = cls.validate_departamento(codigo_o_departamento, normalize=False)
+                departamento = cls.validate_departamento(departamento_o_ubigeo, normalize=False)
             else:
             # Se asume que es el input es un string con el código de ubigeo
-                departamento = cls.get_departamento(codigo_o_departamento, normalize=False)
+                departamento = cls.get_departamento(departamento_o_ubigeo, normalize=False)
             
-        elif isinstance(codigo_o_departamento, int):
+        elif isinstance(departamento_o_ubigeo, int):
             # Se asume que es el input es el código en formato string
-            departamento = cls.get_departamento(codigo_o_departamento, normalize=False)
+            departamento = cls.get_departamento(departamento_o_ubigeo, normalize=False)
         else:
             raise TypeError("Solo se acepta el nombre del departamento o su código de ubigeo")
 
@@ -372,6 +412,21 @@ class Ubigeo:
         else:
             return eliminar_acentos(resultado).upper()
 
+    @classmethod
+    def get_macrorregion_map(
+        cls,
+        institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+        normalize: bool = False,
+    )-> dict:
+        """Devuelve un diccionario con las macrorregiones como keys y los nombres de los departamentos como valores"""
+        cls._load_resource_if_needed("macrorregiones")
+        
+        diccionario = cls._MACRORREGIONES[institucion]
+        resultado = defaultdict(list)
+        for dep, macrorregion in diccionario.items():
+            resultado[macrorregion].append(dep)
+        
+        return resultado
 
     @classmethod
     def get_ubigeo(
@@ -390,7 +445,7 @@ class Ubigeo:
         level : {"departamentos", "distritos", "provincias"}, optional
             Nivel administrativo de la ubicación (por defecto "departamentos").
         institucion : {"inei", "reniec", "sunat"}, optional
-            Institución fuente de los datos de ubigeo (por defecto "inei").
+            Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
 
         Returns
         -------
@@ -483,7 +538,7 @@ class Ubigeo:
         TypeError
             Si `nombre_departamento` no es un str
         KeyError
-            Si `nombre_departamento` no coincide con ningún nombre en los recursos e ignore_errors = `False`
+            Si `nombre_departamento` no coincide con ningún nombre en la base de datos e ignore_errors = `False`
             
         Notes
         --------
@@ -591,7 +646,7 @@ class Ubigeo:
         TypeError
             Si `nombre_ubicacion` no es un str
         KeyError
-            Si `nombre_ubicacion` no coincide con ningún nombre en los recursos e ignore_errors = `False`
+            Si `nombre_ubicacion` no coincide con ningún nombre en la base de datos e ignore_errors = `False`
      
         Notes
         --------

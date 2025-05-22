@@ -16,7 +16,7 @@ def eliminar_acentos(texto: str)-> str:
     return texto_sin_acentos
 
 
-def write_to_json(final_dict: dict, variable_name: str)-> None:
+def write_to_resources(final_dict: dict, variable_name: str)-> None:
     out_path = os.path.join(RESOURCES_PATH, f"{variable_name}.json")
     with open(out_path, mode = "wb") as f:
         f.write(orjson.dumps(final_dict))

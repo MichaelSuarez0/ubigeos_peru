@@ -14,7 +14,23 @@ class TestGetDepartamento:
     def test_get_departamento_normalized(self):
         assert ubg.get_departamento(10101, normalize=True) == "AMAZONAS"
 
+class TestGetProvincia:
+    def test_get_provincia_from_string_code(self):
+        assert ubg.get_provincia("101") == "Chachapoyas"
+        
+    def test_get_departamento_from_integer(self):
+        assert ubg.get_departamento(1506) == "Huaral"
+        
+    def test_get_provincia_normalized(self):
+        assert ubg.get_provincia("101", normalize=True) == "CHACHAPOYAS"
 
+class TestGetDistrito:
+    def test_get_distrito_from_string_code(self):
+        assert ubg.get_distrito("50110") == "San Juan Bautista"
+        
+    def test_get_distrito_from_integer(self):
+        assert ubg.get_distrito(150110) == "Comas"
+        
 class TestGetMacrorregion:
     def test_get_macrorregion_from_name(self):
         assert ubg.get_macrorregion("Amazonas") == "Oriente"
@@ -34,6 +50,8 @@ class TestGetMacrorregion:
     def test_get_macrorregion_with_institution_from_integer(self):
         assert ubg.get_macrorregion(25, institucion="ceplan") == "Nororiente"
 
+class TestGetMacrorregionMap:
+    pass
 
 class TestGetUbigeo:
     def test_get_ubigeo_departamento(self):
@@ -44,6 +62,9 @@ class TestGetUbigeo:
         
     def test_get_ubigeo_distrito(self):
         assert ubg.get_ubigeo("Lince", "distritos") == "150116"
+    
+    def test_get_ubigeo_distrito_2(self):
+        assert ubg.get_ubigeo("Miraflores", "distritos") == "151021"
 
 
 class TestValidateDepartamento:
@@ -58,8 +79,11 @@ class TestValidateDepartamento:
 
 
 class TestValidateUbicacion:
-    def test_validate_ubicacion_basic(self):
+    def test_validate_ubicacion_space(self):
         assert ubg.validate_ubicacion("Madre de dios") == "Madre de Dios"
+    
+    def test_validate_ubicacion_space_sp_char(self):
+        assert ubg.validate_ubicacion("SAN MARTIN") == "San Martín"
 
 
 class TestGetMetadato:
