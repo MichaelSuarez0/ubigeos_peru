@@ -1,17 +1,27 @@
 [project]
 name = "ubigeos_peru"
 version = "0.1.1"
+description = "Librería de Python ligera especializada para consultas a partir del código de ubigeo para obtener el nombre del departamento, provincia o distrito, y viceversa, además de información suplementaria."
 readme = "README.md"
-dependencies = [
-    "orjson"
+requires-python = ">=3.8"
+authors = [
+  { name = "Michael Suárez", email = "michael-salvador@hotmail.com" }
 ]
+license = "MIT" 
+dependencies = [
+  "orjson"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/MichaelSuarez0/ubigeos_peru"
 
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["ubigeos_peru"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ubigeos_peru*"]
 
 [tool.setuptools.package-data]
 "ubigeos_peru" = ["resources/*.json"]

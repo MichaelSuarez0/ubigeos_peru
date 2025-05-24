@@ -18,8 +18,8 @@ class TestGetProvincia:
     def test_get_provincia_from_string_code(self):
         assert ubg.get_provincia("101") == "Chachapoyas"
         
-    def test_get_departamento_from_integer(self):
-        assert ubg.get_departamento(1506) == "Huaral"
+    def test_get_provincia_from_integer(self):
+        assert ubg.get_provincia(1506) == "Huaral"
         
     def test_get_provincia_normalized(self):
         assert ubg.get_provincia("101", normalize=True) == "CHACHAPOYAS"

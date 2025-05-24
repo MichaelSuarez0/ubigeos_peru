@@ -150,7 +150,7 @@ class Ubigeo:
         -----
         - El subcódigo para departamento se toma de los últimos 2 caracteres del código validado.
         - Para códigos de longitud impar (1, 3 o 5), se asume que falta un cero inicial y se añadirá.
-        - Se recomienda utilizar strings de 2 o 6 caracteres.
+        - El input puede ser int o str
 
         Examples
         --------
@@ -185,7 +185,7 @@ class Ubigeo:
         3     150101     1     Lima
         4     210101	 0     Puno
         >>> # Ejemplo con normalize (formato por defecto en la ENAHO)
-        >>> df["DEPT"] = df["UBIGEO"].apply(get_departamento, normalize = True)
+        >>> df["DEPT"] = df["UBIGEO"].apply(lambda x: get_departamento(x, normalize = True))
         >>> df
               UBIGEO  P1144    DEPT
         0      10101     1     AMAZONAS
@@ -245,48 +245,18 @@ class Ubigeo:
         -----
         - Para códigos de longitud impar (3 o 5), se asume que falta un cero inicial y se añadirá.
         - El subcódigo para provincia se toma de los últimos 4 caracteres del código validado.
-        - Se recomienda utilizar strings de 4 o 6 caracteres.
+        - El input puede ser str o int
+
         Examples
         --------
-        >>> # Estandarización básica de nombres
-        >>> ubg.get_departamento("010101") 
-        "Amazonas"
-        >>> ubg.get_departamento(10101)
-        "Amazonas"
-        >>> ubg.get_departamento(10101, normalize=True)
-        "amazonas" 
-        >>>
-        >>> # Integración con Pandas
-        >>> # Ejemplo básico con DataFrame
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({
-        ...     "UBIGEO": [10101, 50101, 110101, 150101, 210101],
-        ...     "P1144": [1, 1, 0, 1, 0]
-        ... })
-        >>> df
-              UBIGEO  P1144
-        0      10101     1
-        1      50101     1
-        2     110101     0
-        3     150101     1
-        4     210101	 0
-        >>> df["DEPT"] = df["UBIGEO"].apply(ubg.get_departamento)
-        >>> df
-              UBIGEO  P1144    DEPT
-        0      10101     1     Amazonas
-        1      50101     1     Ayacucho
-        2     110101     0     Ica
-        3     150101     1     Lima
-        4     210101	 0     Puno
-        >>> # Ejemplo con normalize (formato por defecto en la ENAHO)
-        >>> df["DEPT"] = df["UBIGEO"].apply(get_departamento, normalize = True)
-        >>> df
-              UBIGEO  P1144    DEPT
-        0      10101     1     AMAZONAS
-        1      50101     1     AYACUCHO
-        2     110101     0     ICA
-        3     150101     1     LIMA
-        4     210101	 0     PUNO
+        >>> # Ejemplos básicos de obtención de provincias
+        >>> ubg.get_provincia("101")
+        "Chachapoyas"
+        >>> ubg.get_provincia(1506)
+        "Huaral"
+        >>> ubg.get_provincia(101, normalize=True)
+        "CHACHAPOYAS"
+        >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
         """
         cls._load_resource_if_needed('provincias')
         ubigeo = cls._validate_codigo(ubigeo)
@@ -330,13 +300,24 @@ class Ubigeo:
         Raises
         ------
         ValueError
-            Si el código no tiene 6 caracteres o no es str/int.
+            Si el código no tiene 5 o 6 caracteres o no es str/int.
         KeyError
             Si el código no existe en la base de datos.
-
+        
         Notes
         -----
-        -
+        - El subcódigo para provincia se toma de los últimos 4 caracteres del código validado.
+        - Para códigos de longitud impar (3 o 5), se asume que falta un cero inicial y se añadirá.
+        - El input puede ser str o int
+
+        Examples
+        --------
+        >>> # Ejemplos básicos de obtención de distritos
+        >>> ubg.get_distrito("50110")
+        "San Juan Bautista"
+        >>> ubg.get_distrito(150110)
+        "Comas"
+        >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
         """
         cls._load_resource_if_needed('distritos')
         ubigeo = cls._validate_codigo(ubigeo)
