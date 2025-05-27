@@ -12,7 +12,7 @@ def medir_tiempo(func):
         return resultado
     return wrapper
 
-def construct_random_data(size: int = 100_000):
+def construct_random_data(size: int = 500_000):
     random_numbers_list = [random.randint(1,25) for _ in range(size)]
     id = [1] * size
     data = pd.DataFrame({

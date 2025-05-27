@@ -46,5 +46,3 @@ def inverted_creation():
 
 if __name__ == "__main__":
     inverted_creation()
-
-

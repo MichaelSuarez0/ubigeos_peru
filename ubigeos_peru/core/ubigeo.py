@@ -263,10 +263,10 @@ class Ubigeo:
         
         if len(ubigeo) < 4:
             raise ValueError(
-                "No se aceptan ubigeos con menos de 4 caracteres para provincias"
+                "No se aceptan ubigeos con menos de 3 o 4 caracteres para provincias"
             )
 
-        result = cls._PROVINCIAS[institucion][ubigeo[-4:]]
+        result = cls._PROVINCIAS[institucion][ubigeo[:4]]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -324,7 +324,7 @@ class Ubigeo:
         
         if len(ubigeo) not in (5, 6):
             raise ValueError(
-                "No se aceptan ubigeos que no tengan exactamente 6 caracteres para distritos"
+                "No se aceptan ubigeos que no tengan 5 o 6 caracteres para distritos"
             )
 
         result = cls._DISTRITOS[institucion][ubigeo]
@@ -393,21 +393,20 @@ class Ubigeo:
         else:
             return eliminar_acentos(resultado).upper()
 
-    @classmethod
-    def get_macrorregion_map(
-        cls,
-        institucion: Literal["inei", "minsa", "ceplan"] = "inei",
-        normalize: bool = False,
-    )-> dict:
-        """Devuelve un diccionario con las macrorregiones como keys y los nombres de los departamentos como valores"""
-        cls._load_resource_if_needed("macrorregiones")
+    # @classmethod
+    # def get_macrorregion_map(
+    #     cls,
+    #     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    # )-> dict:
+    #     """Devuelve un diccionario con las macrorregiones como keys y los nombres de los departamentos como valores"""
+    #     cls._load_resource_if_needed("macrorregiones")
         
-        diccionario = cls._MACRORREGIONES[institucion]
-        resultado = defaultdict(list)
-        for dep, macrorregion in diccionario.items():
-            resultado[macrorregion].append(dep)
+    #     diccionario = cls._MACRORREGIONES[institucion]
+    #     resultado = defaultdict(list)
+    #     for dep, macrorregion in diccionario.items():
+    #         resultado[macrorregion].append(dep)
         
-        return resultado
+    #     return list(resultado)
 
     @classmethod
     def get_ubigeo(

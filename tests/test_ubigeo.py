@@ -1,5 +1,5 @@
 from ubigeos_peru import Ubigeo as ubg
-#import pytest
+import pytest
 
 class TestGetDepartamento:
     def test_get_departamento_from_string_code(self):
@@ -63,8 +63,11 @@ class TestGetUbigeo:
     def test_get_ubigeo_distrito(self):
         assert ubg.get_ubigeo("Lince", "distritos") == "150116"
     
-    def test_get_ubigeo_distrito_2(self):
-        assert ubg.get_ubigeo("Miraflores", "distritos") == "151021"
+    def test_get_ubigeo_distrito_badly_written(self):
+        assert ubg.get_ubigeo("Mi peru", "distritos") == "070107"
+
+    def test_get_ubigeo_distrito_from_diff_institution(self):
+        assert ubg.get_ubigeo("Mi peru", "distritos", "reniec") == "240107"
 
 
 class TestValidateDepartamento:
@@ -108,13 +111,46 @@ class TestGetMetadato:
     def test_get_metadato_distrito_superficie_sjl(self):
         assert ubg.get_metadato("San Juan de Lurigancho", level="distritos", key="superficie") == "131.25"
 
+class TestWrongInputs:
+    """Tests para inputs incorrectos en get_departamento"""
+    
+    def test_get_departamento_invalid_type_none(self):
+        with pytest.raises(TypeError):
+            ubg.get_departamento(None)
+    
+    def test_get_departamento_invalid_type_list(self):
+        with pytest.raises(TypeError):
+            ubg.get_departamento([1, 2, 3])
+    
+    def test_get_departamento_invalid_type_dict(self):
+        with pytest.raises(TypeError):
+            ubg.get_departamento({"codigo": "01"})
+    
+    def test_get_departamento_invalid_type_float(self):
+        with pytest.raises(TypeError):
+            ubg.get_departamento(1.5)
+    
+    def test_get_departamento_too_long_code(self):
+        with pytest.raises(ValueError):
+            ubg.get_departamento("1234567")
+    
+    def test_get_departamento_nonexistent_code(self):
+        with pytest.raises(KeyError):
+            ubg.get_departamento("99")
+    
+    def test_get_departamento_invalid_institution(self):
+        with pytest.raises(KeyError):
+            ubg.get_departamento("01", institucion="invalid")
+    
 
-# Performance: pyinstrument -r html -o import_excel_automation.html -c "import ubigeos_peru"
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
+
 # # Ejecutar todas las pruebas
-# pytest -xvs ubigeo_test.py
+# pytest -xvs test_ubigeo.py
 
 # # Ejecutar solo las pruebas de un método específico
-# pytest -xvs ubigeo_test.py::TestGetMetadato
+# pytest -xvs test_ubigeo.py::TestGetMetadato
 
 # # Ejecutar una prueba específica
-# pytest -xvs ubigeo_test.py::TestGetDepartamento::test_get_departamento_from_string_code
+# pytest -xvs test_ubigeo.py::TestGetDepartamento::test_get_departamento_from_string_code
