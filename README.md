@@ -1,12 +1,12 @@
 # Ubigeos Perú
 
-Librería de Python ligera especializada para consultas a partir del código de ubigeo para obtener el nombre del departamento, provincia o distrito, y viceversa, además de información suplementaria.
+Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para consultar macrorregiones, capitales y validar nombres oficiales  Se integra fácilmente con pandas para procesar bases como la ENAHO, permitiendo aplicar transformaciones masivas de ubigeos en menos de un segundo.
 
 ## Características Principales
 
 - **Soporte Multi-institucional**: Soporte para consultar códigos de ubigeo de INEI, RENIEC y SUNAT.
-- **Normalización Inteligente**: Manejo automático de acentos y mayúsculas para consultar ubigeo o validar ubicaciones.
-- **Optimizado para Big Data**: 500 000 consultas en 0.25 segundos*
+- **Normalización Inteligente**: Manejo automático de acentos y mayúsculas para validar ubicaciones.
+- **Optimizado para Big Data**: 500 000 consultas en 0.25-0.65 segundos
 - **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton
 - **Metadatos Geográficos**: Acceso a información adicional como capital, altitud, superficie y coordenadas
 
@@ -99,7 +99,7 @@ capital_prov = ubg.get_metadato("Huarochiri", level="provincias", key="capital")
 altitud_dept = ubg.get_metadato("Cusco", level="departamento", key="altitud")       # "3439"
 altitud_prov = ubg.get_metadato("Huarochiri", level="provincia", key="altitud")     # "2395"
 
-# Superficies de lugares
+# Superficies
 sup1 = ubg.get_metadato("Lince", level="distritos", key="superficie")               # "3.03"
 sup2 = ubg.get_metadato("San Isidro", level="distritos", key="superficie")          # "11.1"
 
@@ -114,10 +114,10 @@ La librería está optimizada para trabajar con DataFrames de pandas, como por e
 ```python
 import pandas as pd
 
-# Crear DataFrame de ejemplo
+# Crear DataFrame de ejemplo (datos no oficiales)
 df = pd.DataFrame({
-    "UBIGEO": [10101, 50101, 110101, 150101, 210101],
-    "POBLACION": [45694, 67823, 34576, 8574974, 45983]
+    "UBIGEO": [10101, 50101, 110101, 150101, 210101, 220101],
+    "POBLACION": [45694, 67823, 34576, 857497, 45983, 87564]
 })
 
 # Agregar información geográfica
@@ -130,13 +130,14 @@ Esto generará el siguiente DataFrame:
 0    10101      45694    Amazonas
 1    50101      67823    Ayacucho
 2   110101      34576    Ica     
-3   150101    8574974    Lima    
-4   210101      45983    Puno    
+3   150101     857497    Lima    
+4   210101      45983    Puno
+5   220101      87564    San Martín
 ```
 También se pueden pasar argumentos con una función lambda
 ```python
 # Agregar información geográfica
-df["PROVINCIA"] = df["UBIGEO"].apply(lambda x: ubg.get_distrito(x, normalize= True))
+df["PROVINCIA"] = df["UBIGEO"].apply(lambda x: ubg.get_provincia(x, normalize= True))
 ```
 Esto generará el siguiente DataFrame:
 
@@ -145,8 +146,9 @@ Esto generará el siguiente DataFrame:
 0    10101      45694    Amazonas    CHACHAPOYAS
 1    50101      67823    Ayacucho    HUAMANGA
 2   110101      34576    Ica         ICA   
-3   150101    8574974    Lima        LIMA
+3   150101     857497    Lima        LIMA
 4   210101      45983    Puno        PUNO
+5   220101      87564    San Martín  MOYOBAMBA
 ```
 ---
 
@@ -204,7 +206,7 @@ distritos = {
         "080807": "Suyckutambo", 
         "080903": "Huayopata",
         "080905": "Ocobamba",
-        "010199": "Nuevo Distrito Ejemplo"  # Nueva entrada
+        "010199": "Distrito de Ejemplo"  # Nueva entrada
     }
 }
 ```

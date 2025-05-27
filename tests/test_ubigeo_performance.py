@@ -26,8 +26,6 @@ def main(data: pd.DataFrame):
     data["departamento"] = data["ubigeo"].apply(ubg.get_departamento)
 
 
-if __name__ == "__main__":    
-    # print(ubg.get_distrito("150110"))
-    # print(ubg.get_ubigeo("Miraflores", "distritos"))
-    data = construct_random_data()
+if __name__ == "__main__":  
+    data = construct_random_data(size=1_000_000)
     main(data)
