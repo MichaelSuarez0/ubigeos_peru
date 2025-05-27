@@ -5,8 +5,8 @@ Librería de Python ligera especializada para consultas a partir del código de 
 ## Características Principales
 
 - **Soporte Multi-institucional**: Soporte para consultar códigos de ubigeo de INEI, RENIEC y SUNAT.
-- **Normalización Inteligente**: Manejo automático de acentos, mayúsculas y formatos variables
-- **Optimizado para Big Data**: 500 000 consultas en 0.62 segundos aprox.
+- **Normalización Inteligente**: Manejo automático de acentos y mayúsculas para consultar ubigeo o validar ubicaciones.
+- **Optimizado para Big Data**: 500 000 consultas en 0.25 segundos*
 - **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton
 - **Metadatos Geográficos**: Acceso a información adicional como capital, altitud, superficie y coordenadas
 
@@ -27,7 +27,7 @@ Se recomienda importar de la siguiente manera:
 ```python
 from ubigeos_peru import Ubigeo as ubg
 ```
-Cabe mencionar que la clase siempre tendrá una única instancia para evitar cargar recursos dos veces,
+La clase siempre tendrá una única instancia para evitar cargar recursos dos veces,
 por lo que también se puede utilizar de la siguiente manera.
 
 ```python
@@ -35,7 +35,7 @@ from ubigeos_peru import Ubigeo
 ubg = Ubigeo()
 ```
 
-## Obtener Información de Ubigeo
+## Consultar información de Ubigeo
 ```python
 # Departamento
 departamento = ubg.get_departamento("1")                 # "Amazonas" (código corto)
@@ -44,8 +44,8 @@ departamento = ubg.get_departamento(10101)               # "Amazonas" (integer)
 departamento = ubg.get_departamento(10101, normalize=True) # "AMAZONAS"
 
 # Provincia
-provincia = ubg.get_provincia("010101")                  # "Chachapoyas"
-provincia = ubg.get_provincia("101", normalize=True)     # "CHACHAPOYAS"
+provincia = ubg.get_provincia("1201")                    # "Huancayo"
+provincia = ubg.get_provincia(10101, normalize = True)   # "CHACHAPOYAS"
 
 # Distrito
 distrito = ubg.get_distrito("50110")                     # "San Juan Bautista"
@@ -56,28 +56,29 @@ distrito = ubg.get_distrito(150110)                      # "Comas"
 codigo_dept = ubg.get_ubigeo("Madre de dios", "departamentos") # "17"
 codigo_prov = ubg.get_ubigeo("Huaral", "provincia")            # "1506"
 codigo_dist = ubg.get_ubigeo("Lince", "distritos")             # "150116"
-codigo_dist = ubg.get_ubigeo("Miraflores", "distritos")        # "151021"
+codigo_dist = ubg.get_ubigeo("Mi peru", "distritos", "reniec") # "240107"
 ```
 
 ## Validación y Normalización
 ```python
-ubg.validate_departamento("HUANUCO")                    # "Huánuco"
-ubg.validate_departamento("HUÁNUCO", normalize=True)    # "HUANUCO"
+ubg.validate_departamento("HUANUCO")                     # "Huánuco"
+ubg.validate_departamento("HUÁNUCO", normalize=True)     # "HUANUCO"
 ubg.validate_departamento("HUÁNUCO", normalize=True).lower()  # "huanuco"
 
 # Validar cualquier ubicación geográfica
-ubicacion = ubg.validate_ubicacion("SAN MARTIN")        # "San Martín"
-ubicacion = ubg.validate_ubicacion("Madre de dios")     # "Madre de Dios"
+ubicacion = ubg.validate_ubicacion("SAN MARTIN")         # "San Martín"
+ubicacion = ubg.validate_ubicacion("Madre de dios")      # "Madre de Dios"
+ubicacion = ubg.validate_ubicacion("Mi peru")            # "Mi Perú"
 ```
 
 ## Macrorregiones
 
 ```python
 # Obtener macrorregión - múltiples formatos
-macro = ubg.get_macrorregion("Amazonas")                # "Oriente"
-macro = ubg.get_macrorregion("AMAZONAS")                # "Oriente" (mayúsculas)
-macro = ubg.get_macrorregion("01")                      # "Oriente" (código string)
-macro = ubg.get_macrorregion(1)                         # "Oriente" (entero)
+macro = ubg.get_macrorregion("Amazonas")                 # "Oriente"
+macro = ubg.get_macrorregion("AMAZONAS")                 # "Oriente" (mayúsculas)
+macro = ubg.get_macrorregion("01")                       # "Oriente" (código string)
+macro = ubg.get_macrorregion(1)                          # "Oriente" (entero)
 
 # Con institución específica
 macro_ceplan = ubg.get_macrorregion(25, institucion="ceplan")          # "Nororiente"
@@ -108,7 +109,7 @@ sup2 = ubg.get_metadato("San Isidro", level="distritos", key="superficie")      
 
 ## Integración con Pandas
 
-La librería está optimizada para trabajar con DataFrames de pandas:
+La librería está optimizada para trabajar con DataFrames de pandas, como por ejemplo encuestas de la Enaho:
 
 ```python
 import pandas as pd
@@ -151,7 +152,82 @@ Esto generará el siguiente DataFrame:
 
 ## Contribución
 
-Para contribuir al desarrollo de esta librería, por favor contáctame: michael-salvador@hotmail.com
+¿Encontraste información faltante o incorrecta? Esta sección te guía paso a paso para contribuir a la mejora de la librería.
+
+### Cuándo contribuir
+
+Puedes contribuir cuando encuentres:
+- **Ubicaciones faltantes**: Provincias o distritos que no están en la base de datos
+- **Nombres incorrectos**: Ubicaciones que no siguen el nombre oficial
+- **Errores de escritura**: Nombres mal escritos o con caracteres incorrectos
+- **Códigos faltantes**: Códigos INEI, RENIEC o SUNAT que no están mapeados
+
+### Cómo contribuir
+
+#### 1. Preparar el entorno
+Debes clonar o hacer fork del repositorio para tener acceso a las carpetas /construction y /resources_readable
+```bash
+# Clona o haz fork del repositorio
+git clone https://github.com/username/repo-name.git
+cd repo-name
+
+# La única dependencia es orjson, no olvides instalarla
+pip install orjson
+```
+
+#### 2. Identificar el recurso a actualizar
+
+Los recursos disponibles son:
+- `departamentos`-> ubigeo : departamento
+- `provincias`-> ubigeo : provincia
+- `distritos`-> ubigeo : distrito
+- `equivalencias`-> UBICACION : Ubicación
+- `inverted`-> nivel : { Ubicación : ubigeo }
+- `macrorregiones`-> departamento : { macrorregion }
+- `otros`-> Ubicación : capital, superficie, altitud, etc
+
+#### 3. Actualizar el recurso
+
+Edita el archivo `insert_entries.py` y agrega tus entradas según la estructura de cada recurso. 
+
+**Para distritos:**
+```python
+distritos = {
+    'inei': {
+        '070107': 'Mi Perú'
+    },
+    'reniec': {
+        '240107': 'Mi Perú'
+    },
+    'sunat': {
+        "120124": "Pariahuanca",
+        "080807": "Suyckutambo", 
+        "080903": "Huayopata",
+        "080905": "Ocobamba",
+        "010199": "Nuevo Distrito Ejemplo"  # Nueva entrada
+    }
+}
+```
+
+#### 4. Ejecutar la actualización
+
+La función update_all se encarga de actualizar entradas en /resources y /resources_readable
+```python
+if __name__ == "__main__":
+    update_all(distritos, "distritos")
+```
+
+#### 5. Verificar los cambios
+
+Dirígite a tests y verifica que pase todas las pruebas.
+
+Luego, puedes enviar un pull request.
+
+### Contacto
+
+Para preguntas adicionales sobre cómo contribuir, dudas técnicas o sugerencias:
+
+📧 michael-salvador@hotmail.com
 
 ## Licencia
 
