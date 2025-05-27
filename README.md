@@ -1,6 +1,6 @@
 # Ubigeos Perú
 
-Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para consultar macrorregiones, capitales y validar nombres oficiales  Se integra fácilmente con pandas para procesar bases como la ENAHO, permitiendo aplicar transformaciones masivas de ubigeos en menos de un segundo.
+Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para consultar macrorregiones, capitales y validar nombres oficiales. Se integra fácilmente con pandas para procesar bases como la ENAHO, permitiendo aplicar transformaciones masivas de ubigeos en menos de un segundo.
 
 ## Características Principales
 
@@ -59,16 +59,15 @@ codigo_dist = ubg.get_ubigeo("Lince", "distritos")             # "150116"
 codigo_dist = ubg.get_ubigeo("Mi peru", "distritos", "reniec") # "240107"
 ```
 
-## Validación y Normalización
+## Validación y Normalización ("agregar" o quitar tildes)
 ```python
 ubg.validate_departamento("HUANUCO")                     # "Huánuco"
 ubg.validate_departamento("HUÁNUCO", normalize=True)     # "HUANUCO"
-ubg.validate_departamento("HUÁNUCO", normalize=True).lower()  # "huanuco"
-
-# Validar cualquier ubicación geográfica
 ubicacion = ubg.validate_ubicacion("SAN MARTIN")         # "San Martín"
-ubicacion = ubg.validate_ubicacion("Madre de dios")      # "Madre de Dios"
+
+# Validar y agregar tildes o mayúsculas a cualquier ubicación geográfica
 ubicacion = ubg.validate_ubicacion("Mi peru")            # "Mi Perú"
+ubicacion = ubg.validate_ubicacion("Madre de dios")      # "Madre de Dios"
 ```
 
 ## Macrorregiones
