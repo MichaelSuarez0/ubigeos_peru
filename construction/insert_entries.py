@@ -22,16 +22,19 @@ equivalencias = {
 
 distritos = {
     'inei': {
-        '070107': 'Mi Perú'
+        '070107': 'Mi Perú',
+        '080801': 'Yauri',
     },
     'reniec' : {
-        '240107': 'Mi Perú'
+        '240107': 'Mi Perú',
+        '070801': 'Yauri',
     },
     'sunat': {
         "120124": "Pariahuanca",
         "080807": "Suyckutambo",
         "080903": "Huayopata",
-        "080905": "Ocobamba"
+        "080905": "Ocobamba",
+        '080801': 'Yauri',
         }
 }
 

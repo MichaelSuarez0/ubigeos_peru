@@ -80,6 +80,15 @@ class TestValidateDepartamento:
     def test_validate_departamento_normalized_lowercase(self):
         assert ubg.validate_departamento("HUÁNUCO", normalize=True).lower() == 'huanuco'
 
+    def test_validate_departamento_on_error_capitalize(self):
+        assert ubg.validate_departamento("ARICA", on_error="capitalize") == "Arica"
+        assert ubg.validate_departamento("otra region", on_error="capitalize") == "Otra region"
+
+    def test_validate_departamento_on_error_ignore(self):
+        # Asegurar que 'ignore' funcione con normalize
+        assert ubg.validate_departamento("ARICA", on_error="ignore") == "ARICA"
+        assert ubg.validate_departamento("OtraRegion", normalize=True, on_error="ignore") == "OTRAREGION"
+    
 
 class TestValidateUbicacion:
     def test_validate_ubicacion_space(self):
