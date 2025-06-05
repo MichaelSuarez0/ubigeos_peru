@@ -1,7 +1,7 @@
 [project]
 name = "ubigeos_peru"
-version = "0.1.1"
-description = "Librería de Python ligera especializada para consultas a partir del código de ubigeo para obtener el nombre del departamento, provincia o distrito, y viceversa, además de información suplementaria."
+version = "0.1.0"
+description = "Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa, además de información suplementaria."
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [

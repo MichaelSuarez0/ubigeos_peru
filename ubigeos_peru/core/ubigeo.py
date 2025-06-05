@@ -446,8 +446,8 @@ class Ubigeo:
         - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
         - Los códigos retornados siguen el formato estándar de 6 dígitos:
             - 2 primeros: departamento
-            - 4 siguientes: provincia
-            - 2 últimos: distrito
+            - 4 primeros: provincia
+            - 6 primeros: distrito
 
         Examples
         --------
@@ -494,7 +494,12 @@ class Ubigeo:
 
     
     @classmethod
-    def validate_departamento(cls, nombre_departamento: str, normalize: bool = False, ignore_errors: bool = False) -> str:
+    def validate_departamento(
+        cls, 
+        nombre_departamento: str, 
+        normalize: bool = False, 
+        on_error: Literal["raise", "ignore", "capitalize"] = "raise"
+    ) -> str:
         """
         Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
 
@@ -504,9 +509,11 @@ class Ubigeo:
             Nombre del departamento que se busca validar y normalizar
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-        ignore_errors : bool, optional
-            Si es True, ignora los nombres que no coinciden con nombres de departamentos sin generar error, 
-            útil si se aplica para conjuntos de datos que no solo contienen departamentos, por defecto `False`.
+        on_error : {"raise", "ignore", "capitalize"}, optional
+            Para manejar casos en que el nombre no coincide con ningún departamento válido, útil para evaluar datos mixtos (no solo departamentos)
+            - `raise`: Lanza una excepción (valor por defecto).
+            - `ignore`: Omite el nombre sin generar error.
+            - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
 
         Returns
         -------
@@ -518,7 +525,7 @@ class Ubigeo:
         TypeError
             Si `nombre_departamento` no es un str
         KeyError
-            Si `nombre_departamento` no coincide con ningún nombre en la base de datos e ignore_errors = `False`
+            Si `nombre_departamento` no coincide con ningún nombre en la base de datos y on_error = `raise`
             
         Notes
         --------
@@ -527,7 +534,7 @@ class Ubigeo:
         Examples
         --------
         >>> # Validación simple de nombres
-        >>> validate_departamento("HUÁNUCO")
+        >>> validate_departamento(`HUÁNUCO")
         'Huánuco'
         >>>
 
@@ -584,12 +591,14 @@ class Ubigeo:
         try:
             resultado = cls._EQUIVALENCIAS["departamentos"][departamento]
         except KeyError:
-            if ignore_errors:
+            if on_error == "raise":
+                raise KeyError(f"No se ha encontrado el departamento {nombre_departamento}")
+            elif on_error == "ignore":
                resultado = nombre_departamento
-            else: 
-                raise KeyError(
-                    f"No se ha encontrado el departamento {nombre_departamento}"
-                )
+            elif on_error == "capitalize":
+                resultado = nombre_departamento.capitalize()
+            else:
+                raise ValueError('El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"')
         
         if not normalize:
             return resultado
@@ -601,7 +610,7 @@ class Ubigeo:
         cls, 
         nombre_ubicacion: str,
         normalize: bool = False,
-        ignore_errors: bool = False
+        on_error: Literal["raise", "ignore", "capitalize"] = "raise"
     ) -> str:
         """
         Valida el nombre de una ubicación (departamento, provincia o distrito) escrita con gramática variable y devuelve el nombre oficial.
@@ -612,9 +621,11 @@ class Ubigeo:
             Nombre de la ubicación que se busca validar y normalizar
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-        ignore_errors : bool, optional
-            Si es True, ignora los nombres que no coinciden con nombres de departamentos sin generar error, 
-            útil si se aplica para conjuntos de datos que no solo contienen departamentos, por defecto `False`.
+         on_error : {"raise", "ignore", "capitalize"}, optional
+            Para manejar casos en que el nombre no coincide con ningún departamento, provincia o distrito; útil para evaluar datos mixtos.
+            - `raise`: Lanza una excepción (valor por defecto).
+            - `ignore`: Omite el nombre sin generar error.
+            - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
 
         Returns
         -------
@@ -626,7 +637,7 @@ class Ubigeo:
         TypeError
             Si `nombre_ubicacion` no es un str
         KeyError
-            Si `nombre_ubicacion` no coincide con ningún nombre en la base de datos e ignore_errors = `False`
+            Si `nombre_ubicacion` no coincide con ningún nombre en la base de datos y on_error = `raise`
      
         Notes
         --------
@@ -635,7 +646,7 @@ class Ubigeo:
         Examples
         --------
         >>> # Validación simple de nombres
-        >>> validate_ubicacion("HUÁNUCO")
+        >>> validate_ubicacion("HUANUCO")
         'Huánuco'
         >>>
 
@@ -643,8 +654,8 @@ class Ubigeo:
         'HUANUCO'
         >>>
 
-        >>> validate_ubicacion("HUÁNUCO", normalize = True).lower()
-        'huanuco'
+        >>> validate_ubicacion("NACIONAL", on_error = "capitalize")
+        'Nacional'
         >>>
         
         >>> # Integración con Pandas: ejemplo básico con DataFrame
@@ -669,7 +680,7 @@ class Ubigeo:
         2       La Mar       Tambo
         3      Marañón      Cholón
         4     Urubamba   Chinchero
-        >>> # Agregar argumentos de normalización
+        >>> # Agregar argumentos adicionales
         >>> df["Provincia"] = df["Provincia"].apply(lambda x: ubg.validate_ubicacion(x, normalize=True))
         >>> df["Distrito"] = df["Distrito"].apply(lambda x: ubg.validate_ubicacion(x, normalize=True))
         >>> df
@@ -691,13 +702,17 @@ class Ubigeo:
                 try:
                     resultado = cls._EQUIVALENCIAS["distritos"][nombre_ubicacion]
                 except KeyError:
-                    if not ignore_errors:
+                    if on_error == "raise":
                         raise KeyError(
                             f"No se encontró el lugar {nombre_ubicacion} en la base de datos de departamentos, provincias o distritos"
                         )
-                    else:
+                    elif on_error == "ignore":
                         resultado = nombre_ubicacion
-
+                    elif on_error == "capitalize":
+                        resultado = nombre_ubicacion.capitalize()
+                    else:
+                        raise ValueError('El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"')
+                
         if not normalize:
             return resultado
         else:
