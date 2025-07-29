@@ -18,6 +18,9 @@ class Ubigeo:
             codigo = str(codigo)
 
         if isinstance(codigo, str):
+            if not codigo.isdigit():
+                raise ValueError("El código debe contener solo dígitos")
+            
             if len(codigo) == 1:
                 codigo = codigo.zfill(2)
             elif len(codigo) == 3:
