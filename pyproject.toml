@@ -20,9 +20,8 @@ dependencies = [
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["ubigeos_peru*"]
+[tool.setuptools]
+package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
 "ubigeos_peru" = ["resources/*.json"]

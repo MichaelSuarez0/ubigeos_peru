@@ -1,4 +1,4 @@
-from ubigeos_peru import Ubigeo as ubg
+import ubigeos_peru as ubg
 import pytest
 
 class TestGetDepartamento:

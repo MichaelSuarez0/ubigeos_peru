@@ -1,87 +1,16 @@
-from collections import defaultdict
-import os
 from typing import Literal
-import unicodedata
-import orjson
-
-# Configuración de recursos
-BASE_DIR = os.path.dirname(__file__)
-RESOURCE_DIR = os.path.join(BASE_DIR, '..', 'resources')
-_RESOURCE_FILES = {
-    'departamentos': "departamentos.json",
-    'provincias': "provincias.json",
-    'distritos': "distritos.json",
-    'macrorregiones': "macrorregiones.json",
-    'equivalencias': "equivalencias.json",
-    'otros': "otros.json",
-    'inverted': "inverted.json",
-}
-
-def eliminar_acentos(texto: str) -> str:
-    texto_normalizado = unicodedata.normalize("NFKD", texto)
-    texto_sin_acentos = "".join(
-        c for c in texto_normalizado if not unicodedata.combining(c)
-    )
-    return texto_sin_acentos
-
+from .utils import eliminar_acentos
+from .resource_manager import ResourceManager
 
 # TODO: También colocar métodos para exportar las bases de datos
 class Ubigeo:
     _instance = None
-    _resources_loaded = {
-        'departamentos': False,
-        'provincias': False,
-        'distritos': False,
-        'macrorregiones': False,
-        'equivalencias': False,
-        'otros': False,
-        'inverted': False
-    }
-    
-    _DEPARTAMENTOS = None
-    _PROVINCIAS = None
-    _DISTRITOS = None
-    _MACRORREGIONES = None
-    _EQUIVALENCIAS = None
-    _OTROS = None
-    _INVERTED = None
+    _resources = ResourceManager()
     
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Ubigeo, cls).__new__(cls)
         return cls._instance
-
-    @classmethod
-    def _load_resource(cls, resource_name: str) -> None:
-        """
-        Carga un recurso JSON desde el directorio de recursos con lazy loading
-        
-        Args:
-            resource_name: Nombre clave del recurso (debe estar en _RESOURCE_FILES)
-        
-        Returns:
-            Diccionario con los datos del JSON
-        
-        Raises:
-            FileNotFoundError: Si el recurso no existe
-            json.JSONDecodeError: Si el archivo no es JSON válido
-        """
-        file_path = os.path.join(RESOURCE_DIR, _RESOURCE_FILES[resource_name])
-        try:
-            with open(file_path, 'rb') as f:
-                resource_data = orjson.loads(f.read())
-        except FileNotFoundError as e:
-            raise FileNotFoundError(f"Recurso no encontrado: {file_path}") from e
-        
-        setattr(cls, f"_{resource_name.upper()}", resource_data)
-        
-    @classmethod
-    def _load_resource_if_needed(cls, resource_name: str) -> None:
-        """Carga un recurso si aún no ha sido cargado"""
-        if not cls._resources_loaded.get(resource_name.lower(), False):
-            cls._load_resource(resource_name)
-            cls._resources_loaded[resource_name.lower()] = True
-
 
     @classmethod
     def _validate_codigo(cls, codigo: str | int) -> str:
@@ -194,10 +123,10 @@ class Ubigeo:
         3     150101     1     LIMA
         4     210101	 0     PUNO
         """
-        cls._load_resource_if_needed('departamentos')
+        cls._resources._load_resource_if_needed('departamentos')
         ubigeo = cls._validate_codigo(ubigeo)
         try:
-            result = cls._DEPARTAMENTOS[institucion][ubigeo[:2]]
+            result = cls._resources._DEPARTAMENTOS[institucion][ubigeo[:2]]
         except KeyError:
             raise KeyError(
                 f"El código de ubigeo {ubigeo} no se encontró en la base de datos"
@@ -258,7 +187,7 @@ class Ubigeo:
         "CHACHAPOYAS"
         >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
         """
-        cls._load_resource_if_needed('provincias')
+        cls._resources._load_resource_if_needed('provincias')
         ubigeo = cls._validate_codigo(ubigeo)
         
         if len(ubigeo) < 4:
@@ -266,7 +195,7 @@ class Ubigeo:
                 "No se aceptan ubigeos con menos de 3 o 4 caracteres para provincias"
             )
 
-        result = cls._PROVINCIAS[institucion][ubigeo[:4]]
+        result = cls._resources._PROVINCIAS[institucion][ubigeo[:4]]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -319,7 +248,7 @@ class Ubigeo:
         "Comas"
         >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
         """
-        cls._load_resource_if_needed('distritos')
+        cls._resources._load_resource_if_needed('distritos')
         ubigeo = cls._validate_codigo(ubigeo)
         
         if len(ubigeo) not in (5, 6):
@@ -327,7 +256,7 @@ class Ubigeo:
                 "No se aceptan ubigeos que no tengan 5 o 6 caracteres para distritos"
             )
 
-        result = cls._DISTRITOS[institucion][ubigeo]
+        result = cls._resources._DISTRITOS[institucion][ubigeo]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -371,7 +300,7 @@ class Ubigeo:
         - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
         - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
         """
-        cls._load_resource_if_needed("macrorregiones")
+        cls._resources._load_resource_if_needed("macrorregiones")
         
         if isinstance(departamento_o_ubigeo, str):
             if not departamento_o_ubigeo[0].isdigit():
@@ -387,7 +316,7 @@ class Ubigeo:
         else:
             raise TypeError("Solo se acepta el nombre del departamento o su código de ubigeo")
 
-        resultado = cls._MACRORREGIONES[institucion][departamento]
+        resultado = cls._resources._MACRORREGIONES[institucion][departamento]
         if not normalize:
             return resultado
         else:
@@ -399,7 +328,7 @@ class Ubigeo:
     #     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     # )-> dict:
     #     """Devuelve un diccionario con las macrorregiones como keys y los nombres de los departamentos como valores"""
-    #     cls._load_resource_if_needed("macrorregiones")
+    #     cls._resources._load_resource_if_needed("macrorregiones")
         
     #     diccionario = cls._MACRORREGIONES[institucion]
     #     resultado = defaultdict(list)
@@ -469,7 +398,7 @@ class Ubigeo:
             ...
         KeyError: 'Nombre no encontrado: "ciudad inexistente"'
         """
-        cls._load_resource_if_needed("inverted")
+        cls._resources._load_resource_if_needed("inverted")
         
         level = cls._validate_level(level)
         
@@ -482,7 +411,7 @@ class Ubigeo:
             ubicacion_normalized = eliminar_acentos(nombre_ubicacion).upper().strip()
             try:
                 lugar_clean = cls.validate_ubicacion(ubicacion_normalized)
-                result = eliminar_acentos(cls._INVERTED[level][institucion][lugar_clean]) 
+                result = eliminar_acentos(cls._resources._INVERTED[level][institucion][lugar_clean]) 
             except KeyError:
                 raise KeyError(f"El lugar '{nombre_ubicacion}' no se encontró en la base de datos de '{level}'")
             else:
@@ -490,7 +419,7 @@ class Ubigeo:
 
         departamento = eliminar_acentos(departamento).lower().strip()
 
-        return eliminar_acentos(cls._MACRORREGIONES[institucion][departamento])
+        return eliminar_acentos(cls._resources._MACRORREGIONES[institucion][departamento])
 
     
     @classmethod
@@ -577,7 +506,7 @@ class Ubigeo:
         3        CUSCO      1
         4      HUANUCO      0
         """
-        cls._load_resource_if_needed('equivalencias')
+        cls._resources._load_resource_if_needed('equivalencias')
         
         # if cls._EQUIVALENCIAS is None:
         #     raise RuntimeError("No se pudieron cargar las equivalencias")
@@ -589,7 +518,7 @@ class Ubigeo:
 
         departamento = eliminar_acentos(nombre_departamento).strip().upper()
         try:
-            resultado = cls._EQUIVALENCIAS["departamentos"][departamento]
+            resultado = cls._resources._EQUIVALENCIAS["departamentos"][departamento]
         except KeyError:
             if on_error == "raise":
                 raise KeyError(f"No se ha encontrado el departamento {nombre_departamento}")
@@ -691,16 +620,16 @@ class Ubigeo:
         3    MARANON      CHOLON
         4   URUBAMBA   CHINCHERO
         """
-        cls._load_resource_if_needed("equivalencias")
+        cls._resources._load_resource_if_needed("equivalencias")
         nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
         try:
-            resultado = cls._EQUIVALENCIAS["departamentos"][nombre_ubicacion]
+            resultado = cls._resources._EQUIVALENCIAS["departamentos"][nombre_ubicacion]
         except KeyError:
             try:
-                resultado = cls._EQUIVALENCIAS["provincias"][nombre_ubicacion]
+                resultado = cls._resources._EQUIVALENCIAS["provincias"][nombre_ubicacion]
             except KeyError:
                 try:
-                    resultado = cls._EQUIVALENCIAS["distritos"][nombre_ubicacion]
+                    resultado = cls._resources._EQUIVALENCIAS["distritos"][nombre_ubicacion]
                 except KeyError:
                     if on_error == "raise":
                         raise KeyError(
@@ -754,7 +683,7 @@ class Ubigeo:
         - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
         - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
         """
-        cls._load_resource_if_needed("otros")
+        cls._resources._load_resource_if_needed("otros")
         level = cls._validate_level(level)
         
         if not isinstance(key, str):
@@ -777,5 +706,5 @@ class Ubigeo:
             raise TypeError("Solo se acepta el nombre de la ubicacion o su código de ubigeo")
 
         ubicacion = eliminar_acentos(ubicacion).upper()
-        return cls._OTROS[level][ubicacion][key]
+        return cls._resources._OTROS[level][ubicacion][key]
         

@@ -1,7 +1,8 @@
 import pandas as pd
 import random
-from ubigeos_peru import Ubigeo as ubg
 import time
+import ubigeos_peru as ubg
+pd.read_excel
 
 def medir_tiempo(func):
     def wrapper(*args, **kwargs):
