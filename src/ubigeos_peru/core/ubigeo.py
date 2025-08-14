@@ -2,7 +2,6 @@ from typing import Literal
 from .utils import eliminar_acentos
 from .resource_manager import ResourceManager
 
-# TODO: También colocar métodos para exportar las bases de datos
 class Ubigeo:
     _instance = None
     _resources = ResourceManager()
@@ -52,6 +51,7 @@ class Ubigeo:
         cls,
         ubigeo: str | int,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
+        with_lima_metro: bool = False,
         normalize: bool = False,
     ) -> str:
         """
@@ -63,6 +63,8 @@ class Ubigeo:
             Código de ubigeo.
         institucion : {"inei", "reniec", "sunat"}, optional
             Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
+        with_lima_metro : bool, optional
+            Si se cambia a True, se diferencia Lima de Lima Metropolitana (el ubigeo debe incluir el código de provincia).
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
@@ -126,14 +128,24 @@ class Ubigeo:
         3     150101     1     LIMA
         4     210101	 0     PUNO
         """
-        cls._resources._load_resource_if_needed('departamentos')
         ubigeo = cls._validate_codigo(ubigeo)
+        cls._resources._load_resource_if_needed('departamentos')
+
         try:
             result = cls._resources._DEPARTAMENTOS[institucion][ubigeo[:2]]
         except KeyError:
             raise KeyError(
                 f"El código de ubigeo {ubigeo} no se encontró en la base de datos"
             )
+        
+        if with_lima_metro:
+            try:
+                prov = Ubigeo.get_provincia(ubigeo)
+            except KeyError:
+                raise ValueError("Para diferenciar Lima de Lima Metropolitana, el ubigeo debe incluir el código de la provincia")
+            
+            if result == "Lima" and prov == "Lima":
+                result = "Lima Metropolitana"
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -190,8 +202,8 @@ class Ubigeo:
         "CHACHAPOYAS"
         >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
         """
-        cls._resources._load_resource_if_needed('provincias')
         ubigeo = cls._validate_codigo(ubigeo)
+        cls._resources._load_resource_if_needed('provincias')
         
         if len(ubigeo) < 4:
             raise ValueError(
@@ -251,8 +263,8 @@ class Ubigeo:
         "Comas"
         >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
         """
-        cls._resources._load_resource_if_needed('distritos')
         ubigeo = cls._validate_codigo(ubigeo)
+        cls._resources._load_resource_if_needed('distritos')
         
         if len(ubigeo) not in (5, 6):
             raise ValueError(
@@ -401,9 +413,8 @@ class Ubigeo:
             ...
         KeyError: 'Nombre no encontrado: "ciudad inexistente"'
         """
-        cls._resources._load_resource_if_needed("inverted")
-        
         level = cls._validate_level(level)
+        cls._resources._load_resource_if_needed("inverted")
         
         if not isinstance(nombre_ubicacion, str):
             try:
@@ -438,7 +449,7 @@ class Ubigeo:
         Parameters
         ----------
         nombre_departamento : str
-            Nombre del departamento que se busca validar y normalizar
+            Nombre del departamento que se busca validar y normalizar.
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
         on_error : {"raise", "ignore", "capitalize"}, optional
@@ -509,8 +520,6 @@ class Ubigeo:
         3        CUSCO      1
         4      HUANUCO      0
         """
-        cls._resources._load_resource_if_needed('equivalencias')
-        
         # if cls._EQUIVALENCIAS is None:
         #     raise RuntimeError("No se pudieron cargar las equivalencias")
         if not isinstance(nombre_departamento, str):
@@ -518,6 +527,8 @@ class Ubigeo:
                 str(nombre_departamento)
             except TypeError:
                 raise TypeError(f"No se permiten otros tipos de datos que no sean str, se insertó {type(nombre_departamento)}")
+        
+        cls._resources._load_resource_if_needed('equivalencias')
 
         departamento = eliminar_acentos(nombre_departamento).strip().upper()
         try:
@@ -550,10 +561,10 @@ class Ubigeo:
         Parameters
         ----------
         nombre_ubicacion : str
-            Nombre de la ubicación que se busca validar y normalizar
+            Nombre de la ubicación que se busca validar y normalizar.
         normalize : bool, optional
             Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-         on_error : {"raise", "ignore", "capitalize"}, optional
+        on_error : {"raise", "ignore", "capitalize"}, optional
             Para manejar casos en que el nombre no coincide con ningún departamento, provincia o distrito; útil para evaluar datos mixtos.
             - `raise`: Lanza una excepción (valor por defecto).
             - `ignore`: Omite el nombre sin generar error.
@@ -623,8 +634,8 @@ class Ubigeo:
         3    MARANON      CHOLON
         4   URUBAMBA   CHINCHERO
         """
-        cls._resources._load_resource_if_needed("equivalencias")
         nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
+        cls._resources._load_resource_if_needed("equivalencias")
         try:
             resultado = cls._resources._EQUIVALENCIAS["departamentos"][nombre_ubicacion]
         except KeyError:
@@ -686,8 +697,8 @@ class Ubigeo:
         - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
         - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
         """
-        cls._resources._load_resource_if_needed("otros")
         level = cls._validate_level(level)
+        cls._resources._load_resource_if_needed("otros")
         
         if not isinstance(key, str):
             raise TypeError('Solo se aceptan "altitud", "capital", "latitud", "longitud", "superficie" como valores para solicitar')
