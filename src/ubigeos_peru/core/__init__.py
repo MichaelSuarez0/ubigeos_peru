@@ -37,6 +37,8 @@ def get_departamento(
         Código de ubigeo.
     institucion : {"inei", "reniec", "sunat"}, optional
         Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
+    with_lima_metro : bool, optional
+        Si se cambia a True, se diferencia Lima de Lima Metropolitana (el ubigeo debe incluir el código de provincia).
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
@@ -60,19 +62,16 @@ def get_departamento(
 
     Examples
     --------
-    Estandarización básica de nombres
-
+    >>> # Estandarización básica de nombres
     >>> ubg.get_departamento("010101") 
     "Amazonas"
     >>> ubg.get_departamento(10101)
     "Amazonas"
     >>> ubg.get_departamento(10101, normalize=True)
     "amazonas" 
-
-    Integración con Pandas
-
-    1. Creamos un DataFrame de ejemplo en la variable ``df``:
-
+    >>>
+    >>> # Integración con Pandas
+    >>> # Ejemplo básico con DataFrame
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...     "UBIGEO": [10101, 50101, 110101, 150101, 210101],
@@ -84,10 +83,7 @@ def get_departamento(
     1      50101     1
     2     110101     0
     3     150101     1
-    4     210101     0
-
-    2) Creamos una columna del departamento a partir del ubigeo:
-
+    4     210101	 0
     >>> df["DEPT"] = df["UBIGEO"].apply(ubg.get_departamento)
     >>> df
             UBIGEO  P1144    DEPT
@@ -95,10 +91,8 @@ def get_departamento(
     1      50101     1     Ayacucho
     2     110101     0     Ica
     3     150101     1     Lima
-    4     210101     0     Puno
-    
-    3) Si queremos los departamentos en mayúscula y sin acentos podemos pasar el sgt. argumento:
-
+    4     210101	 0     Puno
+    >>> # Ejemplo con normalize (formato por defecto en la ENAHO)
     >>> df["DEPT"] = df["UBIGEO"].apply(lambda x: get_departamento(x, normalize = True))
     >>> df
             UBIGEO  P1144    DEPT
@@ -106,7 +100,7 @@ def get_departamento(
     1      50101     1     AYACUCHO
     2     110101     0     ICA
     3     150101     1     LIMA
-    4     210101     0     PUNO
+    4     210101	 0     PUNO
     """
     return Ubigeo.get_departamento(ubigeo, institucion, normalize)
 
@@ -322,7 +316,7 @@ def validate_departamento(
         Nombre del departamento que se busca validar y normalizar
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-    on_error : {"raise", "ignore", "capitalize"}, optional
+    on_error : {"raise", "ignore", "capitalize"}, opcional
         Para manejar casos en que el nombre no coincide con ningún departamento válido, útil para evaluar datos mixtos (no solo departamentos)
         - `raise`: Lanza una excepción (valor por defecto).
         - `ignore`: Omite el nombre sin generar error.
@@ -339,7 +333,7 @@ def validate_departamento(
         Si `nombre_departamento` no es un str
     KeyError
         Si `nombre_departamento` no coincide con ningún nombre en la base de datos y on_error = `raise`
-        
+
     Notes
     --------
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
@@ -358,7 +352,7 @@ def validate_departamento(
     >>> validate_departamento("HUÁNUCO", normalize = True).lower()
     'huanuco'
     >>>
-    
+
     >>> # Integración con Pandas: ejemplo básico con DataFrame
     >>> import pandas as pd
     >>> df = pd.DataFrame({
@@ -404,10 +398,10 @@ def validate_ubicacion(
     Parameters
     ----------
     nombre_ubicacion : str
-        Nombre de la ubicación que se busca validar y normalizar
+        Nombre de la ubicación que se busca validar y normalizar.
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-        on_error : {"raise", "ignore", "capitalize"}, optional
+    on_error : {"raise", "ignore", "capitalize"}, opcional
         Para manejar casos en que el nombre no coincide con ningún departamento, provincia o distrito; útil para evaluar datos mixtos.
         - `raise`: Lanza una excepción (valor por defecto).
         - `ignore`: Omite el nombre sin generar error.
@@ -424,7 +418,7 @@ def validate_ubicacion(
         Si `nombre_ubicacion` no es un str
     KeyError
         Si `nombre_ubicacion` no coincide con ningún nombre en la base de datos y on_error = `raise`
-    
+
     Notes
     --------
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
@@ -434,14 +428,16 @@ def validate_ubicacion(
     >>> # Validación simple de nombres
     >>> validate_ubicacion("HUANUCO")
     'Huánuco'
+    >>>
 
     >>> validate_ubicacion("HUÁNUCO", normalize = True)
     'HUANUCO'
+    >>>
 
     >>> validate_ubicacion("NACIONAL", on_error = "capitalize")
     'Nacional'
     >>>
-    
+
     >>> # Integración con Pandas: ejemplo básico con DataFrame
     >>> import pandas as pd
     >>> df = pd.DataFrame({
