@@ -23,9 +23,12 @@ from .departamento import Departamento
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
 # ------------------------------------------------------------------
 
+
 def get_departamento(
     ubigeo: str | int,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
+    with_lima_metro: bool = False,
+    with_lima_region: bool = False,
     normalize: bool = False,
 ) -> str:
     """
@@ -39,6 +42,8 @@ def get_departamento(
         Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
     with_lima_metro : bool, optional
         Si se cambia a True, se diferencia Lima de Lima Metropolitana (el ubigeo debe incluir el código de provincia).
+    with_lima_region : bool, optional
+        Si se cambia a True, se diferencia Lima de Lima Región (el ubigeo debe incluir el código de provincia).
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
 
@@ -51,6 +56,8 @@ def get_departamento(
     ------
     ValueError
         Si el código supera los 6 caracteres o no es str/int.
+    ValueError
+        Si el código no contiene el código de provincia (más de 2 caracteres) y se señala with_lima_metro o with_lima_region.
     KeyError
         Si el código no existe en la base de datos.
 
@@ -63,12 +70,12 @@ def get_departamento(
     Examples
     --------
     >>> # Estandarización básica de nombres
-    >>> ubg.get_departamento("010101") 
+    >>> ubg.get_departamento("010101")
     "Amazonas"
     >>> ubg.get_departamento(10101)
     "Amazonas"
     >>> ubg.get_departamento(10101, normalize=True)
-    "amazonas" 
+    "amazonas"
     >>>
     >>> # Integración con Pandas
     >>> # Ejemplo básico con DataFrame
@@ -102,7 +109,9 @@ def get_departamento(
     3     150101     1     LIMA
     4     210101	 0     PUNO
     """
-    return Ubigeo.get_departamento(ubigeo, institucion, normalize)
+    return Ubigeo.get_departamento(
+        ubigeo, institucion, with_lima_metro, with_lima_region, normalize
+    )
 
 
 def get_provincia(
@@ -184,7 +193,7 @@ def get_distrito(
         Si el código no tiene 5 o 6 caracteres o no es str/int.
     KeyError
         Si el código no existe en la base de datos.
-    
+
     Notes
     -----
     - El subcódigo para provincia se toma de los últimos 4 caracteres del código validado.

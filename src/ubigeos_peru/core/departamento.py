@@ -21,7 +21,7 @@ class Departamento:
         
         cls._resources._load_resource_if_needed("equivalencias")
 
-        # if cls._EQUIVALENCIAS is None:
+        # if cls["equivalencias"] is None:
         #     raise RuntimeError("No se pudieron cargar las equivalencias")
         if not isinstance(nombre_departamento, str):
             try:
@@ -33,7 +33,7 @@ class Departamento:
 
         departamento = eliminar_acentos(nombre_departamento).strip().upper()
         try:
-            resultado = cls._resources._EQUIVALENCIAS["departamentos"][departamento]
+            resultado = cls._resources["equivalencias"]["departamentos"][departamento]
         except KeyError:
             if on_error == "raise":
                 raise KeyError(
@@ -64,15 +64,15 @@ class Departamento:
         cls._resources._load_resource_if_needed("equivalencias")
         nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
         try:
-            resultado = cls._resources._EQUIVALENCIAS["departamentos"][nombre_ubicacion]
+            resultado = cls._resources["equivalencias"]["departamentos"][nombre_ubicacion]
         except KeyError:
             try:
-                resultado = cls._resources._EQUIVALENCIAS["provincias"][
+                resultado = cls._resources["equivalencias"]["provincias"][
                     nombre_ubicacion
                 ]
             except KeyError:
                 try:
-                    resultado = cls._resources._EQUIVALENCIAS["distritos"][
+                    resultado = cls._resources["equivalencias"]["distritos"][
                         nombre_ubicacion
                     ]
                 except KeyError:
