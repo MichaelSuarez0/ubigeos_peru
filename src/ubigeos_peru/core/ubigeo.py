@@ -1,8 +1,32 @@
-from typing import Literal
-
+from typing import Any, Literal, Protocol, Sequence, TypeVar, runtime_checkable
 from .departamento import Departamento
 from .utils import eliminar_acentos
 from .resource_manager import ResourceManager
+
+@runtime_checkable
+class SeriesLike(Protocol):
+    def map(self, mapper: Any) -> "SeriesLike": ...
+
+S = TypeVar("S", bound=SeriesLike)
+
+def _is_series_like(obj: Any) -> bool:
+    # Duck typing: algo que se pueda iterar (lista, numpy array, pd.Series, etc.)
+    try:
+        iter(obj)
+        return True
+    except TypeError:
+        return False
+
+def _reconstruct_like(proto: Any, data: Sequence) -> Any:
+    """
+    Intenta reconstruir el mismo tipo de contenedor que 'proto' con 'data'.
+    Si falla, devuelve list(data). No requiere pandas.
+    """
+    try:
+        # Caso común: list -> list(data), tuple -> tuple(data), numpy -> np.array(data), pd.Series -> Series(data)
+        return proto.__class__(data)
+    except Exception:
+        return list(data)
 
 class Ubigeo:
     _instance = None
@@ -51,40 +75,68 @@ class Ubigeo:
     @classmethod
     def get_departamento(
         cls,
-        ubigeo: str | int,
+        ubigeo: str | int | SeriesLike,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         with_lima_metro: bool = False,
         with_lima_region: bool = False,
         normalize: bool = False,
     ) -> str:
         
-        ubigeo = cls._validate_codigo(ubigeo)
-        cls._resources._load_resource_if_needed('departamentos')
+        cls._resources._load_resource_if_needed("departamentos")
+        mapping: dict[str, str] = cls._resources._loaded["departamentos"][institucion]
 
-        try:
-            dept = cls._resources._loaded["departamentos"][institucion][ubigeo[:2]]
-        except KeyError:
-            raise KeyError(
-                f"El código de ubigeo {ubigeo} no se encontró en la base de datos"
+        # === Serie-like ===
+        if _is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
+            mapping: dict[str, str] = (
+                {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
+                if normalize else mapping
             )
-        
-        if with_lima_metro or with_lima_region:
+            # Fast-path: sin reglas de Lima -> solo tomar dept key y mapear
+            if not (with_lima_metro or with_lima_region):
+                out = []
+                append = out.append
+                for u in ubigeo:
+                    code = cls._validate_codigo(u)
+                    dept_key = code[:2]
+                    try:
+                        append(mapping[dept_key])
+                    except KeyError:
+                        raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
+                return _reconstruct_like(ubigeo, out)
+        else:
+
+        # def _single(u: str | int) -> str:
+            code = cls._validate_codigo(ubigeo)
             try:
-                prov = Ubigeo.get_provincia(ubigeo)
+                dept = mapping[code[:2]]
             except KeyError:
-                raise ValueError("Para diferenciar Lima de Lima Metropolitana o Lima Región, el ubigeo debe incluir el código de la provincia")
-            
-            if with_lima_metro:
-                if dept == "Lima" and prov == "Lima":
+                raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
+
+            if with_lima_metro or with_lima_region:
+                try:
+                    prov = cls.get_provincia(code, institucion=institucion, normalize=False)
+                except KeyError:
+                    raise ValueError(
+                        "Para diferenciar Lima de Lima Metropolitana o Lima Región, "
+                        "el ubigeo debe incluir el código de la provincia"
+                    )
+
+                if with_lima_metro and dept == "Lima" and prov == "Lima":
                     dept = "Lima Metropolitana"
-            if with_lima_region:
-                if dept == "Lima" and prov != "Lima":
+                elif with_lima_region and dept == "Lima" and prov != "Lima":
                     dept = "Lima Región"
 
-        if normalize:
-            return eliminar_acentos(dept).upper()
-        else:
-            return dept
+            return eliminar_acentos(dept).upper() if normalize else dept
+        
+        # Fast-path: Series-like con .map(dict) cuando NO hay reglas de Lima
+        # if isinstance(ubigeo, SeriesLike):
+        #     if not (with_lima_metro or with_lima_region) and not normalize:
+        #         # usar directamente el dict (más rápido)
+        #         return ubigeo.map(mapping)
+        #     # si hay reglas de Lima o normalize, caemos a map(callable)
+
+        # Escalar
+        #return _single(ubigeo)
 
     @classmethod
     def get_provincia(
