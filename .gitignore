@@ -159,4 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 /ubigeos_peru/databases
-tests/test_ubigeo.ipynb
+scripts/
+*.ipynb
+docs/
+*.xlsx
+*.xls

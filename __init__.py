@@ -1,1 +1,0 @@
-from ubigeos_peru.ubigeos_peru import Ubigeo

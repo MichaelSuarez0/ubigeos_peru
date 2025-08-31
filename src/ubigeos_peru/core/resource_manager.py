@@ -16,7 +16,7 @@ _RESOURCE_FILES = {
 
 
 class ResourceManager:
-    _resources_loaded = {
+    _loaded = {
         'departamentos': False,
         'provincias': False,
         'distritos': False,
@@ -28,7 +28,7 @@ class ResourceManager:
  
 
     @classmethod
-    def _load_resource(cls, resource_name: str) -> dict[str, str]:
+    def cargar_diccionario(cls, resource_name: str) -> dict[str, str]:
         """
         Carga un recurso JSON desde el directorio de recursos con lazy loading
         
@@ -53,7 +53,7 @@ class ResourceManager:
     @classmethod
     def _load_resource_if_needed(cls, resource_name: str) -> None:
         """Carga un recurso si aún no ha sido cargado"""
-        if not cls._resources_loaded.get(resource_name, False):
-            resource_data = cls._load_resource(resource_name)
-            cls._resources_loaded[resource_name] = resource_data
+        if not cls._loaded.get(resource_name, False):
+            resource_data = cls.cargar_diccionario(resource_name)
+            cls._loaded[resource_name] = resource_data
 

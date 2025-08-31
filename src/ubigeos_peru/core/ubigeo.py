@@ -62,7 +62,7 @@ class Ubigeo:
         cls._resources._load_resource_if_needed('departamentos')
 
         try:
-            dept = cls._resources["departamentos"][institucion][ubigeo[:2]]
+            dept = cls._resources._loaded["departamentos"][institucion][ubigeo[:2]]
         except KeyError:
             raise KeyError(
                 f"El código de ubigeo {ubigeo} no se encontró en la base de datos"
@@ -102,7 +102,7 @@ class Ubigeo:
                 "No se aceptan ubigeos con menos de 3 o 4 caracteres para provincias"
             )
 
-        result = cls._resources["provincias"][institucion][ubigeo[:4]]
+        result = cls._resources._loaded["provincias"][institucion][ubigeo[:4]]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -125,7 +125,7 @@ class Ubigeo:
                 "No se aceptan ubigeos que no tengan 5 o 6 caracteres para distritos"
             )
 
-        result = cls._resources["distritos"][institucion][ubigeo]
+        result = cls._resources._loaded["distritos"][institucion][ubigeo]
 
         if normalize:
             return eliminar_acentos(result).upper()
@@ -157,7 +157,7 @@ class Ubigeo:
         else:
             raise TypeError("Solo se acepta el nombre del departamento o su código de ubigeo")
 
-        resultado = cls._resources["macrorregiones"][institucion][departamento]
+        resultado = cls._resources._loaded["macrorregiones"][institucion][departamento]
         if not normalize:
             return resultado
         else:
@@ -198,7 +198,7 @@ class Ubigeo:
             ubicacion_normalized = eliminar_acentos(nombre_ubicacion).upper().strip()
             try:
                 lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
-                result = eliminar_acentos(cls._resources["inverted"][level][institucion][lugar_clean]) 
+                result = eliminar_acentos(cls._resources._loaded["inverted"][level][institucion][lugar_clean]) 
             except KeyError:
                 raise KeyError(f"El lugar '{nombre_ubicacion}' no se encontró en la base de datos de '{level}'")
             else:
@@ -206,7 +206,7 @@ class Ubigeo:
 
         departamento = eliminar_acentos(departamento).lower().strip()
 
-        return eliminar_acentos(cls._resources["macrorregiones"][institucion][departamento])
+        return eliminar_acentos(cls._resources._loaded["macrorregiones"][institucion][departamento])
 
     
     # @classmethod
@@ -389,5 +389,5 @@ class Ubigeo:
             raise TypeError("Solo se acepta el nombre de la ubicacion o su código de ubigeo")
 
         ubicacion = eliminar_acentos(ubicacion).upper()
-        return cls._resources["otros"][level][ubicacion][key]
+        return cls._resources._loaded["otros"][level][ubicacion][key]
         

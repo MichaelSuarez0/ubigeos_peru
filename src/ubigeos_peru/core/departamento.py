@@ -33,7 +33,7 @@ class Departamento:
 
         departamento = eliminar_acentos(nombre_departamento).strip().upper()
         try:
-            resultado = cls._resources["equivalencias"]["departamentos"][departamento]
+            resultado = cls._resources._loaded["equivalencias"]["departamentos"][departamento]
         except KeyError:
             if on_error == "raise":
                 raise KeyError(
@@ -64,15 +64,15 @@ class Departamento:
         cls._resources._load_resource_if_needed("equivalencias")
         nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
         try:
-            resultado = cls._resources["equivalencias"]["departamentos"][nombre_ubicacion]
+            resultado = cls._resources._loaded["equivalencias"]["departamentos"][nombre_ubicacion]
         except KeyError:
             try:
-                resultado = cls._resources["equivalencias"]["provincias"][
+                resultado = cls._resources._loaded["equivalencias"]["provincias"][
                     nombre_ubicacion
                 ]
             except KeyError:
                 try:
-                    resultado = cls._resources["equivalencias"]["distritos"][
+                    resultado = cls._resources._loaded["equivalencias"]["distritos"][
                         nombre_ubicacion
                     ]
                 except KeyError:

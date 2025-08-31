@@ -2,6 +2,10 @@
 
 Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para consultar macrorregiones, capitales y validar nombres oficiales. Se integra fácilmente con pandas para procesar bases como la ENAHO, permitiendo aplicar transformaciones masivas de ubigeos en menos de un segundo.
 
+## TODOs
+Releases
+on error: warn
+
 ## Características Principales
 
 - **Soporte Multi-institucional**: Soporte para consultar códigos de ubigeo de INEI, RENIEC y SUNAT.
@@ -10,12 +14,17 @@ Librería de Python que convierte códigos de ubigeo en su correspondiente depar
 - **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton
 - **Metadatos Geográficos**: Acceso a información adicional como capital, altitud, superficie y coordenadas
 
+## Por agregar
+1) Métodos para exportar las bases de datos (por ejemplo lista de Departamentos)
+2) Agregar tests para diferenciar Lima de Lima Metropolitana (como arg)
+3) Args para personalizar el output (int o str, zfill)
+
 ## Instalación
 
 Ejecutar en una terminal
 
 ```bash
-pip install ubigeos_peru
+pip install ubigeos-peru
 ```
 
 ## Uso Básico
@@ -25,15 +34,9 @@ pip install ubigeos_peru
 Se recomienda importar de la siguiente manera:
 
 ```python
-from ubigeos_peru import Ubigeo as ubg
+import ubigeos_peru as ubg
 ```
-La clase siempre tendrá una única instancia para evitar cargar recursos dos veces,
-por lo que también se puede utilizar de la siguiente manera.
-
-```python
-from ubigeos_peru import Ubigeo
-ubg = Ubigeo()
-```
+La clase siempre tendrá una única instancia para evitar cargar recursos dos veces.
 
 ## Consultar información de Ubigeo
 ```python

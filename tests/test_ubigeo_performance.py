@@ -2,9 +2,10 @@ import pandas as pd
 import random
 import time
 import ubigeos_peru as ubg
-pd.read_excel
+from functools import wraps
 
 def medir_tiempo(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         inicio = time.perf_counter()  # mide con precisión alta
         resultado = func(*args, **kwargs)
@@ -23,10 +24,17 @@ def construct_random_data(size: int = 500_000):
     return data
 
 @medir_tiempo
-def main(data: pd.DataFrame):
+def with_apply(data: pd.DataFrame):
     data["departamento"] = data["ubigeo"].apply(ubg.get_departamento)
+
+@medir_tiempo
+def with_map(data: pd.DataFrame):
+    dptos = ubg.ResourceManager.cargar_diccionario("departamentos")
+    data["departamento"] = data["ubigeo"].map(dptos)
+
 
 
 if __name__ == "__main__":  
     data = construct_random_data(size=1_000_000)
-    main(data)
+    with_apply(data)
+    with_map(data)
