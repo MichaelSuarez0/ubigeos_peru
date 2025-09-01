@@ -1,0 +1,41 @@
+import orjson
+from _utils import RESOURCES_PATH
+from _utils import write_to_resources, write_to_readable, eliminar_acentos
+
+
+def crear_equivalencias():
+    niveles = ["departamentos", "provincias", "distritos"]
+    equivalencias_completo = {}
+    for nivel in niveles:
+        with open(RESOURCES_PATH / f"{nivel}.json", mode= "rb") as f:
+            existing_dict = orjson.loads(f.read())
+    
+        values = existing_dict["inei"].values()
+        equivalencias = {eliminar_acentos(v).upper(): v for v in values }
+        equivalencias = dict(sorted(equivalencias.items(), key=lambda x: x[0]))
+        equivalencias_completo[nivel] = equivalencias
+    
+    # Añadir 
+    # Departamentos
+    equivalencias_completo["departamentos"]["CUZCO"] = "Cusco"
+    equivalencias_completo["departamentos"]["LIMA METROPOLITANA"] = "Lima Metropolitana"
+    equivalencias_completo["departamentos"]["LIMA REGION"] = "Lima Región"
+
+    # Provincias
+    equivalencias_completo["provincias"]["CUZCO"] = "Cusco"
+
+    # Distritos
+    equivalencias_completo["distritos"]["CUZCO"] = "Cusco"
+
+    # Sortear subniveles por última vez
+    for nivel, dicc in equivalencias_completo.items():
+        equivalencias_completo[nivel] = dict(sorted(dicc.items(), key=lambda x: x[0]))
+
+    write_to_resources(equivalencias_completo, "equivalencias")
+    write_to_readable(equivalencias_completo, "equivalencias")
+    return equivalencias_completo
+        
+
+if __name__ == "__main__":
+    from pprint import pprint
+    pprint(crear_equivalencias())

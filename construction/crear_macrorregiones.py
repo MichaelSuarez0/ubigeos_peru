@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from collections import defaultdict
-from _functions import DATABASES_PATH, write_to_resources, write_to_readable
+from _utils import DATABASES_PATH, write_to_resources, write_to_readable
 
 all_path = os.path.join(DATABASES_PATH, "ubigeo_provincia.csv")
 

@@ -48,7 +48,7 @@ def clean_directorio():
     
     directorio_cp = pd.concat([df.reset_index(drop=True) for df in excels.values()], axis=0, ignore_index=True, sort=False)
     directorio_cp.to_excel(OUTPUT_DIR / "directorio_centros_poblados.xlsx", index=False)
-    print("Se terminó yee")
+    #print("Se terminó yee")
     
 if __name__ == "__main__":
     clean_directorio()

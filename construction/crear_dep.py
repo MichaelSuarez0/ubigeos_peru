@@ -1,9 +1,8 @@
 
 import os
 import pandas as pd
-import pprint
 from collections import defaultdict
-from _functions import DATABASES_PATH, write_to_readable, write_to_resources
+from _utils import DATABASES_PATH, write_to_readable, write_to_resources
 
 all_path = os.path.join(DATABASES_PATH, "equivalencia-ubigeos-oti-concytec.csv")
 

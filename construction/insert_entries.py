@@ -1,7 +1,5 @@
-import os
 from typing import Literal
-import orjson
-from _functions import update_to_readable, update_to_resources
+from _utils import update_to_readable, update_to_resources
 
 # TODO: Agregar:
 # Yauri (Espinar) (distritos)
@@ -45,7 +43,7 @@ def update_all(entries: dict, resource_name: Literal["departamentos", "distritos
     update_to_resources(entries, resource_name)
     update_to_readable(entries, resource_name)
     if resource_name in resources_names[:3]:
-        from inverted_creation import inverted_creation
+        from ubigeos_peru.construction.crear_inverted import inverted_creation
         inverted_creation()
 
 

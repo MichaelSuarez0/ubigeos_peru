@@ -1,11 +1,11 @@
 import os
 import orjson
 from collections import defaultdict
-from _functions import RESOURCES_PATH, write_to_resources, write_to_readable
+from _utils import RESOURCES_PATH, write_to_resources, write_to_readable
 
 
 def read_dict(level: str):
-    with open(os.path.join(RESOURCES_PATH, f"{level}.json"), mode="r", encoding="utf-8") as f:
+    with open(RESOURCES_PATH / f"{level}.json", mode="r", encoding="utf-8") as f:
         dictio = orjson.loads(f.read())
 
     return dictio
@@ -31,7 +31,7 @@ def invert_dict(final_dict: dict):
     return final_dict
         
     
-def inverted_creation():
+def crear_inverted():
     names = ["departamentos", "provincias", "distritos"]
     departamentos = read_dict(names[0])
     provincias = read_dict(names[1])
@@ -45,4 +45,4 @@ def inverted_creation():
     
 
 if __name__ == "__main__":
-    inverted_creation()
+    crear_inverted()
