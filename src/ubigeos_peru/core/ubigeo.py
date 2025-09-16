@@ -1,32 +1,8 @@
-from typing import Any, Literal, Protocol, Sequence, TypeVar, runtime_checkable
+from typing import Literal
 from .departamento import Departamento
 from ._utils import SeriesLike, eliminar_acentos, is_series_like, reconstruct_like
 from .resource_manager import ResourceManager
 
-@runtime_checkable
-class SeriesLike(Protocol):
-    def map(self, mapper: Any) -> "SeriesLike": ...
-
-S = TypeVar("S", bound=SeriesLike)
-
-def _is_series_like(obj: Any) -> bool:
-    # Duck typing: algo que se pueda iterar (lista, numpy array, pd.Series, etc.)
-    try:
-        iter(obj)
-        return True
-    except TypeError:
-        return False
-
-def _reconstruct_like(proto: Any, data: Sequence) -> Any:
-    """
-    Intenta reconstruir el mismo tipo de contenedor que 'proto' con 'data'.
-    Si falla, devuelve list(data). No requiere pandas.
-    """
-    try:
-        # Caso común: list -> list(data), tuple -> tuple(data), numpy -> np.array(data), pd.Series -> Series(data)
-        return proto.__class__(data)
-    except Exception:
-        return list(data)
 
 class Ubigeo:
     _instance = None
@@ -86,7 +62,7 @@ class Ubigeo:
         mapping: dict[str, str] = cls._resources._loaded["departamentos"][institucion]
 
         # ---------------------- Input: Series-like ----------------------
-        if is_series_like(ubigeo):
+        if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize else mapping
@@ -99,12 +75,13 @@ class Ubigeo:
                     dept_key = code[:2]
                     try:
                         out.append(mapping[dept_key])
+                        out.append(mapping[dept_key])
                     except KeyError:
                         raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
                 return reconstruct_like(ubigeo, out)
         else:
         # ------------------------ Input: Singular ------------------------
-            code = cls._validate_codigo(ubigeo)    
+            code = cls._validate_codigo(ubigeo)
             try:
                 dept = mapping[code[:2]]
                 dept = mapping[code[:2]]
@@ -149,7 +126,7 @@ class Ubigeo:
         mapping: dict[str, str] = cls._resources._loaded["provincias"][institucion]
         
          # ---------------------- Input: Series-like ----------------------
-        if is_series_like(ubigeo):
+        if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize else mapping
@@ -177,7 +154,10 @@ class Ubigeo:
             except KeyError:
                 raise KeyError(f"El código de ubigeo {ubigeo} no se encontró en la base de datos")
 
-            return eliminar_acentos(result).upper() if normalize else result
+            if normalize:
+                return eliminar_acentos(result).upper()
+            else:
+                return result
 
     # TODO: Implementar "on_error"
     @classmethod
@@ -187,7 +167,7 @@ class Ubigeo:
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str | SeriesLike:
-        
+                
         cls._resources._load_resource_if_needed('distritos')
         mapping: dict[str, str] = cls._resources._loaded["distritos"][institucion]
 
@@ -215,10 +195,8 @@ class Ubigeo:
                 raise ValueError(
                     "No se aceptan ubigeos que no tengan 5 o 6 caracteres para distritos"
                 )
-            try:
-                result = cls._resources._loaded["distritos"][institucion][ubigeo]
-            except KeyError:
-                return ""
+
+            result = cls._resources._loaded["distritos"][institucion][ubigeo]
 
             return eliminar_acentos(result).upper() if normalize else result
 
@@ -334,14 +312,44 @@ class Ubigeo:
                     nombre_ubicacion = str(nombre_ubicacion)
                 except TypeError:
                     raise TypeError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
+        mapping = cls._resources._loaded["inverted"][level][institucion]
+
+        # ---------------------- Input: Series-like ----------------------
+        if isinstance(nombre_ubicacion, SeriesLike):
+            out = []
+            for item in nombre_ubicacion:
+                if not isinstance(item, str):
+                    try:
+                        item = str(item)
+                    except TypeError:
+                        raise TypeError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
+                    
+                ubicacion_normalized = eliminar_acentos(item).upper().strip()
+                try:
+                    lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
+                    out.append(mapping[lugar_clean])
+                except KeyError:
+                    raise KeyError(f"El lugar '{item}' no se encontró en la base de datos de '{level}'")
+            return reconstruct_like(nombre_ubicacion, out)
+        
+        else:
+        # ------------------------ Input: Singular ------------------------
+            if not isinstance(nombre_ubicacion, str):
+                try:
+                    nombre_ubicacion = str(nombre_ubicacion)
+                except TypeError:
+                    raise TypeError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
             ubicacion_normalized = eliminar_acentos(nombre_ubicacion).upper().strip()
             try:
                 lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
-                ubicacion_limpia = cls._resources._loaded["inverted"][level][institucion][lugar_clean]
+                ubicacion_limpia = eliminar_acentos(cls._resources._loaded["inverted"][level][institucion][lugar_clean]) 
             except KeyError:
                 return ""
                 #raise KeyError(f"El lugar '{ubicacion_normalized}' no se encontró en la base de datos de '{level}'")
             else:
+                return ubicacion_limpia
+
+   
                 return ubicacion_limpia
 
    
