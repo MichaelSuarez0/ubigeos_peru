@@ -15,7 +15,7 @@ Antes:
 """
 
 from __future__ import annotations
-from typing import TypeVar, Literal, Any, TYPE_CHECKING
+from typing import Iterable, TypeAlias, TypeVar, Literal, Any, TYPE_CHECKING
 
 # Solo para tipado (no se ejecuta en runtime)
 if TYPE_CHECKING:
@@ -51,17 +51,9 @@ from .resource_manager import ResourceManager
 # Contenedores soportados: pandas.Series, polars.Series, list, tuple
 
 # TODO: Mergear con SeriesLike de _utils
-SeriesLike = TypeVar(
-    "Series",
-    "pd.Series[Any]",
-    "pl.Series",
-    "pl.Expr",
-    list[str],
-    list[int],
-    tuple[str, ...],
-    tuple[int, ...],
+SeriesLike: TypeAlias = (
+    "pd.Series | pl.Series | pl.Expr | Iterable[str|int]"
 )
-
 
 def get_departamento(
     ubigeo: str | int | SeriesLike,
