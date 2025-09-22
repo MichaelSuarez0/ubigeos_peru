@@ -41,6 +41,7 @@ MACRORREGIONES = {
         "La Libertad": "Norte",
         "Lambayeque": "Norte",
         "Lima": "Lima Metropolitana",
+        "Lima Metropolitana": "Lima Metropolitana",
         "Loreto": "Oriente",
         "Madre de Dios": "Sur",
         "Moquegua": "Sur",

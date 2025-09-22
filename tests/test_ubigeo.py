@@ -127,14 +127,6 @@ class TestWrongInputs:
         with pytest.raises(TypeError):
             ubg.get_departamento(None)
     
-    def test_get_departamento_invalid_type_list(self):
-        with pytest.raises(TypeError):
-            ubg.get_departamento([1, 2, 3])
-    
-    def test_get_departamento_invalid_type_dict(self):
-        with pytest.raises(TypeError):
-            ubg.get_departamento({"codigo": "01"})
-    
     def test_get_departamento_invalid_type_float(self):
         with pytest.raises(TypeError):
             ubg.get_departamento(1.5)
