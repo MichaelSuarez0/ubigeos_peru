@@ -14,23 +14,65 @@ Antes:
 
 """
 
-from typing import Literal
+from __future__ import annotations
+from typing import TypeVar, Literal, Any, TYPE_CHECKING
+
+# Solo para tipado (no se ejecuta en runtime)
+if TYPE_CHECKING:
+    import pandas as pd
+    import polars as pl
+
 from .ubigeo import Ubigeo
 from .departamento import Departamento
-
 
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
 # ------------------------------------------------------------------
 
+# @overload
+# def get_departamento(
+#     ubigeo: list[str] | list[int],
+#     institucion: Literal["inei", "reniec", "sunat"] = "inei",
+#     with_lima_metro: bool = False,
+#     with_lima_region: bool = False,
+#     normalize: bool = False,
+# ) -> list[str]: ...
+
+# @overload
+# def get_departamento(
+#     ubigeo: tuple[str, ...] | tuple[int, ...],
+#     institucion: Literal["inei", "reniec", "sunat"] = "inei",
+#     with_lima_metro: bool = False,
+#     with_lima_region: bool = False,
+#     normalize: bool = False,
+# ) -> tuple[str, ...]: ...
+
+if TYPE_CHECKING:
+    import pandas as pd
+    import polars as pl
+
+# Contenedores soportados: pandas.Series, polars.Series, list, tuple
+
+# TODO: Mergear con SeriesLike de _utils
+SeriesLike = TypeVar(
+    "Series",
+    "pd.Series[Any]",
+    "pl.Series",
+    "pl.Expr",
+    list[str],
+    list[int],
+    tuple[str, ...],
+    tuple[int, ...],
+)
+
 
 def get_departamento(
-    ubigeo: str | int,
+    ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     with_lima_metro: bool = False,
     with_lima_region: bool = False,
     normalize: bool = False,
-) -> str:
+) -> str | SeriesLike:
     """
     Obtiene el nombre de un departamento a partir de su código de ubigeo.
 
@@ -69,16 +111,20 @@ def get_departamento(
 
     Examples
     --------
-    >>> # Estandarización básica de nombres
+    
+    Consultas rápidas individuales (sin importar el formato de entrada)
+
     >>> ubg.get_departamento("010101")
     "Amazonas"
     >>> ubg.get_departamento(10101)
     "Amazonas"
     >>> ubg.get_departamento(10101, normalize=True)
-    "amazonas"
-    >>>
-    >>> # Integración con Pandas
-    >>> # Ejemplo básico con DataFrame
+    "AMAZONAS"
+    
+    **Integración con Pandas**
+
+    Ejemplo con un DataFrame de prueba
+
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...     "UBIGEO": [10101, 50101, 110101, 150101, 210101],
@@ -91,23 +137,45 @@ def get_departamento(
     2     110101     0
     3     150101     1
     4     210101	 0
-    >>> df["DEPT"] = df["UBIGEO"].apply(ubg.get_departamento)
+
+    Añadimos una columna para obtener los departamentos
+
+    >>> df["DPTO"] = ubg.get_departamento(df["UBIGEO"])
     >>> df
-            UBIGEO  P1144    DEPT
+            UBIGEO  P1144   DPTO
     0      10101     1     Amazonas
     1      50101     1     Ayacucho
     2     110101     0     Ica
     3     150101     1     Lima
-    4     210101	 0     Puno
-    >>> # Ejemplo con normalize (formato por defecto en la ENAHO)
-    >>> df["DEPT"] = df["UBIGEO"].apply(lambda x: get_departamento(x, normalize = True))
+    4     210101     0     Puno
+
+    Podemos personalizar el output con parámetros adicionales
+
+    >>> df["DPTO"] = ubg.get_departamento(df["UBIGEO"], normalize=True)
     >>> df
-            UBIGEO  P1144    DEPT
+            UBIGEO  P1144    DPTO
     0      10101     1     AMAZONAS
     1      50101     1     AYACUCHO
     2     110101     0     ICA
     3     150101     1     LIMA
-    4     210101	 0     PUNO
+    4     210101     0     PUNO
+
+    La función acepta como input Series de Pandas, pero también acepta valores individuales.
+    En ese sentido, los siguientes son válidos:
+
+    >>> df["DPTO"] = df["UBIGEO"].apply(get_departamento)
+    >>> df["DPTO"] = df["UBIGEO"].apply(
+    ...     lambda x: get_departamento(x, normalize = True)
+    ...     )
+    >>> df
+            UBIGEO  P1144    DPTO
+    0      10101     1     AMAZONAS
+    1      50101     1     AYACUCHO
+    2     110101     0     ICA
+    3     150101     1     LIMA
+    4     210101     0     PUNO
+
+    Sin embargo, estos métodos son más lentos y menos intuitivo, por lo que se recomienda pasar la Serie.
     """
     return Ubigeo.get_departamento(
         ubigeo, institucion, with_lima_metro, with_lima_region, normalize
@@ -115,10 +183,10 @@ def get_departamento(
 
 
 def get_provincia(
-    ubigeo: str | int,
+    ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
-) -> str:
+) -> str | SeriesLike:
     """
     Obtiene el nombre de una provincia a partir de su código de ubigeo.
 
@@ -166,10 +234,10 @@ def get_provincia(
 
 
 def get_distrito(
-    ubigeo: str | int,
+    ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
-) -> str:
+) -> str | SeriesLike:
     """
     Obtiene el nombre de un distrito a partir de su código de ubigeo.
 
@@ -213,10 +281,10 @@ def get_distrito(
 
 
 def get_macrorregion(
-    departamento_o_ubigeo: str | int,
+    departamento_o_ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     normalize: bool = False,
-) -> str:
+) -> str | SeriesLike:
     """
     Obtiene el nombre de una macrorregión a partir de su código o nombre de departamento.
 
@@ -250,10 +318,10 @@ def get_macrorregion(
 
 
 def get_ubigeo(
-    nombre_ubicacion: str,
+    nombre_ubicacion: str | SeriesLike,
     level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
-) -> str:
+) -> str | SeriesLike:
     """
     Obtiene el ubigeo de cierta ubicación (departamentos, distritos o provincias) a partir de su nombre.
 
@@ -312,10 +380,10 @@ def get_ubigeo(
 
 
 def validate_departamento(
-    nombre_departamento: str,
+    nombre_departamento: str | SeriesLike,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
-) -> str:
+) -> str | SeriesLike:
     """
     Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
 
@@ -349,20 +417,21 @@ def validate_departamento(
 
     Examples
     --------
-    >>> # Validación simple de nombres
+
+    Validaciones rápidas individuales (sin importar el formato de entrada)
+
     >>> validate_departamento(`HUÁNUCO")
     'Huánuco'
     >>>
 
-    >>> validate_departamento("HUÁNUCO", normalize = True)
+    >>> validate_departamento("HUÁNUCO", normalize=True)
     'HUANUCO'
     >>>
 
-    >>> validate_departamento("HUÁNUCO", normalize = True).lower()
-    'huanuco'
-    >>>
+    **Integración con Pandas** 
+    
+    Creamos un DataFrame de prueba
 
-    >>> # Integración con Pandas: ejemplo básico con DataFrame
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...     "DEPARTAMENTO": [AMAZONAS, ÁNCASH, APURÍMAC, CUSCO, HUÁNUCO],
@@ -371,11 +440,14 @@ def validate_departamento(
     >>> df
         DEPARTAMENTO  P1144
     0     AMAZONAS      1
-    1       ÁNCASH      1
+    1       ANCASH      1
     2     APURÍMAC      0
     3        CUSCO      1
-    4      HUÁNUCO      0
-    >>> df["DEPARTAMENTO"] = df["DEPARTAMENTO"].apply(ubg.validate_departamento)
+    4      HUANUCO      0
+
+    Sobreescribimos la columna con los nombres oficiales debidamente validados
+
+    >>> df["DEPARTAMENTO"] = ubg.validate_departamento(df["DEPARTAMENTO"])
     >>> df
         DEPARTAMENTO  P1144
     0     Amazonas      1
@@ -383,8 +455,10 @@ def validate_departamento(
     2     Apurímac      0
     3        Cusco      1
     4      Huánuco      0
-    >>> # Agregar argumentos
-    >>> df["DEPARTAMENTO"] = df["DEPARTAMENTO"].apply(lambda x: ubg.validate_departamento(x, normalize = True))
+
+    Agregar argumentos
+
+    >>> df["DEPARTAMENTO"] = ubg.validate_departamento(df["DEPARTAMENTO"], normalize=True)
     >>> df
         DEPARTAMENTO  P1144
     0     AMAZONAS      1
@@ -397,10 +471,10 @@ def validate_departamento(
 
 
 def validate_ubicacion(
-    nombre_ubicacion: str,
+    nombre_ubicacion: str | SeriesLike,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
-) -> str:
+) -> str | SeriesLike:
     """
     Valida el nombre de una ubicación (departamento, provincia o distrito) escrita con gramática variable y devuelve el nombre oficial.
 
@@ -484,10 +558,10 @@ def validate_ubicacion(
 
 
 def get_metadato(
-    codigo_o_ubicacion: str | int,
+    codigo_o_ubicacion: str | int | SeriesLike,
     level: Literal["departamentos", "provincias", "distritos"],
     key: Literal["altitud", "capital", "latitud", "longitud", "superficie"] = "capital",
-) -> str:
+) -> str | SeriesLike:
     """
     Consultar otros datos (como capital o superficie) de la ubicación a partir de su código de ubigeo o nombre.
 
