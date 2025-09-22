@@ -3,7 +3,7 @@ from _utils import update_to_readable, update_to_resources
 
 # TODO: Agregar:
 # Yauri (Espinar) (distritos)
-# TODO: Por agregar:
+# TODO: Por agregar: Región lima para departamentos
 equivalencias = {
     'departamentos':{
         'CUZCO': 'Cusco'
