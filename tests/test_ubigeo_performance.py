@@ -1,5 +1,4 @@
 import statistics
-import pandas as pd
 import random
 import time
 import ubigeos_peru as ubg
