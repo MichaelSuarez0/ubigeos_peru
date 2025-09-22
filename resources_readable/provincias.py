@@ -66,7 +66,7 @@ PROVINCIAS = {
         "0611": "San Miguel",
         "0612": "San Pablo",
         "0613": "Santa Cruz",
-        "0701": "Callao",
+        "8eOoyMAie3-xQwi4oEQFv475EwZFJa6Y91": "Callao",
         "0801": "Cusco",
         "0802": "Acomayo",
         "0803": "Anta",
