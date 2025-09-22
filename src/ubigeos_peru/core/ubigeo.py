@@ -62,7 +62,7 @@ class Ubigeo:
         mapping: dict[str, str] = cls._resources._loaded["departamentos"][institucion]
 
         # ---------------------- Input: Series-like ----------------------
-        if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
+        if is_series_like(ubigeo):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize else mapping
@@ -86,19 +86,19 @@ class Ubigeo:
             except KeyError:
                 raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
 
-            if with_lima_metro or with_lima_region:
-                try:
-                    prov = cls.get_provincia(code, institucion=institucion, normalize=False)
-                except KeyError:
-                    raise ValueError(
-                        "Para diferenciar Lima de Lima Metropolitana o Lima Región, "
-                        "el ubigeo debe incluir el código de la provincia"
-                    )
+            # if with_lima_metro or with_lima_region:
+            #     try:
+            #         prov = cls.get_provincia(code, institucion=institucion, normalize=False)
+            #     except KeyError:
+            #         raise ValueError(
+            #             "Para diferenciar Lima de Lima Metropolitana o Lima Región, "
+            #             "el ubigeo debe incluir el código de la provincia"
+            #         )
 
-                if with_lima_metro and dept == "Lima" and prov == "Lima":
-                    dept = "Lima Metropolitana"
-                elif with_lima_region and dept == "Lima" and prov != "Lima":
-                    dept = "Lima Región"
+            #     if with_lima_metro and dept == "Lima" and prov == "Lima":
+            #         dept = "Lima Metropolitana"
+            #     elif with_lima_region and dept == "Lima" and prov != "Lima":
+            #         dept = "Lima Región"
 
             return eliminar_acentos(dept).upper() if normalize else dept
         
@@ -124,7 +124,7 @@ class Ubigeo:
         mapping: dict[str, str] = cls._resources._loaded["provincias"][institucion]
         
          # ---------------------- Input: Series-like ----------------------
-        if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
+        if is_series_like(ubigeo):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize else mapping
@@ -147,13 +147,14 @@ class Ubigeo:
                     "No se aceptan ubigeos con menos de 3 o 4 caracteres para provincias"
                 )
 
-            result = cls._resources._loaded["provincias"][institucion][ubigeo[:4]]
+            try:
+                result = mapping[ubigeo[:4]]
+            except KeyError:
+                raise KeyError(f"El código de ubigeo {ubigeo} no se encontró en la base de datos")
 
-            if normalize:
-                return eliminar_acentos(result).upper()
-            else:
-                return result
+            return eliminar_acentos(result).upper() if normalize else result
 
+    # TODO: Implementar "on_error"
     @classmethod
     def get_distrito(
         cls,
@@ -189,13 +190,12 @@ class Ubigeo:
                 raise ValueError(
                     "No se aceptan ubigeos que no tengan 5 o 6 caracteres para distritos"
                 )
+            try:
+                result = cls._resources._loaded["distritos"][institucion][ubigeo]
+            except KeyError:
+                return ""
 
-            result = cls._resources._loaded["distritos"][institucion][ubigeo]
-
-            if normalize:
-                return eliminar_acentos(result).upper()
-            else:
-                return result
+            return eliminar_acentos(result).upper() if normalize else result
 
 
     @classmethod
@@ -230,6 +230,8 @@ class Ubigeo:
                     departamento = cls.get_departamento(item, normalize=False)
                 else:
                     raise TypeError("Solo se acepta el nombre del departamento o su código de ubigeo")
+                # if eliminar_acentos(departamento.lower()) in ("region lima", "lima metropolitana"):
+                #     departamento = "Lima"
                 out.append(mapping[departamento])
             return reconstruct_like(departamento_o_ubigeo, out)
         
@@ -310,9 +312,10 @@ class Ubigeo:
             ubicacion_normalized = eliminar_acentos(nombre_ubicacion).upper().strip()
             try:
                 lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
-                ubicacion_limpia = eliminar_acentos(cls._resources._loaded["inverted"][level][institucion][lugar_clean]) 
+                ubicacion_limpia = cls._resources._loaded["inverted"][level][institucion][lugar_clean]
             except KeyError:
-                raise KeyError(f"El lugar '{nombre_ubicacion}' no se encontró en la base de datos de '{level}'")
+                return ""
+                #raise KeyError(f"El lugar '{ubicacion_normalized}' no se encontró en la base de datos de '{level}'")
             else:
                 return ubicacion_limpia
 
@@ -320,33 +323,74 @@ class Ubigeo:
     @classmethod
     def get_metadato(
         cls, 
-        codigo_o_ubicacion: str | int,
+        codigo_o_ubicacion: str | int | SeriesLike,
         level: Literal["departamentos", "provincias", "distritos"],
-        key: Literal["altitud", "capital", "latitud", "longitud", "superficie"] = "capital"
-    )-> str:
+        key: Literal["altitud", "capital", "latitud", "longitud", "superficie"] = "capital",
+    )-> str | SeriesLike:
     
         level = cls._validate_level(level)
         cls._resources._load_resource_if_needed("otros")
-        
+        mapping = cls._resources._loaded["otros"][level]
+
         if not isinstance(key, str):
             raise TypeError('Solo se aceptan "altitud", "capital", "latitud", "longitud", "superficie" como valores para solicitar')
         
         if key not in ["altitud", "capital", "latitud", "longitud", "superficie"]:
             raise ValueError('Solo se aceptan "altitud", "capital", "latitud", "longitud", "superficie" como valores para solicitar')
+
+        # ---------------------- Input: Series-like ----------------------
+        if isinstance(codigo_o_ubicacion, SeriesLike):
+            out = []
+            for item in codigo_o_ubicacion:
+                if isinstance(item, str):
+                    if not item[0].isdigit():
+                        # Se asume que el input es un string con el nombre del departamento
+                        ubicacion = Departamento.validate_ubicacion(item, normalize=False, on_error="ignore")
+                    else:
+                    # Se asume que el input es un string con el código de ubigeo
+                        ubicacion = cls.get_ubigeo(item, level)
+                elif isinstance(item, int):
+                    # Se asume que el input es es un int con l código
+                    if level == "departamentos":
+                        ubicacion = cls.get_departamento(item)
+                    elif level == "provincias":
+                        ubicacion = cls.get_provincia(item)
+                    elif level == "distritos":
+                        ubicacion = cls.get_distrito(item)
+                    #ubicacion = cls.get_ubigeo(codigo_o_ubicacion, level)
+                else:
+                    raise TypeError("Solo se acepta el nombre de la ubicacion o su código de ubigeo")
+                            
+                #ubicacion_normalized = eliminar_acentos(item).upper().strip()
+                try:
+                    ubicacion_normalized = eliminar_acentos(ubicacion).upper()
+                    out.append(mapping[ubicacion_normalized][key])
+                except KeyError:
+                    out.append("")
+                    #raise KeyError(f"El lugar '{ubicacion_normalized}' no se encontró en la base de datos de '{level}'")
+            return reconstruct_like(codigo_o_ubicacion, out)
         
-        if isinstance(codigo_o_ubicacion, str):
-            if not codigo_o_ubicacion[0].isdigit():
-                # Se asume que es el input es un string con el nombre del departamento
-                ubicacion = Departamento.validate_ubicacion(codigo_o_ubicacion, normalize=False)
+        else: 
+            # ------------------------ Input: Singular ------------------------
+            if isinstance(codigo_o_ubicacion, str):
+                if not codigo_o_ubicacion[0].isdigit():
+                    # Se asume que el input es un string con el nombre del departamento
+                    ubicacion = Departamento.validate_ubicacion(codigo_o_ubicacion, normalize=False)
+                else:
+                # Se asume que el input es un string con el código de ubigeo
+                    ubicacion = cls.get_ubigeo(codigo_o_ubicacion, level)
+            elif isinstance(codigo_o_ubicacion, int):
+                # Se asume que el input es un int con el código
+                if level == "departamentos":
+                    ubicacion = cls.get_departamento(codigo_o_ubicacion)
+                elif level == "provincias":
+                    ubicacion = cls.get_provincia(codigo_o_ubicacion)
+                elif level == "distritos":
+                    ubicacion = cls.get_distrito(codigo_o_ubicacion)
+                #ubicacion = cls.get_ubigeo(codigo_o_ubicacion, level)
             else:
-            # Se asume que es el input es un string con el código de ubigeo
-                ubicacion = cls.get_ubigeo(codigo_o_ubicacion, level)
-        elif isinstance(codigo_o_ubicacion, int):
-            # Se asume que es el input es el código en formato string
-            ubicacion = cls.get_ubigeo(codigo_o_ubicacion, level)
-        else:
-            raise TypeError("Solo se acepta el nombre de la ubicacion o su código de ubigeo")
+                raise TypeError("Solo se acepta el nombre de la ubicacion o su código de ubigeo")
 
         ubicacion = eliminar_acentos(ubicacion).upper()
-        return cls._resources._loaded["otros"][level][ubicacion][key]
+        return mapping[ubicacion][key]
         

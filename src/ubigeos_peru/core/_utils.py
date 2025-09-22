@@ -16,6 +16,7 @@ class SeriesLike(Protocol):
 
 S = TypeVar("S", bound=SeriesLike)
 
+#@lru_cache(maxsize=128)
 def is_series_like(obj: Any) -> bool:
     # Duck typing: iterable pero que NO sea str ni bytes ni dict
     if isinstance(obj, (str, bytes, dict)):
