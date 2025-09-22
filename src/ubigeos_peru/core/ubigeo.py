@@ -62,7 +62,7 @@ class Ubigeo:
         mapping: dict[str, str] = cls._resources._loaded["departamentos"][institucion]
 
         # ---------------------- Input: Series-like ----------------------
-        if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
+        if is_series_like(ubigeo):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize else mapping
@@ -88,19 +88,19 @@ class Ubigeo:
             except KeyError:
                 raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
 
-            if with_lima_metro or with_lima_region:
-                try:
-                    prov = cls.get_provincia(code, institucion=institucion, normalize=False)
-                except KeyError:
-                    raise ValueError(
-                        "Para diferenciar Lima de Lima Metropolitana o Lima Región, "
-                        "el ubigeo debe incluir el código de la provincia"
-                    )
+            # if with_lima_metro or with_lima_region:
+            #     try:
+            #         prov = cls.get_provincia(code, institucion=institucion, normalize=False)
+            #     except KeyError:
+            #         raise ValueError(
+            #             "Para diferenciar Lima de Lima Metropolitana o Lima Región, "
+            #             "el ubigeo debe incluir el código de la provincia"
+            #         )
 
-                if with_lima_metro and dept == "Lima" and prov == "Lima":
-                    dept = "Lima Metropolitana"
-                elif with_lima_region and dept == "Lima" and prov != "Lima":
-                    dept = "Lima Región"
+            #     if with_lima_metro and dept == "Lima" and prov == "Lima":
+            #         dept = "Lima Metropolitana"
+            #     elif with_lima_region and dept == "Lima" and prov != "Lima":
+            #         dept = "Lima Región"
 
             return eliminar_acentos(dept).upper() if normalize else dept
         
@@ -126,7 +126,7 @@ class Ubigeo:
         mapping: dict[str, str] = cls._resources._loaded["provincias"][institucion]
         
          # ---------------------- Input: Series-like ----------------------
-        if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
+        if is_series_like(ubigeo):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize else mapping
@@ -154,10 +154,7 @@ class Ubigeo:
             except KeyError:
                 raise KeyError(f"El código de ubigeo {ubigeo} no se encontró en la base de datos")
 
-            if normalize:
-                return eliminar_acentos(result).upper()
-            else:
-                return result
+            return eliminar_acentos(result).upper() if normalize else result
 
     # TODO: Implementar "on_error"
     @classmethod
@@ -195,6 +192,10 @@ class Ubigeo:
                 raise ValueError(
                     "No se aceptan ubigeos que no tengan 5 o 6 caracteres para distritos"
                 )
+            try:
+                result = cls._resources._loaded["distritos"][institucion][ubigeo]
+            except KeyError:
+                return ""
 
             result = cls._resources._loaded["distritos"][institucion][ubigeo]
 
@@ -342,7 +343,7 @@ class Ubigeo:
             ubicacion_normalized = eliminar_acentos(nombre_ubicacion).upper().strip()
             try:
                 lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
-                ubicacion_limpia = eliminar_acentos(cls._resources._loaded["inverted"][level][institucion][lugar_clean]) 
+                ubicacion_limpia = cls._resources._loaded["inverted"][level][institucion][lugar_clean]
             except KeyError:
                 return ""
                 #raise KeyError(f"El lugar '{ubicacion_normalized}' no se encontró en la base de datos de '{level}'")
