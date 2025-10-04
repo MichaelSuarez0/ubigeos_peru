@@ -13,15 +13,22 @@ dependencies = [
   "orjson"
 ]
 
+
 [project.urls]
 "Homepage" = "https://github.com/MichaelSuarez0/ubigeos_peru"
 
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+[[tool.setuptools-rust.ext-modules]]
+target = "tu_libreria.ubigeos_peru"  
+path = "rust/Cargo.toml"
+binding = "PyO3"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
 "ubigeos_peru" = ["resources/*.json"]
+
+[dependency-groups]
+dev = [
+    "pandas>=2.0.3",
+]

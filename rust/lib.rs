@@ -67,8 +67,9 @@
 //     Ok(())
 // }
 
-use numpy::PyArray1;
-use pyo3::{exceptions::PyValueError, prelude::*};
+use pyo3::prelude::*;
+use pyo3::exceptions::PyValueError;
+use numpy::{PyArray1, PyArrayMethods};
 use rayon::prelude::*;
 
 // #[derive(Hash, Eq, PartialEq, Debug)]
@@ -99,18 +100,30 @@ use rayon::prelude::*;
 /// let n = validate_codigo("230145", 2).unwrap();
 /// assert_eq!(n, 23);
 /// ```
-fn validate_codigo(codigo: &str, longitud: u8) -> PyResult<i16> {
+fn validate_codigo(codigo: &str, longitud: u8) -> PyResult<String> {
     if !codigo.chars().all(|c: char| c.is_ascii_digit()) {
         return Err(PyValueError::new_err(
             "El código debe contener solo dígitos",
         ));
     }
 
-    let codigo_validado: String = codigo.chars().take(longitud as usize).collect();
+    if codigo.len() > 6 {
+        return Err(PyValueError::new_err(
+            "No se aceptan códigos con más de 6 caracteres",
+        ));
+    }
 
-    codigo_validado
-        .parse::<i16>()
-        .map_err(|_| PyValueError::new_err("No se pudo convertir a código"))
+    let mut codigo = codigo.to_string();
+
+    codigo = match codigo.len() {
+        1 => format!("{:0>2}", codigo),
+        3 => format!("{:0>4}", codigo),
+        5 => format!("{:0>6}", codigo),
+        _ => codigo,
+    };
+
+    let codigo_validado: String = codigo.chars().take(longitud as usize).collect();
+    Ok(codigo_validado)
 }
 
 /// TODO: optimizar esta función para que acepte arrays de NumPy directamente.
@@ -118,15 +131,19 @@ fn validate_codigo(codigo: &str, longitud: u8) -> PyResult<i16> {
 fn get_departamento_codes<'py>(
     py: Python<'py>,
     ubigeos: Vec<String>,
-) -> PyResult<Bound<'py, PyArray1<i16>>> {
+) -> PyResult<Vec<String>> {
     let longitud: u8 = 2;
-    let codes: Vec<i16> = ubigeos
-        .into_par_iter()
-        .map(|u| validate_codigo(&u, longitud).unwrap_or(-1))
+    
+    let codes: Vec<String> = ubigeos
+        .par_iter()
+        .map(|u| {
+            validate_codigo(u, longitud).unwrap_or_else(|_| String::from("-1"))
+        })
         .collect();
 
-    Ok(PyArray1::from_vec(py, codes))
+    Ok(codes)
 }
+
 
 #[pymodule]
 fn ubigeos_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {

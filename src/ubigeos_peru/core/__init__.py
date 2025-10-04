@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
 from .ubigeo import Ubigeo
 from .departamento import Departamento
+from .resource_manager import ResourceManager
 
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
@@ -46,10 +47,6 @@ from .departamento import Departamento
 #     with_lima_region: bool = False,
 #     normalize: bool = False,
 # ) -> tuple[str, ...]: ...
-
-if TYPE_CHECKING:
-    import pandas as pd
-    import polars as pl
 
 # Contenedores soportados: pandas.Series, polars.Series, list, tuple
 
@@ -593,6 +590,18 @@ def get_metadato(
     """
     return Ubigeo.get_metadato(codigo_o_ubicacion, level, key)
 
+def cargar_diccionario(
+    resource_name: Literal[
+        "departamentos",
+        "provincias",
+        "distritos",
+        "macrorregiones",
+        "equivalencias",
+        "otros",
+        "inverted",
+    ],
+    ) -> dict[str, Any]:
+    return ResourceManager.cargar_diccionario(resource_name)
 
 # ------------------------------------------------------------------
 # Lo que se exporta al hacer `from ubigeos_peru.core import *`
@@ -606,4 +615,5 @@ __all__ = [
     "get_metadato",
     "validate_departamento",
     "validate_ubicacion",
+    "cargar_diccionario"
 ]
