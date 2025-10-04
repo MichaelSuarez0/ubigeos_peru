@@ -69,7 +69,6 @@
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
-use numpy::{PyArray1, PyArrayMethods};
 use rayon::prelude::*;
 
 // #[derive(Hash, Eq, PartialEq, Debug)]
@@ -94,12 +93,6 @@ use rayon::prelude::*;
 /// # Errores
 /// Retorna un `PyValueError` si el código contiene caracteres no numéricos
 /// o si no se puede convertir a número.
-///
-/// # Ejemplo
-/// ```
-/// let n = validate_codigo("230145", 2).unwrap();
-/// assert_eq!(n, 23);
-/// ```
 fn validate_codigo(codigo: &str, longitud: u8) -> PyResult<String> {
     if !codigo.chars().all(|c: char| c.is_ascii_digit()) {
         return Err(PyValueError::new_err(
