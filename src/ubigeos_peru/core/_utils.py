@@ -1,6 +1,6 @@
 from functools import lru_cache
 import unicodedata
-from typing import Any, Literal, Protocol, Sequence, TypeVar, runtime_checkable
+from typing import Any, Iterable, Literal, Protocol, Sequence, TypeVar, runtime_checkable
 
 @lru_cache(maxsize=128)
 def eliminar_acentos(texto: str) -> str:
@@ -12,7 +12,11 @@ def eliminar_acentos(texto: str) -> str:
 
 @runtime_checkable
 class SeriesLike(Protocol):
-    def map(self, mapper: Any) -> "SeriesLike": ...
+    def map(self, mapper: Any) -> "SeriesLike": 
+        ...
+        
+    def __iter__(self) -> Iterable[Any]: 
+        ...
 
 S = TypeVar("S", bound=SeriesLike)
 

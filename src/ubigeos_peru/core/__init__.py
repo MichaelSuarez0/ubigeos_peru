@@ -15,9 +15,8 @@ Antes:
 """
 
 from __future__ import annotations
-from typing import Iterable, TypeAlias, TypeVar, Literal, Any, TYPE_CHECKING
+from typing import Iterable, TypeAlias, Literal, Any, TYPE_CHECKING
 
-# Solo para tipado (no se ejecuta en runtime)
 if TYPE_CHECKING:
     import pandas as pd
     import polars as pl
@@ -25,6 +24,7 @@ if TYPE_CHECKING:
 from .ubigeo import Ubigeo
 from .departamento import Departamento
 from .resource_manager import ResourceManager
+from ._utils import SeriesLike
 
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
@@ -51,9 +51,6 @@ from .resource_manager import ResourceManager
 # Contenedores soportados: pandas.Series, polars.Series, list, tuple
 
 # TODO: Mergear con SeriesLike de _utils
-SeriesLike: TypeAlias = (
-    "pd.Series | pl.Series | pl.Expr | Iterable[str|int]"
-)
 
 def get_departamento(
     ubigeo: str | int | SeriesLike,
