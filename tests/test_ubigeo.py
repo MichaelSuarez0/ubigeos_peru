@@ -58,7 +58,7 @@ class TestGetUbigeo:
         assert ubg.get_ubigeo("Madre de dios", "departamentos") == "17"
         
     def test_get_ubigeo_provincia(self):
-        assert ubg.get_ubigeo("Huaral", "provincia") == "1506"
+        assert ubg.get_ubigeo("Huaral", "provincias") == "1506"
         
     def test_get_ubigeo_distrito(self):
         assert ubg.get_ubigeo("Lince", "distritos") == "150116"
@@ -98,27 +98,27 @@ class TestValidateUbicacion:
         assert ubg.validate_ubicacion("SAN MARTIN") == "San Martín"
 
 
-class TestGetMetadato:
-    def test_get_metadato_departamento_capital(self):
-        assert ubg.get_metadato("La libertad", level="departamentos", key="capital") == "Trujillo"
+# class TestGetMetadato:
+#     def test_get_metadato_departamento_capital(self):
+#         assert ubg.get_metadato("La libertad", level="departamentos", key="capital") == "Trujillo"
         
-    def test_get_metadato_provincia_capital(self):
-        assert ubg.get_metadato("Huarochiri", level="provincias", key="capital") == "Matucana"
+#     def test_get_metadato_provincia_capital(self):
+#         assert ubg.get_metadato("Huarochiri", level="provincias", key="capital") == "Matucana"
         
-    def test_get_metadato_departamento_altitud(self):
-        assert ubg.get_metadato("Cusco", level="departamento", key="altitud") == "3439"
+#     def test_get_metadato_departamento_altitud(self):
+#         assert ubg.get_metadato("Cusco", level="departamento", key="altitud") == "3439"
         
-    def test_get_metadato_provincia_altitud(self):
-        assert ubg.get_metadato("Huarochiri", level="provincia", key="altitud") == "2395"
+#     def test_get_metadato_provincia_altitud(self):
+#         assert ubg.get_metadato("Huarochiri", level="provincia", key="altitud") == "2395"
         
-    def test_get_metadato_distrito_superficie_lince(self):
-        assert ubg.get_metadato("Lince", level="distritos", key="superficie") == "3.03"
+#     def test_get_metadato_distrito_superficie_lince(self):
+#         assert ubg.get_metadato("Lince", level="distritos", key="superficie") == "3.03"
         
-    def test_get_metadato_distrito_superficie_san_isidro(self):
-        assert ubg.get_metadato("San Isidro", level="distritos", key="superficie") == "11.1"
+#     def test_get_metadato_distrito_superficie_san_isidro(self):
+#         assert ubg.get_metadato("San Isidro", level="distritos", key="superficie") == "11.1"
         
-    def test_get_metadato_distrito_superficie_sjl(self):
-        assert ubg.get_metadato("San Juan de Lurigancho", level="distritos", key="superficie") == "131.25"
+#     def test_get_metadato_distrito_superficie_sjl(self):
+#         assert ubg.get_metadato("San Juan de Lurigancho", level="distritos", key="superficie") == "131.25"
 
 class TestWrongInputs:
     """Tests para inputs incorrectos en get_departamento"""

@@ -15,11 +15,7 @@ Antes:
 """
 
 from __future__ import annotations
-from typing import Iterable, TypeAlias, Literal, Any, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import pandas as pd
-    import polars as pl
+from typing import Literal, Any
 
 from .ubigeo import Ubigeo
 from .departamento import Departamento
@@ -30,33 +26,12 @@ from ._utils import SeriesLike
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
 # ------------------------------------------------------------------
 
-# @overload
-# def get_departamento(
-#     ubigeo: list[str] | list[int],
-#     institucion: Literal["inei", "reniec", "sunat"] = "inei",
-#     with_lima_metro: bool = False,
-#     with_lima_region: bool = False,
-#     normalize: bool = False,
-# ) -> list[str]: ...
-
-# @overload
-# def get_departamento(
-#     ubigeo: tuple[str, ...] | tuple[int, ...],
-#     institucion: Literal["inei", "reniec", "sunat"] = "inei",
-#     with_lima_metro: bool = False,
-#     with_lima_region: bool = False,
-#     normalize: bool = False,
-# ) -> tuple[str, ...]: ...
-
-# Contenedores soportados: pandas.Series, polars.Series, list, tuple
-
 # TODO: Mergear con SeriesLike de _utils
 
 def get_departamento(
     ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    with_lima_metro: bool = False,
-    with_lima_region: bool = False,
+    divide_lima: bool = False,
     normalize: bool = False,
 ) -> str | SeriesLike:
     """
@@ -164,7 +139,7 @@ def get_departamento(
     Sin embargo, estos métodos son más lentos y menos intuitivo, por lo que se recomienda pasar la Serie.
     """
     return Ubigeo.get_departamento(
-        ubigeo, institucion, with_lima_metro, with_lima_region, normalize
+        ubigeo, institucion, divide_lima, normalize
     )
 
 

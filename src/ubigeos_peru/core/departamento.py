@@ -2,9 +2,9 @@ from typing import Literal
 from ._utils import (
     eliminar_acentos,
     is_series_like,
-    SeriesLike,
     reconstruct_like,
     assert_error,
+    SeriesLike,
 )
 from .resource_manager import ResourceManager
 
@@ -26,7 +26,7 @@ class Departamento:
         normalize: bool = False,
         on_error: Literal["raise", "ignore", "capitalize"] = "raise",
     ) -> str | SeriesLike:
-        cls._resources._load_resource_if_needed("equivalencias")
+        cls._resources.cargar_diccionario("equivalencias")
         mapping = cls._resources._loaded["equivalencias"]["departamentos"]
 
         # ---------------------- Input: Series-like ----------------------
@@ -106,7 +106,7 @@ class Departamento:
         normalize: bool = False,
         on_error: Literal["raise", "ignore", "capitalize"] = "raise",
     ) -> str | SeriesLike:
-        cls._resources._load_resource_if_needed("equivalencias")
+        cls._resources.cargar_diccionario("equivalencias")
         mapping = cls._resources._loaded["equivalencias"]
 
         if is_series_like(nombre_ubicacion):

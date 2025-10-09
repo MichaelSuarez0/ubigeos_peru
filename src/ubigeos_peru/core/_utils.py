@@ -1,6 +1,6 @@
 from functools import lru_cache
 import unicodedata
-from typing import Any, Iterable, Literal, Protocol, Sequence, TypeVar, runtime_checkable
+from typing import Any, Callable, Iterable, Iterator, Literal, Protocol, Self, Sequence, TypeGuard, TypeVar, Union, overload, runtime_checkable
 
 @lru_cache(maxsize=128)
 def eliminar_acentos(texto: str) -> str:
@@ -10,39 +10,30 @@ def eliminar_acentos(texto: str) -> str:
     )
     return texto_sin_acentos
 
+_T = TypeVar('_T')
+
 @runtime_checkable
 class SeriesLike(Protocol):
-    def map(self, mapper: Any) -> "SeriesLike": 
-        ...
-        
-    def __iter__(self) -> Iterable[Any]: 
-        ...
+    def map(self, *args: Any, **kwargs: Any) -> Any: ...
+    def __iter__(self) -> Iterator[Any]: ...
 
-S = TypeVar("S", bound=SeriesLike)
+    
+S = TypeVar("S")
 
 #@lru_cache(maxsize=128)
-def is_series_like(obj: Any) -> bool:
-    # Duck typing: iterable pero que NO sea str ni bytes ni dict
-    if isinstance(obj, (str, bytes, dict)):
-        return False
-    try:
-        iter(obj)
-        return True
-    except TypeError:
-        return False
+def is_series_like(obj: Any) -> TypeGuard[SeriesLike]:
+    return not isinstance(obj, (str, int, bytes, dict)) and hasattr(obj, "__iter__")
 
-def reconstruct_like(proto: Any, data: Sequence) -> Any:
+def reconstruct_like(proto: Any, data: list[str]) -> Any:
     """
     Intenta reconstruir el mismo tipo de contenedor que 'proto' con 'data'.
     Si falla, devuelve list(data). No requiere pandas.
     """
-    try:
-        # Caso común: list -> list(data), tuple -> tuple(data), numpy -> np.array(data), pd.Series -> Series(data)
-        return proto.__class__(data)
-    except Exception:
-        return list(data)
+    return proto.__class__(data)
+    # except Exception:
+    #     return list(data)
 
-def assert_error(on_error: Literal["raise", "ignore", "capitalize"], evaluated: str, message: str):
+def assert_error(on_error: Literal["raise", "warn", "capitalize", "ignore"], evaluated: str, message: str):
     if on_error == "raise":
         raise KeyError(message.format(evaluated))
     elif on_error == "ignore":
