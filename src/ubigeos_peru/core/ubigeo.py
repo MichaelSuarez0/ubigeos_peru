@@ -15,23 +15,20 @@ class Ubigeo:
 
     @classmethod
     def _validate_codigo(cls, codigo: str | int) -> str:
-        if isinstance(codigo, int):
-            codigo = str(codigo)
-
-        if isinstance(codigo, str):
-            if not codigo.isdigit():
-                raise ValueError("El código debe contener solo dígitos")
-            
-            if len(codigo) == 1:
-                codigo = codigo.zfill(2)
-            elif len(codigo) == 3:
-                codigo = codigo.zfill(4)
-            elif len(codigo) == 5:
-                codigo = codigo.zfill(6)
-            elif len(codigo) > 6:
-                raise ValueError("No se aceptan ubigeos con más de 6 caracteres")
-        else:
+        if not isinstance(codigo, (str, int)):
             raise TypeError("No se aceptan valores que no sean str o int")
+
+        codigo = str(codigo)
+        length = len(codigo)
+
+        if not codigo.isdigit():
+            raise ValueError("El código debe contener solo dígitos")
+
+        if length > 6:
+            raise ValueError("No se aceptan ubigeos con más de 6 caracteres")
+
+        if length in (1, 3, 5):
+            codigo = codigo.zfill(length + 1)
 
         return codigo
 
@@ -58,7 +55,7 @@ class Ubigeo:
         normalize: bool = False,
     ) -> str | SeriesLike:
         
-        cls._resources._load_resource_if_needed("departamentos")
+        cls._resources.cargar_diccionario("departamentos")
         mapping: dict[str, str] = cls._resources._loaded["departamentos"][institucion]
 
         # ---------------------- Input: Series-like ----------------------
@@ -122,7 +119,7 @@ class Ubigeo:
         normalize: bool = False,
     ) -> str | SeriesLike:
         
-        cls._resources._load_resource_if_needed('provincias')
+        cls._resources.cargar_diccionario('provincias')
         mapping: dict[str, str] = cls._resources._loaded["provincias"][institucion]
         
          # ---------------------- Input: Series-like ----------------------
@@ -165,7 +162,7 @@ class Ubigeo:
         normalize: bool = False,
     ) -> str | SeriesLike:
                 
-        cls._resources._load_resource_if_needed('distritos')
+        cls._resources.cargar_diccionario('distritos')
         mapping: dict[str, str] = cls._resources._loaded["distritos"][institucion]
 
         # ---------------------- Input: Series-like ----------------------
@@ -210,7 +207,7 @@ class Ubigeo:
         normalize: bool = False,
     )-> str | SeriesLike:
         
-        cls._resources._load_resource_if_needed("macrorregiones")
+        cls._resources.cargar_diccionario("macrorregiones")
         mapping = cls._resources._loaded["macrorregiones"][institucion]
 
         # ---------------------- Input: Series-like ----------------------
@@ -267,7 +264,7 @@ class Ubigeo:
     #     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     # )-> dict:
     #     """Devuelve un diccionario con las macrorregiones como keys y los nombres de los departamentos como valores"""
-    #     cls._resources._load_resource_if_needed("macrorregiones")
+    #     cls._resources.cargar_diccionario("macrorregiones")
         
     #     diccionario = cls._MACRORREGIONES[institucion]
     #     resultado = defaultdict(list)
@@ -285,7 +282,7 @@ class Ubigeo:
     )-> str | SeriesLike:
         
         level = cls._validate_level(level)
-        cls._resources._load_resource_if_needed("inverted")
+        cls._resources.cargar_diccionario("inverted")
         mapping = cls._resources._loaded["inverted"][level][institucion]
 
         # ---------------------- Input: Series-like ----------------------
@@ -363,7 +360,7 @@ class Ubigeo:
     )-> str | SeriesLike:
     
         level = cls._validate_level(level)
-        cls._resources._load_resource_if_needed("otros")
+        cls._resources.cargar_diccionario("otros")
         mapping = cls._resources._loaded["otros"][level]
 
         if not isinstance(key, str):
