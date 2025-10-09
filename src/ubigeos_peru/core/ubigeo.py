@@ -51,7 +51,7 @@ class Ubigeo:
     @classmethod
     def get_departamento(
         cls,
-        ubigeo: str | int | SeriesLike,
+        ubigeo: str | int | SeriesLike | SeriesLike,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         with_lima_metro: bool = False,
         with_lima_region: bool = False,
@@ -75,6 +75,7 @@ class Ubigeo:
                     dept_key = code[:2]
                     try:
                         out.append(mapping[dept_key])
+                        out.append(mapping[dept_key])
                     except KeyError:
                         raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
                 return reconstruct_like(ubigeo, out)
@@ -82,6 +83,7 @@ class Ubigeo:
         # ------------------------ Input: Singular ------------------------
             code = cls._validate_codigo(ubigeo)
             try:
+                dept = mapping[code[:2]]
                 dept = mapping[code[:2]]
             except KeyError:
                 raise KeyError(f"El código de ubigeo {code} no se encontró en la base de datos")
@@ -162,7 +164,7 @@ class Ubigeo:
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str | SeriesLike:
-        
+                
         cls._resources._load_resource_if_needed('distritos')
         mapping: dict[str, str] = cls._resources._loaded["distritos"][institucion]
 
@@ -194,6 +196,8 @@ class Ubigeo:
                 result = cls._resources._loaded["distritos"][institucion][ubigeo]
             except KeyError:
                 return ""
+
+            result = cls._resources._loaded["distritos"][institucion][ubigeo]
 
             return eliminar_acentos(result).upper() if normalize else result
 
@@ -309,6 +313,33 @@ class Ubigeo:
                     nombre_ubicacion = str(nombre_ubicacion)
                 except TypeError:
                     raise TypeError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
+        mapping = cls._resources._loaded["inverted"][level][institucion]
+
+        # ---------------------- Input: Series-like ----------------------
+        if isinstance(nombre_ubicacion, SeriesLike):
+            out = []
+            for item in nombre_ubicacion:
+                if not isinstance(item, str):
+                    try:
+                        item = str(item)
+                    except TypeError:
+                        raise TypeError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
+                    
+                ubicacion_normalized = eliminar_acentos(item).upper().strip()
+                try:
+                    lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
+                    out.append(mapping[lugar_clean])
+                except KeyError:
+                    raise KeyError(f"El lugar '{item}' no se encontró en la base de datos de '{level}'")
+            return reconstruct_like(nombre_ubicacion, out)
+        
+        else:
+        # ------------------------ Input: Singular ------------------------
+            if not isinstance(nombre_ubicacion, str):
+                try:
+                    nombre_ubicacion = str(nombre_ubicacion)
+                except TypeError:
+                    raise TypeError("El lugar debe ser un str, no se aceptan números u otros tipos de datos")
             ubicacion_normalized = eliminar_acentos(nombre_ubicacion).upper().strip()
             try:
                 lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
@@ -317,6 +348,9 @@ class Ubigeo:
                 return ""
                 #raise KeyError(f"El lugar '{ubicacion_normalized}' no se encontró en la base de datos de '{level}'")
             else:
+                return ubicacion_limpia
+
+   
                 return ubicacion_limpia
 
    

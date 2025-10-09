@@ -8,7 +8,7 @@ from .core import (
     get_distrito,
     get_macrorregion,
     get_ubigeo,
-    get_metadato
+    cargar_diccionario
 )
 from .core.resource_manager import ResourceManager
 
@@ -23,6 +23,7 @@ __all__ = [
     "get_distrito",
     "get_macrorregion",
     "get_ubigeo",
-    "get_medatato"
+    "get_medatato",
+    "cargar_diccionario"
 ]
 

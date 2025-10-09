@@ -1,5 +1,9 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
 [project]
-name = "ubigeos_peru"
+name = "ubigeos-peru"
 version = "0.1.0"
 description = "Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa, además de información suplementaria."
 readme = "README.md"
@@ -8,7 +12,7 @@ authors = [
   { name = "Michael Suárez", email = "michael-salvador@hotmail.com" }
 ]
 keywords = ["ubigeo", "peru", "departamentos", "provincias", "distritos", "enaho"]
-license = "MIT" 
+license = "MIT"
 dependencies = [
   "orjson"
 ]
@@ -16,12 +20,13 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/MichaelSuarez0/ubigeos_peru"
 
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.maturin]
+module-name = "ubigeos_peru.ubigeos_rust"
+python-source = "src"
+manifest-path = "rust/Cargo.toml"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
-[tool.setuptools.package-data]
-"ubigeos_peru" = ["resources/*.json"]
+[dependency-groups]
+dev = [
+    "pandas>=2.0.3",
+    "polars>=1.8.2",
+]

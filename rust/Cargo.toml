@@ -1,0 +1,16 @@
+[package]
+name = "ubigeos_rust"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "ubigeos_rust"
+crate-type = ["cdylib"]
+path = "lib.rs"
+
+[dependencies]
+numpy = "0.26.0"
+once_cell = "1.21.3"
+pyo3 = { version = "0.26.0", features = ["extension-module"] }
+rayon = "1.11.0"
+
