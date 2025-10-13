@@ -15,18 +15,23 @@ Antes:
 """
 
 from __future__ import annotations
-from typing import Literal, Any
+from typing import Literal, Any, TYPE_CHECKING
 
 from .ubigeo import Ubigeo
 from .departamento import Departamento
 from .resource_manager import ResourceManager
 from ._utils import SeriesLike
 
+if TYPE_CHECKING:
+    import pandas as pd
+    import polars as pl
+
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
 # ------------------------------------------------------------------
 
 # TODO: Mergear con SeriesLike de _utils
+
 
 def get_departamento(
     ubigeo: str | int | SeriesLike,
@@ -350,8 +355,8 @@ def validate_departamento(
 
     Parameters
     ----------
-    nombre_departamento : str
-        Nombre del departamento que se busca validar y normalizar
+    nombre_departamento : str | SeriesLike
+        Nombre o Serie de nombres de departamentos que se buscan validar y normalizar
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
     on_error : {"raise", "ignore", "capitalize"}, opcional
@@ -381,7 +386,7 @@ def validate_departamento(
 
     Validaciones rápidas individuales (sin importar el formato de entrada)
 
-    >>> validate_departamento(`HUÁNUCO")
+    >>> validate_departamento("HUÁNUCO")
     'Huánuco'
     >>>
 

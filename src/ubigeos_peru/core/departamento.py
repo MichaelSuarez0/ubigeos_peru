@@ -63,7 +63,14 @@ class Departamento:
                     out.append(item)
 
             return reconstruct_like(nombre_departamento, out)
-
+        # # ---------------------- Input: Expr-like ----------------------
+        # module = getattr(type(nombre_departamento), "__module__", "")
+        # name = getattr(type(nombre_departamento), "__name__", "")
+        # if "polars" in module and name == "Expr":
+        #     # Lazy-safe: aplicar por batches
+        #     return nombre_departamento.map_batches(
+        #         lambda s: cls.validate_departamento(s, normalize=normalize, on_error=on_error)
+        #     )
         else:
             # ------------------------ Input: Singular ------------------------
             if not isinstance(nombre_departamento, str):

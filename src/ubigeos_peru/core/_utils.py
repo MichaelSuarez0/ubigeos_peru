@@ -1,6 +1,15 @@
 from functools import lru_cache
 import unicodedata
-from typing import Any, Callable, Iterable, Iterator, Literal, Protocol, Self, Sequence, TypeGuard, TypeVar, Union, overload, runtime_checkable
+from typing import (
+    Any,
+    Iterator,
+    Literal,
+    Protocol,
+    TypeGuard,
+    TypeVar,
+    runtime_checkable,
+)
+
 
 @lru_cache(maxsize=128)
 def eliminar_acentos(texto: str) -> str:
@@ -10,19 +19,62 @@ def eliminar_acentos(texto: str) -> str:
     )
     return texto_sin_acentos
 
-_T = TypeVar('_T')
+
+_T = TypeVar("_T")
+
 
 @runtime_checkable
 class SeriesLike(Protocol):
-    def map(self, *args: Any, **kwargs: Any) -> Any: ...
+    # def apply(self, *args: Any, **kwargs: Any) -> Any: ...
     def __iter__(self) -> Iterator[Any]: ...
 
-    
-S = TypeVar("S")
 
-#@lru_cache(maxsize=128)
+# class Expr(Protocol):
+#     #def apply(self, *args: Any, **kwargs: Any) -> Any: ...
+#     def alias(self, name: str, *args: Any, **kwargs: Any) -> "Expr": ...
+
+# SeriesLike = Series | Expr
+
+
+# @lru_cache(maxsize=128)
 def is_series_like(obj: Any) -> TypeGuard[SeriesLike]:
-    return not isinstance(obj, (str, int, bytes, dict)) and hasattr(obj, "__iter__")
+    """
+    Determina si el objeto es una estructura tipo serie (pandas, polars o iterable),
+    sin requerir dependencias externas.
+
+    Detecta dinámicamente:
+      - pandas.Series
+      - polars.Series
+      - polars.Expr
+      - cualquier iterable (listas, arrays, etc.)
+    Excluye tipos escalares (str, int, bytes, dict).
+
+    Retorna
+    -------
+    bool
+        True si el objeto se comporta como una serie o expresión; False en caso contrario.
+    """
+    if isinstance(obj, (str, int, bytes, dict)):
+        return False
+
+    # Introspección segura
+    module = getattr(type(obj), "__module__", "")
+    name = getattr(type(obj), "__name__", "")
+
+    # pandas.Series
+    if "pandas" in module and name == "Series":
+        return True
+
+    # polars.Series o polars.Expr
+    if "polars" in module and name in ("Series", "Expr"):
+        return True
+
+    # Genérico iterable (listas, tuplas, arrays, etc.)
+    if hasattr(obj, "__iter__"):
+        return True
+
+    return False
+
 
 def reconstruct_like(proto: Any, data: list[str]) -> Any:
     """
@@ -33,7 +85,12 @@ def reconstruct_like(proto: Any, data: list[str]) -> Any:
     # except Exception:
     #     return list(data)
 
-def assert_error(on_error: Literal["raise", "warn", "capitalize", "ignore"], evaluated: str, message: str):
+
+def assert_error(
+    on_error: Literal["raise", "warn", "capitalize", "ignore"],
+    evaluated: str,
+    message: str,
+):
     if on_error == "raise":
         raise KeyError(message.format(evaluated))
     elif on_error == "ignore":
