@@ -1,14 +1,14 @@
 from .core import (
     Departamento,
     Ubigeo,
-    validate_departamento,
-    validate_ubicacion,
+    cargar_diccionario,
     get_departamento,
-    get_provincia,
     get_distrito,
     get_macrorregion,
+    get_provincia,
     get_ubigeo,
-    cargar_diccionario
+    validate_departamento,
+    validate_ubicacion,
 )
 from .core.resource_manager import ResourceManager
 
@@ -24,6 +24,5 @@ __all__ = [
     "get_macrorregion",
     "get_ubigeo",
     "get_medatato",
-    "cargar_diccionario"
+    "cargar_diccionario",
 ]
-

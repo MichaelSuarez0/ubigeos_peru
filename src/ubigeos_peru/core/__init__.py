@@ -15,12 +15,13 @@ Antes:
 """
 
 from __future__ import annotations
-from typing import Literal, Any, TYPE_CHECKING
 
-from .ubigeo import Ubigeo
+from typing import TYPE_CHECKING, Any, Literal
+
+from ._utils import SeriesLike
 from .departamento import Departamento
 from .resource_manager import ResourceManager
-from ._utils import SeriesLike
+from .ubigeo import Ubigeo
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -77,7 +78,7 @@ def get_departamento(
 
     Examples
     --------
-    
+
     Consultas rápidas individuales (sin importar el formato de entrada)
 
     >>> ubg.get_departamento("010101")
@@ -86,7 +87,7 @@ def get_departamento(
     "Amazonas"
     >>> ubg.get_departamento(10101, normalize=True)
     "AMAZONAS"
-    
+
     **Integración con Pandas**
 
     Ejemplo con un DataFrame de prueba
@@ -143,9 +144,7 @@ def get_departamento(
 
     Sin embargo, estos métodos son más lentos y menos intuitivo, por lo que se recomienda pasar la Serie.
     """
-    return Ubigeo.get_departamento(
-        ubigeo, institucion, divide_lima, normalize
-    )
+    return Ubigeo.get_departamento(ubigeo, institucion, divide_lima, normalize)
 
 
 def get_provincia(
@@ -394,8 +393,8 @@ def validate_departamento(
     'HUANUCO'
     >>>
 
-    **Integración con Pandas** 
-    
+    **Integración con Pandas**
+
     Creamos un DataFrame de prueba
 
     >>> import pandas as pd
@@ -559,6 +558,7 @@ def get_metadato(
     """
     return Ubigeo.get_metadato(codigo_o_ubicacion, level, key)
 
+
 def cargar_diccionario(
     resource_name: Literal[
         "departamentos",
@@ -569,8 +569,9 @@ def cargar_diccionario(
         "otros",
         "inverted",
     ],
-    ) -> dict[str, Any]:
+) -> dict[str, Any]:
     return ResourceManager.cargar_diccionario(resource_name)
+
 
 # ------------------------------------------------------------------
 # Lo que se exporta al hacer `from ubigeos_peru.core import *`
@@ -584,5 +585,5 @@ __all__ = [
     "get_metadato",
     "validate_departamento",
     "validate_ubicacion",
-    "cargar_diccionario"
+    "cargar_diccionario",
 ]

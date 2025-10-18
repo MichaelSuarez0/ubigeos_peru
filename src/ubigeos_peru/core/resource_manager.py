@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Any, Literal
+
 import orjson
 
 # Configuración de recursos
@@ -30,10 +31,7 @@ class ResourceManager:
     _loaded: dict[str, dict[str, Any]] = {}
 
     @classmethod
-    def cargar_diccionario(
-        cls,
-        resource_name: ResourceName
-    ) -> dict[str, Any]:
+    def cargar_diccionario(cls, resource_name: ResourceName) -> dict[str, Any]:
         """
         Carga un recurso JSON desde el directorio de recursos con lazy loading
 

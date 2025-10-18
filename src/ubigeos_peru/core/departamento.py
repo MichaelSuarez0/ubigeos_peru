@@ -1,10 +1,11 @@
 from typing import Literal
+
 from ._utils import (
+    SeriesLike,
+    assert_error,
     eliminar_acentos,
     is_series_like,
     reconstruct_like,
-    assert_error,
-    SeriesLike,
 )
 from .resource_manager import ResourceManager
 

@@ -1,9 +1,7 @@
 from typing import Literal
-import polars as pl
-from pathlib import Path
-from natsort import natsorted
-from _utils import update_to_readable, update_to_resources, DATABASES_PATH
 
+import polars as pl
+from _utils import DATABASES_PATH, update_to_readable, update_to_resources
 
 columns = [
     "Ubigeo",
@@ -22,8 +20,11 @@ columns = [
     "Correo Electrónico",
 ]
 
+
 # Helper functions
-def extraer_datos_de_directorio(df: pl.DataFrame, key: Literal["provincias", "distritos"]) -> dict:
+def extraer_datos_de_directorio(
+    df: pl.DataFrame, key: Literal["provincias", "distritos"]
+) -> dict:
     df.columns = columns
     if key == "provincias":
         longitud = 4
@@ -34,8 +35,7 @@ def extraer_datos_de_directorio(df: pl.DataFrame, key: Literal["provincias", "di
     )
     llaves = df.select(["Ubigeo", "Provincia y Distrito"]).to_dicts()
     dict_final = {
-        llave["Ubigeo"]
-        .strip(): llave["Provincia y Distrito"]
+        llave["Ubigeo"].strip(): llave["Provincia y Distrito"]
         .replace("\n", "")
         .replace("\r", "")
         .strip()
@@ -89,7 +89,5 @@ def crear_distritos_db():
 
 
 if __name__ == "__main__":
-    from pprint import pprint
-
     crear_provincias_db()
     crear_distritos_db()

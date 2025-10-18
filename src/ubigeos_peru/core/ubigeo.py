@@ -1,6 +1,7 @@
 from typing import Literal
-from .departamento import Departamento
+
 from ._utils import SeriesLike, eliminar_acentos, is_series_like, reconstruct_like
+from .departamento import Departamento
 from .resource_manager import ResourceManager
 
 
@@ -57,7 +58,6 @@ class Ubigeo:
         divide_lima: bool = False,
         normalize: bool = False,
     ) -> str | SeriesLike:
-        
         cls._resources.cargar_diccionario("departamentos")
 
         if divide_lima:
@@ -69,7 +69,9 @@ class Ubigeo:
             mapping: dict[str, str] = (
                 {
                     k: eliminar_acentos(v).upper()
-                    for k, v in cls._resources._loaded["departamentos"][institucion].items()
+                    for k, v in cls._resources._loaded["departamentos"][
+                        institucion
+                    ].items()
                 }
                 if normalize
                 else cls._resources._loaded["departamentos"][institucion]
@@ -118,7 +120,6 @@ class Ubigeo:
 
             return dept if not normalize else eliminar_acentos(dept).upper()
 
-
     @classmethod
     def get_provincia(
         cls,
@@ -126,7 +127,6 @@ class Ubigeo:
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str | SeriesLike:
-        
         cls._resources.cargar_diccionario("provincias")
 
         # ---------------------- Input: Series-like ----------------------
@@ -135,7 +135,9 @@ class Ubigeo:
             mapping: dict[str, str] = (
                 {
                     k: eliminar_acentos(v).upper()
-                    for k, v in cls._resources._loaded["provincias"][institucion].items()
+                    for k, v in cls._resources._loaded["provincias"][
+                        institucion
+                    ].items()
                 }
                 if normalize
                 else cls._resources._loaded["provincias"][institucion]
@@ -177,13 +179,15 @@ class Ubigeo:
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
         normalize: bool = False,
     ) -> str | SeriesLike:
-        
         cls._resources.cargar_diccionario("distritos")
 
         # ---------------------- Input: Series-like ----------------------
         if is_series_like(ubigeo) and not isinstance(ubigeo, (str, bytes)):
             mapping: dict[str, str] = (
-                {k: eliminar_acentos(v).upper() for k, v in cls._resources._loaded["distritos"][institucion].items()}
+                {
+                    k: eliminar_acentos(v).upper()
+                    for k, v in cls._resources._loaded["distritos"][institucion].items()
+                }
                 if normalize
                 else cls._resources._loaded["distritos"][institucion]
             )

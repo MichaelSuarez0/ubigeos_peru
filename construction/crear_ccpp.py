@@ -1,6 +1,8 @@
 from pathlib import Path
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 import ubigeos_peru as ubg
 
 centros_poblados = Path(
@@ -9,14 +11,16 @@ centros_poblados = Path(
 
 OUTPUT_DIR = centros_poblados.parent
 
+
 def get_headers(df: pd.DataFrame):
-    df_headers = df.iloc[:3,:].copy()
+    df_headers = df.iloc[:3, :].copy()
     df_headers.ffill(axis=0, limit=1, inplace=True)
-    df_headers = list(df_headers.iloc[-1,:])
+    df_headers = list(df_headers.iloc[-1, :])
     df_headers[-3] = "Viviendas particulares"
     df_headers[-6] = "Población Censada"
     df_headers[2] = "Región natural (según piso altitudinal)"
     return df_headers
+
 
 def clean_directorio():
     excels = {}
@@ -34,7 +38,9 @@ def clean_directorio():
         df_clean = df.loc[df.iloc[:, 0].str.len() == 4, :]
         df_clean.reset_index(drop=True, inplace=True)
         df_clean = df_clean.drop(index=0).copy()
-        df_clean.iloc[:, 3:] = df_clean.iloc[:, 3:].apply(pd.to_numeric, errors='coerce')
+        df_clean.iloc[:, 3:] = df_clean.iloc[:, 3:].apply(
+            pd.to_numeric, errors="coerce"
+        )
         df_final = df_clean.replace("-", np.nan)
 
         # Crear col "Departamento" y mover a la segunda posición
@@ -45,11 +51,16 @@ def clean_directorio():
 
         print(f"Ya va {n}")
         n += 1
-    
-    directorio_cp = pd.concat([df.reset_index(drop=True) for df in excels.values()], axis=0, ignore_index=True, sort=False)
+
+    directorio_cp = pd.concat(
+        [df.reset_index(drop=True) for df in excels.values()],
+        axis=0,
+        ignore_index=True,
+        sort=False,
+    )
     directorio_cp.to_excel(OUTPUT_DIR / "directorio_centros_poblados.xlsx", index=False)
-    #print("Se terminó yee")
-    
+    # print("Se terminó yee")
+
+
 if __name__ == "__main__":
     clean_directorio()
-

@@ -1,5 +1,5 @@
-from functools import lru_cache
 import unicodedata
+from functools import lru_cache
 from typing import (
     Any,
     Iterator,
@@ -49,7 +49,7 @@ def is_series_like(obj: Any) -> TypeGuard[SeriesLike]:
       - cualquier iterable (listas, arrays, etc.)
     Excluye tipos escalares (str, int, bytes, dict).
 
-    Retorna
+    Returns
     -------
     bool
         True si el objeto se comporta como una serie o expresión; False en caso contrario.

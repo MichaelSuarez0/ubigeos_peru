@@ -1,13 +1,13 @@
-import os
-from pathlib import Path
-from pprint import PrettyPrinter
-import unicodedata
-from natsort import natsorted
-import orjson
-from typing import Literal
 import importlib.util
+import os
 import sys
+import unicodedata
+from pathlib import Path
+from typing import Literal
+
 import black
+import orjson
+from natsort import natsorted
 
 SCRIPT_DIR = Path(__file__).parent
 # DATABASES_PATH = os.path.join(script_dir, "..", "databases")
@@ -97,10 +97,7 @@ def update_to_resources(
 
     merged_dicts = deep_merge_dicts(existing_data, final_dict)
     for subdict, values in merged_dicts.items():
-        merged_dicts[subdict] = dict(
-            natsorted(values.items(), key=lambda x: int(x[0]))
-        )
-
+        merged_dicts[subdict] = dict(natsorted(values.items(), key=lambda x: int(x[0])))
 
     with open(output_path, mode="wb") as f:
         f.write(orjson.dumps(merged_dicts))
@@ -139,9 +136,7 @@ def update_to_readable(
     # Combinar diccionarios
     merged_dicts = deep_merge_dicts(existing_data, final_dict)
     for subdict, values in merged_dicts.items():
-        merged_dicts[subdict] = dict(
-            natsorted(values.items(), key=lambda x: int(x[0]))
-        )
+        merged_dicts[subdict] = dict(natsorted(values.items(), key=lambda x: int(x[0])))
 
     # Formatear con black
     code_str = f"{variable_name.upper()} = {repr(merged_dicts)}"
