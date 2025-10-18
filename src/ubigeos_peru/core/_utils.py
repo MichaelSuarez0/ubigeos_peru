@@ -6,7 +6,6 @@ from typing import (
     Literal,
     Protocol,
     TypeGuard,
-    TypeVar,
     runtime_checkable,
 )
 
@@ -18,9 +17,6 @@ def eliminar_acentos(texto: str) -> str:
         c for c in texto_normalizado if not unicodedata.combining(c)
     )
     return texto_sin_acentos
-
-
-_T = TypeVar("_T")
 
 
 @runtime_checkable
