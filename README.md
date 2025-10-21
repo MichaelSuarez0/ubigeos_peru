@@ -131,8 +131,8 @@ Esto generará el siguiente DataFrame:
     UBIGEO  POBLACION DEPARTAMENTO
 0    10101      45694    Amazonas
 1    50101      67823    Ayacucho
-2   110101      34576    Ica     
-3   150101     857497    Lima    
+2   110101      34576    Ica
+3   150101     857497    Lima
 4   210101      45983    Puno
 5   220101      87564    San Martín
 ```
@@ -144,10 +144,10 @@ df["PROVINCIA"] = df["UBIGEO"].apply(lambda x: ubg.get_provincia(x, normalize= T
 Esto generará el siguiente DataFrame:
 
 ```
-    UBIGEO  POBLACION DEPARTAMENTO  PROVINCIA   
+    UBIGEO  POBLACION DEPARTAMENTO  PROVINCIA
 0    10101      45694    Amazonas    CHACHAPOYAS
 1    50101      67823    Ayacucho    HUAMANGA
-2   110101      34576    Ica         ICA   
+2   110101      34576    Ica         ICA
 3   150101     857497    Lima        LIMA
 4   210101      45983    Puno        PUNO
 5   220101      87564    San Martín  MOYOBAMBA
@@ -192,7 +192,7 @@ Los recursos disponibles son:
 
 #### 3. Actualizar el recurso
 
-Edita el archivo `insert_entries.py` y agrega tus entradas según la estructura de cada recurso. 
+Edita el archivo `insert_entries.py` y agrega tus entradas según la estructura de cada recurso.
 
 **Para distritos:**
 ```python
@@ -205,7 +205,7 @@ distritos = {
     },
     'sunat': {
         "120124": "Pariahuanca",
-        "080807": "Suyckutambo", 
+        "080807": "Suyckutambo",
         "080903": "Huayopata",
         "080905": "Ocobamba",
         "010199": "Distrito de Ejemplo"  # Nueva entrada
