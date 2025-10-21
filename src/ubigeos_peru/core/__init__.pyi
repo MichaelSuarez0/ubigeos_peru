@@ -16,6 +16,7 @@ from ._utils import SeriesLike
 def get_departamento(
     ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> str | SeriesLike: ...
@@ -23,6 +24,7 @@ def get_departamento(
 def get_departamento(
     ubigeo: str,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> str: ...
@@ -30,6 +32,7 @@ def get_departamento(
 def get_departamento(
     ubigeo: int,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> str: ...
@@ -37,6 +40,7 @@ def get_departamento(
 def get_departamento(
     ubigeo: pd.Series,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> pd.Series: ...
@@ -44,12 +48,14 @@ def get_departamento(
 def get_departamento(
     ubigeo: pl.Series,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> pl.Series: ...
 def get_departamento(
     ubigeo: str | SeriesLike,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> str | SeriesLike: ...
