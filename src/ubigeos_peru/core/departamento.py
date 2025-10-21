@@ -23,7 +23,7 @@ class Departamento:
     @classmethod
     def validate_departamento(
         cls,
-        nombre_departamento: str | SeriesLike,
+        departamento: str | SeriesLike,
         normalize: bool = False,
         on_error: Literal["raise", "ignore", "capitalize"] = "raise",
     ) -> str | SeriesLike:
@@ -31,14 +31,14 @@ class Departamento:
         mapping = cls._resources._loaded["equivalencias"]["departamentos"]
 
         # ---------------------- Input: Series-like ----------------------
-        if is_series_like(nombre_departamento):
+        if is_series_like(departamento):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize
                 else mapping
             )
             out = []
-            for item in nombre_departamento:
+            for item in departamento:
                 if not isinstance(item, str):
                     try:
                         str(item)
@@ -47,9 +47,9 @@ class Departamento:
                             f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
                         )
 
-                departamento = eliminar_acentos(item).strip().upper()
+                dep_limpio = eliminar_acentos(item).strip().upper()
                 try:
-                    out.append(mapping[departamento])
+                    out.append(mapping[dep_limpio])
                 except KeyError:
                     if on_error == "raise":
                         raise KeyError(f"No se ha encontrado el departamento {item}")
@@ -63,7 +63,7 @@ class Departamento:
                         )
                     out.append(item)
 
-            return reconstruct_like(nombre_departamento, out)
+            return reconstruct_like(departamento, out)
         # # ---------------------- Input: Expr-like ----------------------
         # module = getattr(type(nombre_departamento), "__module__", "")
         # name = getattr(type(nombre_departamento), "__name__", "")
@@ -74,28 +74,28 @@ class Departamento:
         #     )
         else:
             # ------------------------ Input: Singular ------------------------
-            if not isinstance(nombre_departamento, str):
+            if not isinstance(departamento, str):
                 try:
-                    str(nombre_departamento)
+                    str(departamento)
                 except TypeError:
                     raise TypeError(
-                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(nombre_departamento)}"
+                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(departamento)}"
                     )
 
-            departamento = eliminar_acentos(nombre_departamento).strip().upper()
+            dep_limpio = eliminar_acentos(departamento).strip().upper()
             try:
-                resultado = mapping[departamento]
+                resultado = mapping[dep_limpio]
             except KeyError:
-                if departamento == "REGION LIMA":
+                if dep_limpio == "REGION LIMA":
                     return "Lima Región"
                 if on_error == "raise":
                     raise KeyError(
-                        f"No se ha encontrado el departamento {nombre_departamento}"
+                        f"No se ha encontrado el departamento {departamento}"
                     )
                 elif on_error == "ignore":
-                    resultado = nombre_departamento
+                    resultado = departamento
                 elif on_error == "capitalize":
-                    resultado = nombre_departamento.capitalize()
+                    resultado = departamento.capitalize()
                 else:
                     raise ValueError(
                         'El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"'
@@ -110,14 +110,14 @@ class Departamento:
     @classmethod
     def validate_ubicacion(
         cls,
-        nombre_ubicacion: str | SeriesLike,
+        ubicacion: str | SeriesLike,
         normalize: bool = False,
         on_error: Literal["raise", "ignore", "capitalize"] = "raise",
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("equivalencias")
         mapping = cls._resources._loaded["equivalencias"]
 
-        if is_series_like(nombre_ubicacion):
+        if is_series_like(ubicacion):
             mapping: dict[str, str] = (
                 {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
                 if normalize
@@ -125,7 +125,7 @@ class Departamento:
             )
 
             out = []
-            for item in nombre_ubicacion:
+            for item in ubicacion:
                 item = eliminar_acentos(item).strip().upper()
                 try:
                     resultado = mapping["departamentos"][item]
@@ -150,22 +150,22 @@ class Departamento:
                                 )
 
                 out.append(resultado)
-            return reconstruct_like(nombre_ubicacion, out)
+            return reconstruct_like(ubicacion, out)
 
         else:
-            nombre_ubicacion = eliminar_acentos(nombre_ubicacion).strip().upper()
+            ubicacion = eliminar_acentos(ubicacion).strip().upper()
             try:
-                resultado = mapping["departamentos"][nombre_ubicacion]
+                resultado = mapping["departamentos"][ubicacion]
             except KeyError:
                 try:
-                    resultado = mapping["provincias"][nombre_ubicacion]
+                    resultado = mapping["provincias"][ubicacion]
                 except KeyError:
                     try:
-                        resultado = mapping["distritos"][nombre_ubicacion]
+                        resultado = mapping["distritos"][ubicacion]
                     except KeyError:
                         resultado = assert_error(
                             on_error,
-                            nombre_ubicacion,
+                            ubicacion,
                             message="No se encontró el lugar {} en la base de datos de departamentos, provincias o distritos",
                         )
 

@@ -283,7 +283,7 @@ def get_macrorregion(
 
 
 def get_ubigeo(
-    nombre_ubicacion: str | SeriesLike,
+    ubicacion: str | SeriesLike,
     level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
 ) -> str | SeriesLike:
@@ -341,11 +341,11 @@ def get_ubigeo(
         ...
     KeyError: 'Nombre no encontrado: "ciudad inexistente"'
     """
-    return Ubigeo.get_ubigeo(nombre_ubicacion, level, institucion)
+    return Ubigeo.get_ubigeo(ubicacion, level, institucion)
 
 
 def validate_departamento(
-    nombre_departamento: str | SeriesLike,
+    departamento: str | SeriesLike,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> str | SeriesLike:
@@ -432,11 +432,11 @@ def validate_departamento(
     3        CUSCO      1
     4      HUANUCO      0
     """
-    return Departamento.validate_departamento(nombre_departamento, normalize, on_error)
+    return Departamento.validate_departamento(departamento, normalize, on_error)
 
 
 def validate_ubicacion(
-    nombre_ubicacion: str | SeriesLike,
+    ubicacion: str | SeriesLike,
     normalize: bool = False,
     on_error: Literal["raise", "ignore", "capitalize"] = "raise",
 ) -> str | SeriesLike:
@@ -519,7 +519,7 @@ def validate_ubicacion(
     3    MARANON      CHOLON
     4   URUBAMBA   CHINCHERO
     """
-    return Departamento.validate_ubicacion(nombre_ubicacion, normalize, on_error)
+    return Departamento.validate_ubicacion(ubicacion, normalize, on_error)
 
 
 def get_metadato(

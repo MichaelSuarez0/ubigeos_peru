@@ -32,7 +32,7 @@ class SeriesLike(Protocol):
 # SeriesLike = Series | Expr
 
 
-# @lru_cache(maxsize=128)
+# @lru_cache(maxsize=128) # No funciona con Series
 def is_series_like(obj: Any) -> TypeGuard[SeriesLike]:
     """
     Determina si el objeto es una estructura tipo serie (pandas, polars o iterable),
