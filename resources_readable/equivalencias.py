@@ -1075,6 +1075,7 @@ EQUIVALENCIAS = {
         "LUNAHUANA": "Lunahuana",
         "LURICOCHA": "Luricocha",
         "LURIGANCHO": "Lurigancho",
+        "LURIGANCHO - CHOSICA": "Lurigancho",
         "LURIN": "Lurín",
         "LUYA": "Luya",
         "LUYA VIEJO": "Luya Viejo",

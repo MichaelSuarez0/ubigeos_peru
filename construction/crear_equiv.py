@@ -38,6 +38,7 @@ def crear_equivalencias():
     equivalencias_completo["distritos"]["ANDRES AVELINO CACERES"] = "Andrés Avelino Cáceres Dorregaray"
     equivalencias_completo["distritos"]["ANCO_HUALLO"] = "Anco-Huallo"
     equivalencias_completo["distritos"]["ANCOHUALLO"] = "Anco-Huallo"
+    equivalencias_completo["distritos"]["LURIGANCHO - CHOSICA"] = "Lurigancho"
 
 
     # Sortear subniveles por última vez
