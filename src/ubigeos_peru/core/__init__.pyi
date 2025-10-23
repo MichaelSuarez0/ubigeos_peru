@@ -59,8 +59,6 @@ def get_departamento(
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-
 @overload
 def get_provincia(
     ubigeo: str | int | SeriesLike,
@@ -102,8 +100,6 @@ def get_provincia(
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-
 @overload
 def get_distrito(
     ubigeo: str | int | SeriesLike,
@@ -145,8 +141,6 @@ def get_distrito(
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-
 @overload
 def get_macrorregion(
     departamento_o_ubigeo: str | SeriesLike,
@@ -188,8 +182,6 @@ def get_macrorregion(
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-
 @overload
 def get_ubigeo(
     ubicacion: str | SeriesLike,
@@ -225,7 +217,6 @@ def get_ubigeo(
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 
-
 # @overload
 # def get_metadato(
 #     codigo_ubigeo: str | SeriesLike,
@@ -256,7 +247,6 @@ def get_ubigeo(
 #     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 # ) -> str | SeriesLike: ...
 
-
 @overload
 def validate_departamento(
     nombre_departamento: str | SeriesLike,
@@ -286,8 +276,6 @@ def validate_departamento(
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-
 @overload
 def validate_ubicacion(
     nombre_ubicacion: str | SeriesLike,
@@ -312,8 +300,6 @@ def validate_ubicacion(
     nombre_ubicacion: str | SeriesLike,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-
 def cargar_diccionario(
     resource_name: Literal[
         "departamentos",

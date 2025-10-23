@@ -1,7 +1,12 @@
 from collections import defaultdict
 
 import orjson
-from _utils import RESOURCES_PATH, write_to_readable, write_to_resources, eliminar_acentos
+from _utils import (
+    RESOURCES_PATH,
+    eliminar_acentos,
+    write_to_readable,
+    write_to_resources,
+)
 
 
 def read_dict(level: str):
@@ -22,7 +27,10 @@ def join_dicts(dictionaries: list[dict], names: list[str]) -> dict:
 def invert_dict(final_dict: dict):
     final_dict = {
         level: {
-            inst: {eliminar_acentos(lugar.upper()): code for code, lugar in mappings.items()}
+            inst: {
+                eliminar_acentos(lugar.upper()): code
+                for code, lugar in mappings.items()
+            }
             for inst, mappings in institutions.items()
         }
         for level, institutions in final_dict.items()

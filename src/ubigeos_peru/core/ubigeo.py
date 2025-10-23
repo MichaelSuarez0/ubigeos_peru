@@ -2,10 +2,10 @@ from typing import Literal
 
 from ._utils import (
     SeriesLike,
+    assert_error,
     eliminar_acentos,
     is_series_like,
     reconstruct_like,
-    assert_error,
 )
 from .departamento import Departamento
 from .resource_manager import ResourceManager
@@ -181,7 +181,6 @@ class Ubigeo:
 
             return eliminar_acentos(result).upper() if normalize else result
 
-    
     @classmethod
     def get_distrito(
         cls,

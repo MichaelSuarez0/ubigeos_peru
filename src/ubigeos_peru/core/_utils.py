@@ -1,4 +1,5 @@
 import unicodedata
+import warnings
 from functools import lru_cache
 from typing import (
     Any,
@@ -9,7 +10,6 @@ from typing import (
     TypeGuard,
     runtime_checkable,
 )
-import warnings
 
 
 @lru_cache(maxsize=128)
@@ -84,7 +84,6 @@ def reconstruct_like(proto: Any, data: list[str]) -> Any:
     #     return list(data)
 
 
-
 def assert_error(
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"],
     evaluated: str,
@@ -92,7 +91,7 @@ def assert_error(
 ) -> Optional[str]:
     """
     Maneja errores en la transformación de ubigeos.
-    
+
     Parameters
     ----------
     on_error : {'raise', 'warn', 'ignore', 'capitalize', 'coerce'}
@@ -105,7 +104,7 @@ def assert_error(
         El valor (ubigeo) a procesar
     message : str
         Mensaje de error (puede usar .format())
-    
+
     Returns
     -------
     str or None

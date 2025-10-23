@@ -83,12 +83,12 @@ class Departamento:
             except KeyError:
                 # if dep_limpio == "REGION LIMA":
                 #     return "Lima Región"
-                    resultado = assert_error(
-                        on_error,
-                        evaluated=dep_limpio,
-                        message="No se ha encontrado del departamento {}"
-                        )
-                    return resultado
+                resultado = assert_error(
+                    on_error,
+                    evaluated=dep_limpio,
+                    message="No se ha encontrado del departamento {}",
+                )
+                return resultado
 
             if not normalize:
                 return resultado
