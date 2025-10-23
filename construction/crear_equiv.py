@@ -35,6 +35,10 @@ def crear_equivalencias():
     equivalencias_completo["distritos"]["CUZCO"] = "Cusco"
     equivalencias_completo["distritos"]["26 DE OCTUBRE"] = "Veintiséis de Octubre"
     equivalencias_completo["distritos"]["27 DE NOVIEMBRE"] = "Veintisiete de Noviembre"
+    equivalencias_completo["distritos"]["ANDRES AVELINO CACERES"] = "Andrés Avelino Cáceres Dorregaray"
+    equivalencias_completo["distritos"]["ANCO_HUALLO"] = "Anco-Huallo"
+    equivalencias_completo["distritos"]["ANCOHUALLO"] = "Anco-Huallo"
+
 
     # Sortear subniveles por última vez
     for nivel, dicc in equivalencias_completo.items():
