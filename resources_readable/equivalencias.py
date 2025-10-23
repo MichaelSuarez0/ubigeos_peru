@@ -159,7 +159,7 @@ EQUIVALENCIAS = {
         "MOHO": "Moho",
         "MORROPON": "Morropón",
         "MOYOBAMBA": "Moyobamba",
-        "NASCA": "Nazca",
+        "NASCA": "Nasca",
         "NAZCA": "Nazca",
         "OCROS": "Ocros",
         "OTUZCO": "Otuzco",
