@@ -1,6 +1,12 @@
 from typing import Literal
 
-from ._utils import SeriesLike, eliminar_acentos, is_series_like, reconstruct_like
+from ._utils import (
+    SeriesLike,
+    eliminar_acentos,
+    is_series_like,
+    reconstruct_like,
+    assert_error,
+)
 from .departamento import Departamento
 from .resource_manager import ResourceManager
 
@@ -125,6 +131,7 @@ class Ubigeo:
         cls,
         ubigeo: str | int | SeriesLike,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
+        on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
         normalize: bool = False,
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("provincias")
@@ -150,9 +157,12 @@ class Ubigeo:
                 try:
                     series.append(mapping[dept_key])
                 except KeyError:
-                    raise KeyError(
-                        f"El código de ubigeo {code} no se encontró en la base de datos"
+                    resultado = assert_error(
+                        on_error,
+                        evaluated=dept_key,
+                        message="El código de ubigeo {} no se encontró en la base de datos de provincias",
                     )
+                    series.append(resultado)
             return reconstruct_like(ubigeo, series)
         else:
             # ------------------------ Input: Singular ------------------------
@@ -166,17 +176,18 @@ class Ubigeo:
                 result = cls._resources._loaded["provincias"][institucion][code[:4]]
             except KeyError:
                 raise KeyError(
-                    f"El código de ubigeo {ubigeo} no se encontró en la base de datos"
+                    f"El código de ubigeo {ubigeo} no se encontró en la base de datos de provincias"
                 )
 
             return eliminar_acentos(result).upper() if normalize else result
 
-    # TODO: Implementar "on_error"
+    
     @classmethod
     def get_distrito(
         cls,
         ubigeo: str | int | SeriesLike,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
+        on_error: Literal["raise", "warn", "coerce", "ignore", "capitalize"] = "raise",
         normalize: bool = False,
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("distritos")
@@ -199,9 +210,12 @@ class Ubigeo:
                 try:
                     series.append(mapping[dept_key])
                 except KeyError:
-                    raise KeyError(
-                        f"El código de ubigeo {code} no se encontró en la base de datos"
+                    resultado = assert_error(
+                        on_error,
+                        evaluated=dept_key,
+                        message="El código de ubigeo {} no se encontró en la base de datos de distritos",
                     )
+                    series.append(resultado)
             return reconstruct_like(ubigeo, series)
 
         else:
@@ -215,7 +229,7 @@ class Ubigeo:
                 result = cls._resources._loaded["distritos"][institucion][code]
             except KeyError:
                 raise KeyError(
-                    f"El código de ubigeo {code} no se encontró en la base de datos"
+                    f"El código de ubigeo {code} no se encontró en la base de datos de distritos"
                 )
 
             result = cls._resources._loaded["distritos"][institucion][code]
@@ -324,7 +338,9 @@ class Ubigeo:
             out = []
             for item in ubicacion:
                 try:
-                    ubicacion_normalized = eliminar_acentos(str(ubicacion)).upper().strip()
+                    ubicacion_normalized = (
+                        eliminar_acentos(str(ubicacion)).upper().strip()
+                    )
                 except TypeError:
                     raise TypeError(
                         "El lugar debe ser un str, no se aceptan números u otros tipos de datos"

@@ -25,7 +25,7 @@ class Departamento:
         cls,
         departamento: str | SeriesLike,
         normalize: bool = False,
-        on_error: Literal["raise", "ignore", "capitalize"] = "raise",
+        on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("equivalencias")
         mapping = cls._resources._loaded["equivalencias"]["departamentos"]
@@ -51,17 +51,12 @@ class Departamento:
                 try:
                     out.append(mapping[dep_limpio])
                 except KeyError:
-                    if on_error == "raise":
-                        raise KeyError(f"No se ha encontrado el departamento {item}")
-                    elif on_error == "capitalize":
-                        item = item.capitalize()
-                    elif on_error == "ignore":
-                        pass
-                    else:
-                        raise ValueError(
-                            'El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"'
-                        )
-                    out.append(item)
+                    resultado = assert_error(
+                        on_error,
+                        evaluated=dep_limpio,
+                        message="No se ha encontrado del departamento {}",
+                    )
+                    out.append(resultado)
 
             return reconstruct_like(departamento, out)
         # # ---------------------- Input: Expr-like ----------------------
@@ -86,20 +81,14 @@ class Departamento:
             try:
                 resultado = mapping[dep_limpio]
             except KeyError:
-                if dep_limpio == "REGION LIMA":
-                    return "Lima Región"
-                if on_error == "raise":
-                    raise KeyError(
-                        f"No se ha encontrado el departamento {departamento}"
-                    )
-                elif on_error == "ignore":
-                    resultado = departamento
-                elif on_error == "capitalize":
-                    resultado = departamento.capitalize()
-                else:
-                    raise ValueError(
-                        'El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"'
-                    )
+                # if dep_limpio == "REGION LIMA":
+                #     return "Lima Región"
+                    resultado = assert_error(
+                        on_error,
+                        evaluated=dep_limpio,
+                        message="No se ha encontrado del departamento {}"
+                        )
+                    return resultado
 
             if not normalize:
                 return resultado
@@ -112,7 +101,7 @@ class Departamento:
         cls,
         ubicacion: str | SeriesLike,
         normalize: bool = False,
-        on_error: Literal["raise", "ignore", "capitalize"] = "raise",
+        on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("equivalencias")
         mapping = cls._resources._loaded["equivalencias"]
@@ -136,20 +125,14 @@ class Departamento:
                         try:
                             resultado = mapping["distritos"][item]
                         except KeyError:
-                            if on_error == "raise":
-                                raise KeyError(
-                                    f"No se encontró el lugar {item} en la base de datos de departamentos, provincias o distritos"
-                                )
-                            elif on_error == "ignore":
-                                resultado = item
-                            elif on_error == "capitalize":
-                                resultado = item.capitalize()
-                            else:
-                                raise ValueError(
-                                    'El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"'
-                                )
+                            resultado = assert_error(
+                                on_error,
+                                evaluated=item,
+                                message="No se encontró el lugar {} en la base de datos de departamentos, provincias o distritos",
+                            )
 
                 out.append(resultado)
+
             return reconstruct_like(ubicacion, out)
 
         else:
@@ -168,6 +151,7 @@ class Departamento:
                             ubicacion,
                             message="No se encontró el lugar {} en la base de datos de departamentos, provincias o distritos",
                         )
+                        return resultado
 
             if not normalize:
                 return resultado

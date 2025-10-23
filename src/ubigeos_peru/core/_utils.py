@@ -4,10 +4,12 @@ from typing import (
     Any,
     Iterator,
     Literal,
+    Optional,
     Protocol,
     TypeGuard,
     runtime_checkable,
 )
+import warnings
 
 
 @lru_cache(maxsize=128)
@@ -82,18 +84,45 @@ def reconstruct_like(proto: Any, data: list[str]) -> Any:
     #     return list(data)
 
 
+
 def assert_error(
-    on_error: Literal["raise", "warn", "capitalize", "ignore"],
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"],
     evaluated: str,
     message: str,
-):
+) -> Optional[str]:
+    """
+    Maneja errores en la transformación de ubigeos.
+    
+    Parameters
+    ----------
+    on_error : {'raise', 'warn', 'ignore', 'capitalize', 'coerce'}
+        - 'raise': Lanza KeyError
+        - 'warn': Emite warning y retorna None
+        - 'coerce': Retorna None
+        - 'ignore': Retorna el valor sin cambios
+        - 'capitalize': Capitaliza el valor
+    evaluated : str
+        El valor (ubigeo) a procesar
+    message : str
+        Mensaje de error (puede usar .format())
+    
+    Returns
+    -------
+    str or None
+        Valor procesado según la estrategia
+    """
     if on_error == "raise":
         raise KeyError(message.format(evaluated))
+    elif on_error == "warn":
+        warnings.warn(message.format(evaluated), UserWarning, stacklevel=2)
+        return None
+    elif on_error == "coerce":
+        return None
     elif on_error == "ignore":
         return evaluated
     elif on_error == "capitalize":
         return evaluated.capitalize()
     else:
         raise ValueError(
-            'El arg "on_error" debe ser uno de los siguientes: "raise", "ignore", "capitalize"'
+            'El arg "on_error" debe ser uno de: "raise", "warn", "ignore", "capitalize", "coerce"'
         )

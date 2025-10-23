@@ -16,16 +16,12 @@ Antes:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
 from ._utils import SeriesLike
 from .departamento import Departamento
 from .resource_manager import ResourceManager
 from .ubigeo import Ubigeo
-
-if TYPE_CHECKING:
-    import pandas as pd
-    import polars as pl
 
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
@@ -150,6 +146,7 @@ def get_departamento(
 def get_provincia(
     ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
+    on_error: Literal["raise", "warn", "coerce", "ignore", "capitalize"] = "raise",
     normalize: bool = False,
 ) -> str | SeriesLike:
     """
@@ -195,12 +192,13 @@ def get_provincia(
     "CHACHAPOYAS"
     >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
     """
-    return Ubigeo.get_provincia(ubigeo, institucion, normalize)
+    return Ubigeo.get_provincia(ubigeo, institucion, on_error, normalize)
 
 
 def get_distrito(
     ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
+    on_error: Literal["raise", "warn", "coerce", "ignore", "capitalize"] = "raise",
     normalize: bool = False,
 ) -> str | SeriesLike:
     """
@@ -242,7 +240,7 @@ def get_distrito(
     "Comas"
     >>> Para ver ejemplos de integración con pandas, visitar el docstring de get_departamento()
     """
-    return Ubigeo.get_distrito(ubigeo, institucion, normalize)
+    return Ubigeo.get_distrito(ubigeo, institucion, on_error, normalize)
 
 
 def get_macrorregion(
@@ -347,7 +345,7 @@ def get_ubigeo(
 def validate_departamento(
     departamento: str | SeriesLike,
     normalize: bool = False,
-    on_error: Literal["raise", "ignore", "capitalize"] = "raise",
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
     Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
@@ -438,7 +436,7 @@ def validate_departamento(
 def validate_ubicacion(
     ubicacion: str | SeriesLike,
     normalize: bool = False,
-    on_error: Literal["raise", "ignore", "capitalize"] = "raise",
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
     Valida el nombre de una ubicación (departamento, provincia o distrito) escrita con gramática variable y devuelve el nombre oficial.
