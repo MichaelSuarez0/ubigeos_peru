@@ -231,6 +231,8 @@ EQUIVALENCIAS = {
         "ZARUMILLA": "Zarumilla",
     },
     "distritos": {
+        "26 DE OCTUBRE": "Veintiséis de Octubre",
+        "27 DE NOVIEMBRE": "Veintisiete de Noviembre",
         "ABANCAY": "Abancay",
         "ABELARDO PARDO LEZAMETA": "Abelardo Pardo Lezameta",
         "ACARI": "Acarí",

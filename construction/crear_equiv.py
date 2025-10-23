@@ -29,10 +29,12 @@ def crear_equivalencias():
     # Provincias
     equivalencias_completo["provincias"]["CUZCO"] = "Cusco"
     equivalencias_completo["provincias"]["NAZCA"] = "Nazca"
-    equivalencias_completo["provincias"]["NASCA"] = "Nazca"
+    equivalencias_completo["provincias"]["NASCA"] = "Nasca"
 
     # Distritos
     equivalencias_completo["distritos"]["CUZCO"] = "Cusco"
+    equivalencias_completo["distritos"]["26 DE OCTUBRE"] = "Veintiséis de Octubre"
+    equivalencias_completo["distritos"]["27 DE NOVIEMBRE"] = "Veintisiete de Noviembre"
 
     # Sortear subniveles por última vez
     for nivel, dicc in equivalencias_completo.items():
