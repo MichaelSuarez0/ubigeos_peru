@@ -24,9 +24,12 @@ def crear_equivalencias():
     equivalencias_completo["departamentos"]["CUZCO"] = "Cusco"
     equivalencias_completo["departamentos"]["LIMA METROPOLITANA"] = "Lima Metropolitana"
     equivalencias_completo["departamentos"]["LIMA REGION"] = "Lima Región"
+    equivalencias_completo["departamentos"]["REGION LIMA"] = "Lima Región"
 
     # Provincias
     equivalencias_completo["provincias"]["CUZCO"] = "Cusco"
+    equivalencias_completo["provincias"]["NAZCA"] = "Nazca"
+    equivalencias_completo["provincias"]["NASCA"] = "Nazca"
 
     # Distritos
     equivalencias_completo["distritos"]["CUZCO"] = "Cusco"
@@ -41,6 +44,4 @@ def crear_equivalencias():
 
 
 if __name__ == "__main__":
-    from pprint import pprint
-
-    pprint(crear_equivalencias())
+    crear_equivalencias()
