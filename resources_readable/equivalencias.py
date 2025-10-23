@@ -41,6 +41,7 @@ EQUIVALENCIAS = {
         "ANGARAES": "Angaraes",
         "ANTA": "Anta",
         "ANTABAMBA": "Antabamba",
+        "ANTONIO RAIMONDI": "Antonio Raymondi",
         "ANTONIO RAYMONDI": "Antonio Raymondi",
         "AREQUIPA": "Arequipa",
         "ASCOPE": "Ascope",

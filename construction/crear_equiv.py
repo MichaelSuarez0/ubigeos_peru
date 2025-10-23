@@ -30,7 +30,8 @@ def crear_equivalencias():
     equivalencias_completo["provincias"]["CUZCO"] = "Cusco"
     equivalencias_completo["provincias"]["NAZCA"] = "Nazca"
     equivalencias_completo["provincias"]["NASCA"] = "Nasca"
-
+    equivalencias_completo["provincias"]["ANTONIO RAIMONDI"] = "Antonio Raymondi"
+    
     # Distritos
     equivalencias_completo["distritos"]["CUZCO"] = "Cusco"
     equivalencias_completo["distritos"]["26 DE OCTUBRE"] = "Veintiséis de Octubre"

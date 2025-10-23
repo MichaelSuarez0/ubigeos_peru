@@ -107,28 +107,32 @@ class Departamento:
         mapping = cls._resources._loaded["equivalencias"]
 
         if is_series_like(ubicacion):
-            mapping: dict[str, str] = (
-                {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
-                if normalize
-                else mapping
-            )
+            # Normalizar cada sub-diccionario si es necesario
+            if normalize:
+                mapping_norm = {
+                    "departamentos": {k: eliminar_acentos(v).upper() for k, v in mapping["departamentos"].items()},
+                    "provincias": {k: eliminar_acentos(v).upper() for k, v in mapping["provincias"].items()},
+                    "distritos": {k: eliminar_acentos(v).upper() for k, v in mapping["distritos"].items()}
+                }
+            else:
+                mapping_norm = mapping
 
             out = []
             for item in ubicacion:
                 item = eliminar_acentos(item).strip().upper()
                 try:
-                    resultado = mapping["departamentos"][item]
+                    resultado = mapping_norm["departamentos"][item]
                 except KeyError:
                     try:
-                        resultado = mapping["provincias"][item]
+                        resultado = mapping_norm["provincias"][item]
                     except KeyError:
                         try:
-                            resultado = mapping["distritos"][item]
+                            resultado = mapping_norm["distritos"][item]
                         except KeyError:
                             resultado = assert_error(
                                 on_error,
                                 evaluated=item,
-                                message="No se encontró el lugar {} en la base de datos de departamentos, provincias o distritos",
+                                message="No se encontró el lugar {} en la base de datos de provincias o distritos",
                             )
 
                 out.append(resultado)
@@ -149,7 +153,7 @@ class Departamento:
                         resultado = assert_error(
                             on_error,
                             ubicacion,
-                            message="No se encontró el lugar {} en la base de datos de departamentos, provincias o distritos",
+                            message="No se encontró el lugar {} en la base de datos de provincias o distritos",
                         )
                         return resultado
 

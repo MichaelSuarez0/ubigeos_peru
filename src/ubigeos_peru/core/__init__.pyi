@@ -15,7 +15,7 @@ from ._utils import SeriesLike
 @overload
 def get_departamento(
     ubigeo: str | int | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
@@ -23,7 +23,7 @@ def get_departamento(
 @overload
 def get_departamento(
     ubigeo: str,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
@@ -31,7 +31,7 @@ def get_departamento(
 @overload
 def get_departamento(
     ubigeo: int,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
@@ -39,7 +39,7 @@ def get_departamento(
 @overload
 def get_departamento(
     ubigeo: pd.Series,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
@@ -47,14 +47,14 @@ def get_departamento(
 @overload
 def get_departamento(
     ubigeo: pl.Series,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
 def get_departamento(
     ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
@@ -62,82 +62,82 @@ def get_departamento(
 @overload
 def get_provincia(
     ubigeo: str | int | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 @overload
 def get_provincia(
     ubigeo: str,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
 @overload
 def get_provincia(
     ubigeo: int,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
 @overload
 def get_provincia(
     ubigeo: pd.Series,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
 @overload
 def get_provincia(
     ubigeo: pl.Series,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
 def get_provincia(
     ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 @overload
 def get_distrito(
     ubigeo: str | int | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 @overload
 def get_distrito(
     ubigeo: str,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
 @overload
 def get_distrito(
     ubigeo: int,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
 @overload
 def get_distrito(
     ubigeo: pd.Series,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
 @overload
 def get_distrito(
     ubigeo: pl.Series,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
 def get_distrito(
     ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
@@ -279,25 +279,30 @@ def validate_departamento(
 @overload
 def validate_ubicacion(
     nombre_ubicacion: str | SeriesLike,
+    normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 @overload
 def validate_ubicacion(
     nombre_ubicacion: str,
+    normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
 @overload
 def validate_ubicacion(
     nombre_ubicacion: pd.Series,
+    normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
 @overload
 def validate_ubicacion(
     nombre_ubicacion: pl.Series,
+    normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
 def validate_ubicacion(
     nombre_ubicacion: str | SeriesLike,
+    normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 def cargar_diccionario(
