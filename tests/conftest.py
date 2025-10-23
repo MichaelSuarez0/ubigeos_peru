@@ -2,12 +2,12 @@
 Configuración global para pytest
 """
 
-import pandas as pd
-import pytest
 from pathlib import Path
 
-DBS_DIR = Path(__file__).parent.resolve() / "test_dbs"
+import pandas as pd
+import pytest
 
+DBS_DIR = Path(__file__).parent.resolve() / "test_dbs"
 
 
 @pytest.fixture
@@ -20,8 +20,15 @@ def db_mininter():
     df = pd.read_csv(
         DBS_DIR / "mininter_personas_desaparecidas.csv",
         sep=",",
-        usecols=["AÑO", "MES", "UBIGEO_HECHO", "DPTO_HECHO", "PROV_HECHO", "DIST_HECHO"],
-        encoding="utf-8-sig"
+        usecols=[
+            "AÑO",
+            "MES",
+            "UBIGEO_HECHO",
+            "DPTO_HECHO",
+            "PROV_HECHO",
+            "DIST_HECHO",
+        ],
+        encoding="utf-8-sig",
     )
     return df.apply(lambda col: col.str.strip() if col.dtype == "object" else col)
 
@@ -40,8 +47,6 @@ def db_minam():
         usecols=["UBIGEO", "REG_NAT", "DEPARTAMENTO", "PROVINCIA", "DISTRITO"],
     )
     return df.apply(lambda col: col.str.strip() if col.dtype == "object" else col)
-
-
 
 
 # @pytest.fixture

@@ -2,6 +2,7 @@ import pytest
 
 import ubigeos_peru as ubg
 
+
 class TestGetDepartamento:
     def test_get_departamento_from_string_code(self):
         assert ubg.get_departamento("1") == "Amazonas"

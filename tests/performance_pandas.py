@@ -1,9 +1,12 @@
-import statistics
 import random
+import statistics
 import time
-import ubigeos_peru as ubg
 from functools import wraps
+
 import pandas as pd
+
+import ubigeos_peru as ubg
+
 
 def medir_tiempo(func):
     @wraps(func)
@@ -13,7 +16,9 @@ def medir_tiempo(func):
         fin = time.perf_counter()
         print(f"La función '{func.__name__}' tardó {fin - inicio:.6f} segundos")
         return resultado
+
     return wrapper
+
 
 def medir_tiempo_repetido(_func=None, *, n_iter=10, warmup=1, copiar_df=True):
     def _decorator(func):
@@ -39,36 +44,46 @@ def medir_tiempo_repetido(_func=None, *, n_iter=10, warmup=1, copiar_df=True):
 
             promedio = statistics.mean(tiempos)
             desv = statistics.pstdev(tiempos) if len(tiempos) > 1 else 0.0
-            print(f"{func.__name__}: {promedio:.6f} s ± {desv:.6f} s "
-                  f"(promedio de {n_iter} corridas, warmup={warmup})")
+            print(
+                f"{func.__name__}: {promedio:.6f} s ± {desv:.6f} s "
+                f"(promedio de {n_iter} corridas, warmup={warmup})"
+            )
             return result
+
         return _wrapper
 
     # Permite @medir_tiempo_repetido y @medir_tiempo_repetido(...)
     return _decorator if _func is None else _decorator(_func)
 
+
 def construct_random_data(size: int = 500_000):
     random.seed(128)
     ubigeos_list = list(ubg.cargar_diccionario("distritos")["inei"].keys())
     random_numbers_list = random.choices(ubigeos_list, k=size)
-    data = pd.DataFrame({
-        "id": list(range(1, len(random_numbers_list) + 1)),
-        "ubigeo": random_numbers_list
-    })
-    #data["ubigeo"] = data["ubigeo"].apply(ubg.Ubigeo._validate_codigo)
+    data = pd.DataFrame(
+        {
+            "id": list(range(1, len(random_numbers_list) + 1)),
+            "ubigeo": random_numbers_list,
+        }
+    )
+    # data["ubigeo"] = data["ubigeo"].apply(ubg.Ubigeo._validate_codigo)
     return data
+
 
 def construct_random_dirty_data(size: int = 500_000):
     random.seed(128)
     ubigeos_list = list(ubg.cargar_diccionario("distritos")["inei"].keys())
     random_numbers_list = random.choices(ubigeos_list, k=size)
-    data = pd.DataFrame({
-        "id": list(range(1, len(random_numbers_list) + 1)),
-        "ubigeo": random_numbers_list
-    })
+    data = pd.DataFrame(
+        {
+            "id": list(range(1, len(random_numbers_list) + 1)),
+            "ubigeo": random_numbers_list,
+        }
+    )
     data["ubigeo"] = pd.to_numeric(data["ubigeo"])
-    #data["ubigeo"] = data["ubigeo"].apply(ubg.Ubigeo._validate_codigo)
+    # data["ubigeo"] = data["ubigeo"].apply(ubg.Ubigeo._validate_codigo)
     return data
+
 
 # def construct_random_data(size: int = 500_000):
 #     random.seed(10)
@@ -80,14 +95,17 @@ def construct_random_dirty_data(size: int = 500_000):
 #     })
 #     return data
 
+
 @medir_tiempo_repetido
 def with_apply(data: pd.DataFrame):
     data["departamento"] = data["ubigeo"].map(ubg.get_departamento)
+
 
 @medir_tiempo_repetido
 def with_series(data: pd.DataFrame):
     data["departamento"] = ubg.get_departamento(data["ubigeo"])
     return data
+
 
 @medir_tiempo_repetido
 def with_map(data: pd.DataFrame):
@@ -96,18 +114,17 @@ def with_map(data: pd.DataFrame):
     return data
 
 
-if __name__ == "__main__":  
+if __name__ == "__main__":
     data = construct_random_data(size=1_000_000)
-    #data = with_rust(data)
-    #print(data)
+    # data = with_rust(data)
+    # print(data)
     with_apply(data)
     with_series(data)
     with_map(data)
-    #with_rust(data)
+    # with_rust(data)
 
 
-
-#DEPARTAMENTOS = {
+# DEPARTAMENTOS = {
 #     "01": "Amazonas",
 #     "02": "Áncash",
 #     "03": "Apurímac",

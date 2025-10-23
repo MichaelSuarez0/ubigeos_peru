@@ -1,7 +1,7 @@
 import pytest
 
 import ubigeos_peru as ubg
-import warnings
+
 
 def test_get_departamento(db_mininter):
     # Crear una copia del dataset para comparar
@@ -17,7 +17,8 @@ def test_get_departamento(db_mininter):
     # ORIGINAL: Solo validar la columna esperada (DPTO_HECHO) para tener
     # ambas columnas en el mismo formato antes de la comparación.
     db_mininter["DPTO_HECHO"] = ubg.validate_departamento(
-        db_mininter["DPTO_HECHO"], normalize=True, on_error="ignore")
+        db_mininter["DPTO_HECHO"], normalize=True, on_error="ignore"
+    )
 
     # Comparar cada departamento calculado con el esperado.
     for dep_clean, dep_expected in zip(
@@ -34,18 +35,15 @@ def test_get_provincia(db_mininter):
     dataset_limpio = db_mininter.copy()
 
     # COPIA: Extraer la provincia a partir del código UBIGEO_HECHO.
-    dataset_limpio["PROVINCIA"] = ubg.get_provincia(
-        db_mininter["UBIGEO_HECHO"]
-    )
+    dataset_limpio["PROVINCIA"] = ubg.get_provincia(db_mininter["UBIGEO_HECHO"])
 
     # ORIGINAL: Solo validar la columna esperada (PROV_HECHO) para tener
     db_mininter["PROV_HECHO"] = ubg.validate_ubicacion(
-        db_mininter["PROV_HECHO"], on_error="raise")
+        db_mininter["PROV_HECHO"], on_error="raise"
+    )
 
     # Comparar cada provincia calculada con el esperado.
-    for clean, expected in zip(
-        dataset_limpio["PROVINCIA"], db_mininter["PROV_HECHO"]
-    ):
+    for clean, expected in zip(dataset_limpio["PROVINCIA"], db_mininter["PROV_HECHO"]):
         if clean == "Nasca":
             clean = "Nazca"
         assert clean == expected
@@ -62,11 +60,13 @@ def test_get_distrito(db_mininter):
 
     # ORIGINAL: Solo validar la columna esperada (DIST_HECHO) para tener
     db_mininter["DIST_HECHO"] = ubg.validate_ubicacion(
-        db_mininter["DIST_HECHO"], on_error="coerce")
+        db_mininter["DIST_HECHO"], on_error="coerce"
+    )
 
     # Comparar cada distrito calculada con el esperado.
     for clean, expected in zip(
-        dataset_limpio["DISTRITO"], db_mininter["DIST_HECHO"],
+        dataset_limpio["DISTRITO"],
+        db_mininter["DIST_HECHO"],
     ):
         if expected == "EL MUYO" or expected == "Bagua" or clean == "150144":
             continue
