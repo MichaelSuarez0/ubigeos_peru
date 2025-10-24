@@ -1,16 +1,16 @@
-import importlib.util
 import os
-import sys
-import unicodedata
 from pathlib import Path
-from typing import Literal
+import re
+import unicodedata
+from natsort import natsorted
+import orjson
+from typing import Literal, Optional
+import importlib.util
 
 import black
-import orjson
-from natsort import natsorted
+import pprint
 
 SCRIPT_DIR = Path(__file__).parent
-# DATABASES_PATH = os.path.join(script_dir, "..", "databases")
 RESOURCES_PATH = SCRIPT_DIR.parent / "src" / "ubigeos_peru" / "resources"
 RESOURCES_READABLE_PATH = SCRIPT_DIR.parent / "resources_readable"
 DATABASES_PATH = SCRIPT_DIR.parent / "databases"
@@ -23,6 +23,48 @@ def eliminar_acentos(texto: str) -> str:
     )
     return texto_sin_acentos
 
+
+# Helper functions
+def dms_to_dd(coord: str, hemisphere: str) -> Optional[float]:
+    """
+    Convierte coordenadas en grados, minutos, segundos (DMS) a decimal (DD).
+    Ejemplo: "74º13'31\"" con hemisferio "O" -> -74.225278
+
+    Retorna None si la conversión falla.
+    """
+    if coord is None or not isinstance(coord, str) or coord.strip() == "":
+        return None
+
+    try:
+        # Normalizar símbolos y quitar comillas
+        clean = (
+            coord.replace("º", " ")
+                 .replace("°", " ")
+                 .replace("ʹ", " ")
+                 .replace("'", " ")
+                 .replace("′", " ")
+                 .replace('"', " ")
+                 .replace("″", " ")
+                 .replace(",", ".")
+        )
+        
+        # Separar en partes y limpiar espacios
+        parts = [p.strip() for p in re.split(r"\s+", clean.strip()) if p.strip()]
+
+        deg = float(parts[0])
+        minutes = float(parts[1])
+        seconds = float(parts[2])
+
+        dd = deg + minutes / 60 + seconds / 3600
+
+        # Aplicar signo según hemisferio
+        if hemisphere.upper() in ["S", "O", "W"]:
+            dd = -dd
+
+        return round(dd, 8)  # Redondear a 8 decimales para precisión
+    except Exception as e:
+        print(f"Error convirtiendo coordenada '{coord}': {e}")
+        return None
 
 def write_to_resources(
     final_dict: dict,
@@ -95,12 +137,18 @@ def update_to_resources(
         with open(output_path, mode="rb") as f:
             existing_data = orjson.loads(f.read())
 
-    merged_dicts = deep_merge_dicts(existing_data, final_dict)
-    for subdict, values in merged_dicts.items():
-        merged_dicts[subdict] = dict(natsorted(values.items(), key=lambda x: int(x[0])))
+        merged_dicts = deep_merge_dicts(existing_data, final_dict)
+    else:
+        merged_dicts = {}
+    # for subdict, values in merged_dicts.items():
+    #     merged_dicts[subdict] = dict(
+    #         natsorted(values.items(), key=lambda x: int(x[0]))
+    #     )
 
     with open(output_path, mode="wb") as f:
         f.write(orjson.dumps(merged_dicts))
+        
+    print(f"[INFO] Se actualizó {variable_name} en resources")
 
 
 def update_to_readable(
@@ -135,15 +183,18 @@ def update_to_readable(
 
     # Combinar diccionarios
     merged_dicts = deep_merge_dicts(existing_data, final_dict)
-    for subdict, values in merged_dicts.items():
-        merged_dicts[subdict] = dict(natsorted(values.items(), key=lambda x: int(x[0])))
+    for institucion, values in merged_dicts.items():
+        merged_dicts[institucion] = dict(
+            natsorted(values.items(), key=lambda x: x[0])
+        )
 
     # Formatear con black
-    code_str = f"{variable_name.upper()} = {repr(merged_dicts)}"
+    code_str = f"{variable_name.upper()} = {pprint.pformat(merged_dicts)}"
     formatted_code = black.format_str(code_str, mode=black.FileMode())
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(formatted_code)
+    print(f"[INFO] Se actualizó {variable_name} en resources_readable")
 
 
 # Note: when writing to readable format, remember to use this commdand in the terminal to pretty print:
