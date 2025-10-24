@@ -126,7 +126,7 @@ fn get_departamento_codes<'py>(
     ubigeos: Vec<String>,
 ) -> PyResult<Vec<String>> {
     let longitud: u8 = 2;
-    
+
     let codes: Vec<String> = ubigeos
         .par_iter()
         .map(|u| {

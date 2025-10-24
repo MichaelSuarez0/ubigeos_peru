@@ -1,15 +1,16 @@
 """
 ---
 script:
-  name: "crear_global.py"
+  name: "crear_ubigeo_inei.py"
   description: "Script para transformar el Directorio Nacional de Centros Poblados y extraer la metadata de todos los distritos"
   output:
     - "ubigeos_peru/resources_readable/global.py"
-    - "ubigeos_peru/src/ubigeos_peru/resources/global.json"
-    - "ubigeos_peru/resources_readable/distritos.py"
-    - "ubigeos_peru/src/ubigeos_peru/resources/distritos.json"
     - "ubigeos_peru/resources_readable/provincias.py"
+    - "ubigeos_peru/resources_readable/distritos.py"
+    - "ubigeos_peru/src/ubigeos_peru/resources/global.json"
     - "ubigeos_peru/src/ubigeos_peru/resources/provincias.json"
+    - "ubigeos_peru/src/ubigeos_peru/resources/distritos.json"
+    - "ubigeos_peru/src/ubigeos_peru/databases/ubigeo_inei_2025.csv"
 
 source:
   name: "Directorio Nacional de Gobiernos Regionales, Municipalidades Provinciales, Distritales y de Centros Poblados 2025 (Cuadros en Excel)"
@@ -184,7 +185,7 @@ def _merge_directories(path: Path, key: Literal["provincia", "distrito"]) -> lis
     return final_list
 
 
-def crear_provincias_db():
+def crear_provincias_inei():
     provincias_dir = DATABASES_PATH / "municipalidades_2025"
     provincias = {}
     final_dict = {}
@@ -206,7 +207,7 @@ def crear_provincias_db():
     return final_dict
 
 
-def crear_distritos_db():
+def crear_distritos_inei():
     distritos_dir = DATABASES_PATH / "municipalidades_2025"
     final_dict = {}
 
@@ -242,7 +243,7 @@ def crear_global_db():
     return final_dict
 
 
-def crear_full_db():
+def crear_ubigeo_inei():
     provincias_dir = DATABASES_PATH / "municipalidades_2025"
 
     final_list = _merge_directories(provincias_dir, key="distrito")
@@ -299,4 +300,4 @@ def crear_full_db():
 
 
 if __name__ == "__main__":
-    crear_full_db()
+    crear_ubigeo_inei()

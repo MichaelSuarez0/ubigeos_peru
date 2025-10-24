@@ -4,10 +4,9 @@ import numpy as np
 import pandas as pd
 
 import ubigeos_peru as ubg
+from _utils import DATABASES_PATH
 
-centros_poblados = Path(
-    r"C:\Users\micha\OneDrive\Python\ubigeos_peru\resources_readable\6722617-directorio-nacional-de-gobiernos-regionales-municipalidades-provinciales-distritales-y-de-centros-poblados-2025-cuadros-en-excel\Centros poblados"
-)
+centros_poblados = Path(DATABASES_PATH / "municipalidades_centros_poblados_2025")
 
 OUTPUT_DIR = centros_poblados.parent
 
@@ -58,8 +57,9 @@ def clean_directorio():
         ignore_index=True,
         sort=False,
     )
-    directorio_cp.to_excel(OUTPUT_DIR / "directorio_centros_poblados.xlsx", index=False)
-    # print("Se terminó yee")
+    directorio_cp.to_csv(
+        OUTPUT_DIR / "directorio_centros_poblados.csv", index=False, sep=";", encoding="utf-8-sig"
+    )
 
 
 if __name__ == "__main__":

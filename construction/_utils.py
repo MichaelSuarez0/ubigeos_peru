@@ -129,6 +129,7 @@ def update_to_resources(
         "macrorregiones",
         "otros",
         "provincias",
+        "global"
     ],
 ) -> None:
     output_path = RESOURCES_PATH / f"{variable_name}.json"
@@ -161,6 +162,7 @@ def update_to_readable(
         "macrorregiones",
         "otros",
         "provincias",
+        "global"
     ],
 ) -> None:
     output_path = RESOURCES_READABLE_PATH / f"{variable_name}.py"

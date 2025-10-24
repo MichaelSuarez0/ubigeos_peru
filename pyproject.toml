@@ -41,4 +41,8 @@ dev = [
     "pandas>=2.3.2",
     "polars>=1.8.2",
     "pyarrow>=17.0.0",
+    "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
+    "xlrd>=2.0.2",
+    "duckdb>=1.4.1",
 ]
