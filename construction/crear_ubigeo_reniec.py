@@ -30,7 +30,6 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import duckdb
-import time
 
 import ubigeos_peru as ubg
 from ubigeos_peru.core._utils import eliminar_acentos
@@ -39,7 +38,15 @@ from _utils import DATABASES_PATH
 
 
 def _clean_ubigeo_reniec(df: pd.DataFrame):
-    df = df.drop(columns=["N°"])
+    try:
+        df = df.drop(columns=["N°"])
+    except KeyError:
+        print("['N°'] not found in axis")
+
+    df["COD_DEP"]  = df["COD_DEP"].astype(str).str.zfill(2)
+    df["COD_PROV"] = df["COD_PROV"].astype(str).str.zfill(2)
+    df["COD_DIST"] = df["COD_DIST"].astype(str).str.zfill(2)
+
     df["Ubigeo"] = df["COD_DEP"] + df["COD_PROV"] + df["COD_DIST"]
     cols = ["Ubigeo"] + [c for c in df.columns if c != "Ubigeo"]
 
@@ -49,7 +56,28 @@ def _clean_ubigeo_reniec(df: pd.DataFrame):
         "",
         regex=True,
     )
+    df["Distrito"] = df["Distrito"].replace(
+        {"SAN ISI": "SAN ISIDRO"},
+        regex=False
+    )
+
+    df["Departamento"] = ubg.validate_departamento(df["Departamento"])
+    df["Provincia"] = ubg.validate_ubicacion(df["Provincia"], on_error="raise")
+    df["Distrito"] = ubg.validate_ubicacion(df["Distrito"], on_error="warn")
+
+
     return df
+
+def _write_ubigeo_reniec(df: pd.DataFrame):
+    df.to_csv(
+        DATABASES_PATH / "ubigeo_reniec_2025.csv", encoding="utf-8-sig", index=False
+    )
+    print("Se creó ubigeo_reniec_2025.csv")
+
+def _leer_ubigeo_reniec():
+    df = pd.read_csv(DATABASES_PATH / "ubigeo_reniec_2025.csv", encoding="utf-8-sig")
+    return df
+
 
 def crear_ubigeo_reniec():
     URL = "https://www.reniec.gob.pe/Adherentes/ubigeos"
@@ -135,11 +163,11 @@ def crear_ubigeo_reniec():
 
     df = _clean_ubigeo_reniec(df)
 
-    df.to_csv(
-        DATABASES_PATH / "ubigeo_reniec_2025.csv", encoding="utf-8-sig", index=False
-    )
-    print("Se creó ubigeo_reniec_2025.csv")
+    _write_ubigeo_reniec(df)
+
 
 
 if __name__ == "__main__":
-    crear_ubigeo_reniec()
+    df = _leer_ubigeo_reniec()
+    df = _clean_ubigeo_reniec(df)
+    _write_ubigeo_reniec(df)

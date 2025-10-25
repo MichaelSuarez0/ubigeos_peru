@@ -281,6 +281,8 @@ def crear_ubigeo_inei():
     df = df.with_columns(
         pl.when(pl.col("ubigeo") == "040302").then(pl.lit("Acarí"))
         .when(pl.col("ubigeo") == "250307").then(pl.lit("Boquerón"))
+        .when(pl.col("ubigeo") == "061306").then(pl.lit("Ninabamba"))
+        .when(pl.col("ubigeo") == "060414").then(pl.lit("Pion"))
         .otherwise(pl.col("distrito"))
         .alias("distrito")
     )
