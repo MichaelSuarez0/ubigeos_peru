@@ -114,7 +114,7 @@ def assert_error(
         raise KeyError(message.format(evaluated))
     elif on_error == "warn":
         warnings.warn(message.format(evaluated), UserWarning, stacklevel=2)
-        return None
+        return evaluated
     elif on_error == "coerce":
         return None
     elif on_error == "ignore":

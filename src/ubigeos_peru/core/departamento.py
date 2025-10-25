@@ -39,13 +39,10 @@ class Departamento:
             )
             out = []
             for item in departamento:
-                if not isinstance(item, str):
-                    try:
-                        str(item)
-                    except TypeError:
-                        raise TypeError(
-                            f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
-                        )
+                if not isinstance(item, str) or item.isdigit():
+                    raise TypeError(
+                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
+                    )
 
                 dep_limpio = eliminar_acentos(item).strip().upper()
                 try:
@@ -119,6 +116,11 @@ class Departamento:
 
             out = []
             for item in ubicacion:
+                if not isinstance(item, str) or item.isdigit():
+                    raise TypeError(
+                    f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
+                )
+
                 item = eliminar_acentos(item).strip().upper()
                 try:
                     resultado = mapping_norm["departamentos"][item]
@@ -140,6 +142,10 @@ class Departamento:
             return reconstruct_like(ubicacion, out)
 
         else:
+            if not isinstance(ubicacion, str) or ubicacion.isdigit():
+                raise TypeError(
+                    f"No se permiten otros tipos de datos que no sean str, se insertó {type(ubicacion)}"
+                )
             ubicacion = eliminar_acentos(ubicacion).strip().upper()
             try:
                 resultado = mapping["departamentos"][ubicacion]
