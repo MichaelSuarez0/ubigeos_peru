@@ -247,12 +247,7 @@ def get_ubigeo(
 #     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 # ) -> str | SeriesLike: ...
 
-@overload
-def validate_departamento(
-    nombre_departamento: str | SeriesLike,
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
+
 @overload
 def validate_departamento(
     nombre_departamento: str,
@@ -276,12 +271,7 @@ def validate_departamento(
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-@overload
-def validate_ubicacion(
-    nombre_ubicacion: str | SeriesLike,
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
+
 @overload
 def validate_ubicacion(
     nombre_ubicacion: str,
