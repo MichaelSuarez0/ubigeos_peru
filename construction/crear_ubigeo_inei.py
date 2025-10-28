@@ -296,7 +296,7 @@ def crear_ubigeo_inei():
     # escribir
     df = df.to_pandas()
     df["ubigeo"] = df["ubigeo"].astype(str)
-    df.to_csv(DATABASES_PATH / "full.csv", encoding="utf-8-sig", index=False)
+    df.to_csv(DATABASES_PATH / "ubigeo_inei_2025.csv", encoding="utf-8-sig", index=False, sep=";")
 
     return df
 

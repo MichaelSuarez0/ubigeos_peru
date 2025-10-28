@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 import polars as pl
@@ -20,74 +21,67 @@ columns = [
     "Correo Electrónico",
 ]
 
+DB_INEI = DATABASES_PATH / "ubigeo_inei_2025.csv"
+DB_RENIEC = DATABASES_PATH / "ubigeo_reniec_2019.csv"
 
-# Helper functions
-def extraer_datos_de_directorio(
-    df: pl.DataFrame, key: Literal["provincias", "distritos"]
-) -> dict:
-    df.columns = columns
-    if key == "provincias":
-        longitud = 4
-    elif key == "distritos":
-        longitud = 6
-    df = df.with_columns(pl.col("Ubigeo").cast(pl.Utf8)).filter(
-        pl.col("Ubigeo").str.len_chars() == longitud
-    )
-    llaves = df.select(["Ubigeo", "Provincia y Distrito"]).to_dicts()
-    dict_final = {
-        llave["Ubigeo"].strip(): llave["Provincia y Distrito"]
-        .replace("\n", "")
-        .replace("\r", "")
-        .strip()
-        for llave in llaves
-    }
-    return dict_final
-
-
-def crear_provincias_db():
-    provincias_dir = DATABASES_PATH / "municipalidades_2025"
+def crear_provincias(institucion: Literal["inei", "reniec"]):
     provincias = {}
     final_dict = {}
 
-    for path in provincias_dir.iterdir():
-        df = pl.read_excel(path)
-        provs = extraer_datos_de_directorio(df, key="provincias")
-        provincias.update(provs)
+    if institucion == "inei":
+        DB = DB_INEI
+    elif institucion == "reniec":
+        DB = DB_RENIEC
 
-    # Limpiar algunos nombres
-    provincias["0701"] = "Callao"
-    provincias["1501"] = "Lima"
-    provincias["0508"] = "Páucar del Sara Sara"
-    provincias["1005"] = "Huamalíes"
+    df = pl.read_csv(
+        DB,
+        separator=";",
+        schema_overrides={"ubigeo": pl.Utf8}
+    )
 
-    final_dict["inei"] = provincias
+    unique = set()
+    for row in df.iter_rows(named=True):
+        ubigeo = row["ubigeo"][:4]
+        if ubigeo not in unique:
+            unique.add(ubigeo)
+            provincias[ubigeo] = row["provincia"]
+
+    final_dict[institucion] = provincias
     update_to_readable(final_dict, variable_name="provincias")
     update_to_resources(final_dict, variable_name="provincias")
     return final_dict
 
-
-def crear_distritos_db():
-    provincias_dir = DATABASES_PATH / "municipalidades_2025"
-    distritos_dict = {}
+def crear_distritos(institucion: Literal["inei", "reniec"]):
+    provincias = {}
     final_dict = {}
 
-    for path in provincias_dir.iterdir():
-        df = pl.read_excel(path)
-        distritos = extraer_datos_de_directorio(df, key="distritos")
-        distritos_dict.update(distritos)
+    if institucion == "inei":
+        DB = DB_INEI
+    elif institucion == "reniec":
+        DB = DB_RENIEC
 
-    # Limpiar algunos nombres
-    distritos_dict.pop("Ubigeo")
-    distritos_dict["040302"] = "Acarí"
-    distritos_dict["061306"] = "Ninabamba"
-    distritos_dict["250307"] = "Boquerón"
+    df = pl.read_csv(
+        DB,
+        separator=";",
+        schema_overrides={"ubigeo": pl.Utf8}
+    )
 
-    final_dict["inei"] = distritos_dict
+    unique = set()
+    for row in df.iter_rows(named=True):
+        ubigeo = row["ubigeo"]
+        if ubigeo not in unique:
+            unique.add(ubigeo)
+            provincias[ubigeo] = row["distrito"]
+
+    final_dict[institucion] = provincias
     update_to_readable(final_dict, variable_name="distritos")
     update_to_resources(final_dict, variable_name="distritos")
     return final_dict
 
 
 if __name__ == "__main__":
-    crear_provincias_db()
-    crear_distritos_db()
+    # crear_provincias(institucion="inei")
+    # crear_provincias(institucion="reniec")
+    crear_distritos(institucion="inei")
+    crear_distritos(institucion="reniec")
+    # crear_distritos_inei()

@@ -61,6 +61,10 @@ def crear_equivalencias():
     equivalencias_full["distritos"]["HUAY HUAY"] = "Huay-Huay"
     equivalencias_full["distritos"]["CASTA"] = "San Pedro de Casta"
     equivalencias_full["distritos"]["SAN JOSE DE LOS CHORRILLOS"] = "San José de los Chorrillos"
+    equivalencias_full["distritos"]["HUAYA"] = "Hualla"
+    equivalencias_full["distritos"]["DANIEL ALOMIAS ROBLES"] = "Daniel Alomia Robles"
+    equivalencias_full["distritos"]["AYAUCA"] = "ALLAUCA"
+    equivalencias_full["distritos"]["CARMEN DE LA LEGUA"] = "CARMEN DE LA LEGUA REYNOSO"
 
 
     # Sortear subniveles por última vez
