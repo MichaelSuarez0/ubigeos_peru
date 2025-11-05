@@ -33,7 +33,7 @@ def dms_to_dd(coord: str, hemisphere: str) -> Optional[float]:
 
     Retorna None si la conversión falla.
     """
-    if coord is None or not isinstance(coord, str) or coord.strip() == "":
+    if not coord or not isinstance(coord, str) or coord.strip() == "":
         return None
 
     try:
@@ -62,8 +62,7 @@ def dms_to_dd(coord: str, hemisphere: str) -> Optional[float]:
         if hemisphere.upper() in ["S", "O", "W"]:
             dd = -dd
 
-        return round(dd, 8)  # Redondear a 8 decimales para precisión
-    except Exception as e:
+        return round(dd, 8)  # Redondear a 8 decimales para precisión    except Exception as e:
         print(f"Error convirtiendo coordenada '{coord}': {e}")
         return None
 
