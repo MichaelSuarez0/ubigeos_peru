@@ -6,8 +6,41 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+import inei_tools as inei
 
 DBS_DIR = Path(__file__).parent.resolve() / "test_dbs"
+
+
+@pytest.fixture
+def db_enaho_2024():
+    """
+    Lee un dataset de ejemplo de la Enaho 01 2024 para pruebas.
+    Fuente: https://proyectos.inei.gob.pe/iinei/srienaho/descarga/CSV/966-Modulo01.zip
+    """
+    
+    downloader = inei.Downloader(
+        modulos="1",
+        anios=2024,
+        output_dir=DBS_DIR,
+        overwrite=False,
+        file_type="csv",
+        data_only=True,
+    )
+    DB_PATH = downloader.download_all()[0]
+    
+
+    df = pd.read_csv(
+        DB_PATH,
+        sep=",",
+        usecols=[
+            "AÑO",
+            "MES",
+            "UBIGEO",
+            "P22",
+        ],
+        encoding="latin-1",
+    )
+    return df.apply(lambda col: col.str.strip() if col.dtype == "object" else col)
 
 
 @pytest.fixture
