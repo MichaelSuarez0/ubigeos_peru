@@ -15,10 +15,9 @@ class TestGetDepartamento:
 
     def test_get_departamento_normalized(self):
         assert ubg.get_departamento(10101, normalize=True) == "AMAZONAS"
-    
+
     def test_get_departamento_with_sp_char(self):
         assert ubg.get_departamento(22) == "San Martín"
-    
 
 
 class TestGetProvincia:

@@ -26,45 +26,45 @@ def eliminar_acentos(texto: str) -> str:
 
 
 # Helper functions
-def dms_to_dd(coord: str, hemisphere: str) -> Optional[float]:
-    """
-    Convierte coordenadas en grados, minutos, segundos (DMS) a decimal (DD).
-    Ejemplo: "74º13'31\"" con hemisferio "O" -> -74.225278
+# def dms_to_dd(coord: str, hemisphere: str) -> Optional[float]:
+#     """
+#     Convierte coordenadas en grados, minutos, segundos (DMS) a decimal (DD).
+#     Ejemplo: "74º13'31\"" con hemisferio "O" -> -74.225278
 
-    Retorna None si la conversión falla.
-    """
-    if not coord or not isinstance(coord, str) or coord.strip() == "":
-        return None
+#     Retorna None si la conversión falla.
+#     """
+#     if not coord or not isinstance(coord, str) or coord.strip() == "":
+#         return None
 
-    try:
-        # Normalizar símbolos y quitar comillas
-        clean = (
-            coord.replace("º", " ")
-                 .replace("°", " ")
-                 .replace("ʹ", " ")
-                 .replace("'", " ")
-                 .replace("′", " ")
-                 .replace('"', " ")
-                 .replace("″", " ")
-                 .replace(",", ".")
-        )
+#     try:
+#         # Normalizar símbolos y quitar comillas
+#         clean = (
+#             coord.replace("º", " ")
+#                  .replace("°", " ")
+#                  .replace("ʹ", " ")
+#                  .replace("'", " ")
+#                  .replace("′", " ")
+#                  .replace('"', " ")
+#                  .replace("″", " ")
+#                  .replace(",", ".")
+#         )
         
-        # Separar en partes y limpiar espacios
-        parts = [p.strip() for p in re.split(r"\s+", clean.strip()) if p.strip()]
+#         # Separar en partes y limpiar espacios
+#         parts = [p.strip() for p in re.split(r"\s+", clean.strip()) if p.strip()]
 
-        deg = float(parts[0])
-        minutes = float(parts[1])
-        seconds = float(parts[2])
+#         deg = float(parts[0])
+#         minutes = float(parts[1])
+#         seconds = float(parts[2])
 
-        dd = deg + minutes / 60 + seconds / 3600
+#         dd = deg + minutes / 60 + seconds / 3600
 
-        # Aplicar signo según hemisferio
-        if hemisphere.upper() in ["S", "O", "W"]:
-            dd = -dd
+#         # Aplicar signo según hemisferio
+#         if hemisphere.upper() in ["S", "O", "W"]:
+#             dd = -dd
 
-        return round(dd, 8)  # Redondear a 8 decimales para precisión    except Exception as e:
-        print(f"Error convirtiendo coordenada '{coord}': {e}")
-        return None
+#         return round(dd, 8)  # Redondear a 8 decimales para precisión    except Exception as e:
+#         print(f"Error convirtiendo coordenada '{coord}': {e}")
+#         return None
 
 def write_to_resources(
     final_dict: dict,

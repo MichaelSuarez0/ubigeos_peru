@@ -15,8 +15,8 @@ script:
 source:
   name: "Directorio Nacional de Gobiernos Regionales, Municipalidades Provinciales, Distritales y de Centros Poblados 2025 (Cuadros en Excel)"
   url: "https://www.gob.pe/institucion/inei/informes-publicaciones/6722617-directorio-nacional-de-gobiernos-regionales-municipalidades-provinciales-distritales-y-de-centros-poblados-2025"
-  reference: "1.Directorio-MPyMD-2025"
-  date: "2025-05-29"
+  original_name: "1.Directorio-MPyMD-2025"
+  last_visited: "2025-05-29"
   location: "ubigeos_peru/databases/municipalidades_2025"
   files:
     - "Amazonas_2025_CC.xls"

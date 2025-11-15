@@ -2,9 +2,7 @@
 
 Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para consultar macrorregiones, capitales y validar nombres oficiales. Se integra fácilmente con pandas para procesar bases como la ENAHO, permitiendo aplicar transformaciones masivas de ubigeos en menos de un segundo.
 
-## TODOs
-Releases
-on error: warn
+
 
 ## Características Principales
 

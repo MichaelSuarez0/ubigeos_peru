@@ -2,15 +2,17 @@
 ---
 script:
   name: "crear_ubigeo_reniec.py"
-  description: "Script para obtener los ubigeos de la RENIEC a partir de limpieza de la página GeoDir"
-  output:
-    - "ubigeos_peru/src/ubigeos_peru/databases/ubigeo_reniec_2025.csv"
+  description: "Script para obtener los ubigeos de la RENIEC a partir de limpieza de Excel de Identidad Reniec"
+  output: "ubigeos_peru/src/ubigeos_peru/databases/ubigeo_reniec_2024.csv"
 
 source:
   name: "Ubigeo de DNI de Perú (RENIEC)"
-  url: "https://account.geodir.co/recursos/ubigeo-reniec-peru.html"
+  url: "https://identidad.reniec.gob.pe/documents/d/guest/c02-9-2024-ii"
   reference: ""
-  date: "2019-01-15"
+  original_name: "C02.9.2024.II.xlsx"
+  original_date: " 2024-06-30
+  last_visited: "2025-11-11"
+  location: "ubigeos_peru/databases/C02.9.2024.II.xlsx"
   files: ""
 ---
 """

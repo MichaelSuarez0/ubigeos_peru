@@ -14,7 +14,8 @@ authors = [
 keywords = ["ubigeo", "peru", "departamentos", "provincias", "distritos", "enaho"]
 license = "MIT"
 dependencies = [
-  "orjson"
+  "orjson",
+  "rapidfuzz>=3.13.0",
 ]
 
 [project.urls]
