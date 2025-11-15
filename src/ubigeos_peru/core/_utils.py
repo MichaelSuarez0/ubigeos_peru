@@ -10,7 +10,7 @@ from typing import (
     TypeGuard,
     runtime_checkable,
 )
-
+from rapidfuzz import fuzz, process, utils
 
 @lru_cache(maxsize=128)
 def eliminar_acentos(texto: str) -> str:
@@ -125,3 +125,7 @@ def assert_error(
         raise ValueError(
             'El arg "on_error" debe ser uno de: "raise", "warn", "ignore", "capitalize", "coerce"'
         )
+
+def fuzzy_validate(ubicacion: str, options: list[str], limit: int = 1):
+    result = process.extract(ubicacion, options, scorer=fuzz.WRatio, processor=utils.default_process, limit=1)
+    return result[0][0]

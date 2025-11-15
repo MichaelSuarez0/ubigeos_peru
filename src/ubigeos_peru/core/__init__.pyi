@@ -250,51 +250,100 @@ def get_ubigeo(
 
 @overload
 def validate_departamento(
-    nombre_departamento: str,
+    departamento: str,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
+
 @overload
 def validate_departamento(
-    nombre_departamento: pd.Series,
+    departamento: pd.Series,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
+
 @overload
 def validate_departamento(
-    nombre_departamento: pl.Series,
+    departamento: pl.Series,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
+
 def validate_departamento(
-    nombre_departamento: str | SeriesLike,
+    departamento: str | SeriesLike,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 
+# ==================== validate_provincia ====================
 @overload
-def validate_ubicacion(
-    nombre_ubicacion: str,
+def validate_provincia(
+    provincia: str,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
+
 @overload
-def validate_ubicacion(
-    nombre_ubicacion: pd.Series,
+def validate_provincia(
+    provincia: pd.Series,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
+
 @overload
-def validate_ubicacion(
-    nombre_ubicacion: pl.Series,
+def validate_provincia(
+    provincia: pl.Series,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
-def validate_ubicacion(
-    nombre_ubicacion: str | SeriesLike,
+
+def validate_provincia(
+    provincia: str | SeriesLike,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
+
+# ==================== validate_distrito ====================
+@overload
+def validate_distrito(
+    distrito: str,
+    normalize: bool = False,
+    fuzzy_match: bool = True,
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
+) -> str: ...
+
+@overload
+def validate_distrito(
+    distrito: pd.Series,
+    normalize: bool = False,
+    fuzzy_match: bool = True,
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
+) -> pd.Series: ...
+
+@overload
+def validate_distrito(
+    distrito: pl.Series,
+    normalize: bool = False,
+    fuzzy_match: bool = True,
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
+) -> pl.Series: ...
+
+def validate_distrito(
+    distrito: str | SeriesLike,
+    normalize: bool = False,
+    fuzzy_match: bool = True,
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
+) -> str | SeriesLike: ...
+
+# ==================== cargar_diccionario ====================
 def cargar_diccionario(
     resource_name: Literal[
         "departamentos",

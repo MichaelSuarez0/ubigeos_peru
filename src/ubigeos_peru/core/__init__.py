@@ -460,52 +460,56 @@ def get_ubigeo(
 def validate_departamento(
     departamento: str | SeriesLike,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
     Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
-
+    
     Parameters
     ----------
-    nombre_departamento : str | SeriesLike
-        Nombre o Serie de nombres de departamentos que se buscan validar y normalizar
+    departamento : str | SeriesLike
+        Nombre del departamento que se busca validar y normalizar.
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-    on_error : {"raise", "ignore", "capitalize"}, opcional
-        Para manejar casos en que el nombre no coincide con ningún departamento válido, útil para evaluar datos mixtos (no solo departamentos)
+    fuzzy_match : bool, optional
+        Si es True, intenta encontrar coincidencias aproximadas usando fuzzy matching, por defecto True.
+    on_error : {"raise", "warn", "ignore", "capitalize", "coerce"}, opcional
+        Para manejar casos en que el nombre no coincide con ningún departamento; útil para evaluar datos mixtos.
         - `raise`: Lanza una excepción (valor por defecto).
+        - `warn`: Muestra una advertencia.
         - `ignore`: Omite el nombre sin generar error.
         - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
-
+        - `coerce`: Devuelve None.
+    
     Returns
     -------
-    str
+    str | SeriesLike
         Nombre oficial del departamento.
-
+    
     Raises
     ------
     TypeError
-        Si `nombre_departamento` no es un str
+        Si `departamento` no es un str o SeriesLike
     KeyError
-        Si `nombre_departamento` no coincide con ningún nombre en la base de datos y on_error = `raise`
-
+        Si `departamento` no coincide con ningún nombre en la base de datos y on_error = `raise`
+    
     Notes
-    --------
+    -----
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
-
+    
     Examples
     --------
-
-    Validaciones rápidas individuales (sin importar el formato de entrada)
-
-    >>> validate_departamento("HUÁNUCO")
+    >>> # Validación simple de nombres
+    >>> validate_departamento("HUANUCO")
     'Huánuco'
     >>>
-
     >>> validate_departamento("HUÁNUCO", normalize=True)
     'HUANUCO'
     >>>
-
+    >>> validate_departamento("NACIONAL", on_error="capitalize")
+    'Nacional'
+    
     **Integración con Pandas**
 
     Creamos un DataFrame de prueba
@@ -545,94 +549,179 @@ def validate_departamento(
     3        CUSCO      1
     4      HUANUCO      0
     """
-    return Departamento.validate_departamento(departamento, normalize, on_error)
+    return Departamento.validate_departamento(departamento, normalize, fuzzy_match, on_error)
 
 
-def validate_ubicacion(
-    ubicacion: str | SeriesLike,
+def validate_provincia(
+    provincia: str | SeriesLike,
     normalize: bool = False,
+    fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
-    Valida el nombre de una ubicación (departamento, provincia o distrito) escrita con gramática variable y devuelve el nombre oficial.
-
+    Valida el nombre de una provincia escrita con gramática variable y devuelve el nombre oficial.
+    
     Parameters
     ----------
-    nombre_ubicacion : str
-        Nombre de la ubicación que se busca validar y normalizar.
+    provincia : str | SeriesLike
+        Nombre de la provincia que se busca validar y normalizar.
     normalize : bool, optional
-        Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
-    on_error : {"raise", "ignore", "capitalize"}, opcional
-        Para manejar casos en que el nombre no coincide con ningún departamento, provincia o distrito; útil para evaluar datos mixtos.
+        Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. HUAROCHIRI), por defecto False.
+    fuzzy_match : bool, optional
+        Si es True, intenta encontrar coincidencias aproximadas usando fuzzy matching, por defecto True.
+    on_error : {"raise", "warn", "ignore", "capitalize", "coerce"}, opcional
+        Para manejar casos en que el nombre no coincide con ninguna provincia; útil para evaluar datos mixtos.
         - `raise`: Lanza una excepción (valor por defecto).
+        - `warn`: Muestra una advertencia.
         - `ignore`: Omite el nombre sin generar error.
         - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
-
+        - `coerce`: Devuelve None.
+    
     Returns
     -------
-    str
-        Nombre oficial del ubicación.
-
+    str | SeriesLike
+        Nombre oficial de la provincia.
+    
     Raises
     ------
     TypeError
-        Si `nombre_ubicacion` no es un str
+        Si `provincia` no es un str o SeriesLike
     KeyError
-        Si `nombre_ubicacion` no coincide con ningún nombre en la base de datos y on_error = `raise`
-
+        Si `provincia` no coincide con ningún nombre en la base de datos y on_error = `raise`
+    
     Notes
-    --------
+    -----
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
-
+    
     Examples
     --------
     >>> # Validación simple de nombres
-    >>> validate_ubicacion("HUANUCO")
-    'Huánuco'
+    >>> validate_provincia("HUAROCHIRÍ")
+    'Huarochirí'
     >>>
-
-    >>> validate_ubicacion("HUÁNUCO", normalize = True)
-    'HUANUCO'
+    >>> validate_provincia("HUARAZ")
+    'Huaraz'
     >>>
-
-    >>> validate_ubicacion("NACIONAL", on_error = "capitalize")
-    'Nacional'
+    >>> validate_provincia("LA MAR", normalize=True)
+    'LA MAR'
     >>>
-
     >>> # Integración con Pandas: ejemplo básico con DataFrame
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     >>>     "Provincia": ["HUAROCHIRÍ", "HUARAZ", "LA MAR", "MARAÑÓN", "URUBAMBA"]
+    >>> })
+    >>> df
+        Provincia
+    0  HUAROCHIRÍ
+    1      HUARAZ
+    2      LA MAR
+    3     MARAÑÓN
+    4    URUBAMBA
+    >>> df["Provincia"] = df["Provincia"].apply(validate_provincia)
+    >>> df
+        Provincia
+    0  Huarochirí
+    1      Huaraz
+    2      La Mar
+    3     Marañón
+    4    Urubamba
+    >>> # Agregar argumentos adicionales
+    >>> df["Provincia"] = df["Provincia"].apply(lambda x: validate_provincia(x, normalize=True))
+    >>> df
+        Provincia
+    0  HUAROCHIRI
+    1      HUARAZ
+    2      LA MAR
+    3     MARANON
+    4    URUBAMBA
+    """
+    return Departamento.validate_provincia(provincia, normalize, fuzzy_match, on_error)
+
+
+def validate_distrito(
+    distrito: str | SeriesLike,
+    normalize: bool = False,
+    fuzzy_match: bool = True,
+    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
+) -> str | SeriesLike:
+    """
+    Valida el nombre de un distrito escrito con gramática variable y devuelve el nombre oficial.
+    
+    Parameters
+    ----------
+    distrito : str | SeriesLike
+        Nombre del distrito que se busca validar y normalizar.
+    normalize : bool, optional
+        Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. ANTIOQUIA), por defecto False.
+    fuzzy_match : bool, optional
+        Si es True, intenta encontrar coincidencias aproximadas usando fuzzy matching, por defecto True.
+    on_error : {"raise", "warn", "ignore", "capitalize", "coerce"}, opcional
+        Para manejar casos en que el nombre no coincide con ningún distrito; útil para evaluar datos mixtos.
+        - `raise`: Lanza una excepción (valor por defecto).
+        - `warn`: Muestra una advertencia.
+        - `ignore`: Omite el nombre sin generar error.
+        - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
+        - `coerce`: Devuelve None.
+    
+    Returns
+    -------
+    str | SeriesLike
+        Nombre oficial del distrito.
+    
+    Raises
+    ------
+    TypeError
+        Si `distrito` no es un str o SeriesLike
+    KeyError
+        Si `distrito` no coincide con ningún nombre en la base de datos y on_error = `raise`
+    
+    Notes
+    -----
+    - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
+    
+    Examples
+    --------
+    >>> # Validación simple de nombres
+    >>> validate_distrito("ANTIOQUÍA")
+    'Antioquia'
+    >>>
+    >>> validate_distrito("HUARAZ")
+    'Huaraz'
+    >>>
+    >>> validate_distrito("TAMBO", normalize=True)
+    'TAMBO'
+    >>>
+    >>> # Integración con Pandas: ejemplo básico con DataFrame
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({
     >>>     "Distrito": ["ANTIOQUÍA", "HUARAZ", "TAMBO", "CHOLÓN", "CHINCHERO"]
     >>> })
     >>> df
-        Provincia    Distrito
-    0 HUAROCHIRÍ   ANTIOQUÍA
-    1     HUARAZ      HUARAZ
-    2     LA MAR       TAMBO
-    3    MARAÑÓN      CHOLÓN
-    4   URUBAMBA   CHINCHERO
-    >>> df["Provincia"] = df["Provincia"].apply(ubg.validate_ubicacion)
-    >>> df["Distrito"] = df["Distrito"].apply(ubg.validate_ubicacion)
+        Distrito
+    0  ANTIOQUÍA
+    1     HUARAZ
+    2      TAMBO
+    3     CHOLÓN
+    4  CHINCHERO
+    >>> df["Distrito"] = df["Distrito"].apply(validate_distrito)
     >>> df
-            Provincia    Distrito
-    0   Huarochirí   Antioquia
-    1       Huaraz      Huaraz
-    2       La Mar       Tambo
-    3      Marañón      Cholón
-    4     Urubamba   Chinchero
+        Distrito
+    0  Antioquia
+    1     Huaraz
+    2      Tambo
+    3     Cholón
+    4  Chinchero
     >>> # Agregar argumentos adicionales
-    >>> df["Provincia"] = df["Provincia"].apply(lambda x: ubg.validate_ubicacion(x, normalize=True))
-    >>> df["Distrito"] = df["Distrito"].apply(lambda x: ubg.validate_ubicacion(x, normalize=True))
+    >>> df["Distrito"] = df["Distrito"].apply(lambda x: validate_distrito(x, normalize=True))
     >>> df
-        Provincia    Distrito
-    0 HUAROCHIRI   ANTIOQUIA
-    1     HUARAZ      HUARAZ
-    2     LA MAR       TAMBO
-    3    MARANON      CHOLON
-    4   URUBAMBA   CHINCHERO
+        Distrito
+    0  ANTIOQUIA
+    1     HUARAZ
+    2      TAMBO
+    3     CHOLON
+    4  CHINCHERO
     """
-    return Departamento.validate_ubicacion(ubicacion, normalize, on_error)
+    return Departamento.validate_distrito(distrito, normalize, fuzzy_match, on_error)
 
 
 def get_metadato(

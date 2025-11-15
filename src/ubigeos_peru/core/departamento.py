@@ -6,8 +6,10 @@ from ._utils import (
     eliminar_acentos,
     is_series_like,
     reconstruct_like,
+    fuzzy_validate
 )
 from .resource_manager import ResourceManager
+
 
 
 class Departamento:
@@ -25,6 +27,7 @@ class Departamento:
         cls,
         departamento: str | SeriesLike,
         normalize: bool = False,
+        fuzzy_match: bool = True,
         on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("equivalencias")
@@ -48,6 +51,14 @@ class Departamento:
                 try:
                     out.append(mapping[dep_limpio])
                 except KeyError:
+                    if fuzzy_match:
+                        resultado = fuzzy_validate(
+                            dep_limpio,
+                            list(mapping.keys()),
+                            limit=1
+                        )
+                        out.append(resultado)
+                        continue
                     resultado = assert_error(
                         on_error,
                         evaluated=dep_limpio,
@@ -56,14 +67,6 @@ class Departamento:
                     out.append(resultado)
 
             return reconstruct_like(departamento, out)
-        # # ---------------------- Input: Expr-like ----------------------
-        # module = getattr(type(nombre_departamento), "__module__", "")
-        # name = getattr(type(nombre_departamento), "__name__", "")
-        # if "polars" in module and name == "Expr":
-        #     # Lazy-safe: aplicar por batches
-        #     return nombre_departamento.map_batches(
-        #         lambda s: cls.validate_departamento(s, normalize=normalize, on_error=on_error)
-        #     )
         else:
             # ------------------------ Input: Singular ------------------------
             if not isinstance(departamento, str):
@@ -78,8 +81,6 @@ class Departamento:
             try:
                 resultado = mapping[dep_limpio]
             except KeyError:
-                # if dep_limpio == "REGION LIMA":
-                #     return "Lima Región"
                 resultado = assert_error(
                     on_error,
                     evaluated=dep_limpio,
@@ -92,78 +93,144 @@ class Departamento:
             else:
                 return eliminar_acentos(resultado).strip().upper()
 
-    # TODO: Unhasable type Series when passing series
     @classmethod
-    def validate_ubicacion(
+    def validate_provincia(
         cls,
-        ubicacion: str | SeriesLike,
+        provincia: str | SeriesLike,
         normalize: bool = False,
+        fuzzy_match: bool = True,
         on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
     ) -> str | SeriesLike:
         cls._resources.cargar_diccionario("equivalencias")
-        mapping = cls._resources._loaded["equivalencias"]
+        mapping = cls._resources._loaded["equivalencias"]["provincias"]
 
-        if is_series_like(ubicacion):
-            # Normalizar cada sub-diccionario si es necesario
-            if normalize:
-                mapping_norm = {
-                    "departamentos": {k: eliminar_acentos(v).upper() for k, v in mapping["departamentos"].items()},
-                    "provincias": {k: eliminar_acentos(v).upper() for k, v in mapping["provincias"].items()},
-                    "distritos": {k: eliminar_acentos(v).upper() for k, v in mapping["distritos"].items()}
-                }
-            else:
-                mapping_norm = mapping
-
+        # ---------------------- Input: Series-like ----------------------
+        if is_series_like(provincia):
+            mapping: dict[str, str] = (
+                {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
+                if normalize
+                else mapping
+            )
             out = []
-            for item in ubicacion:
+            for item in provincia:
                 if not isinstance(item, str) or item.isdigit():
                     raise TypeError(
-                    f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
-                )
+                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
+                    )
 
-                item = eliminar_acentos(item).strip().upper()
+                prov_limpio = eliminar_acentos(item).strip().upper()
                 try:
-                    resultado = mapping_norm["departamentos"][item]
+                    out.append(mapping[prov_limpio])
                 except KeyError:
-                    try:
-                        resultado = mapping_norm["provincias"][item]
-                    except KeyError:
-                        try:
-                            resultado = mapping_norm["distritos"][item]
-                        except KeyError:
-                            resultado = assert_error(
-                                on_error,
-                                evaluated=item,
-                                message="No se encontró el lugar {} en la base de datos de provincias o distritos",
-                            )
-
-                out.append(resultado)
-
-            return reconstruct_like(ubicacion, out)
-
-        else:
-            if not isinstance(ubicacion, str) or ubicacion.isdigit():
-                raise TypeError(
-                    f"No se permiten otros tipos de datos que no sean str, se insertó {type(ubicacion)}"
-                )
-            ubicacion = eliminar_acentos(ubicacion).strip().upper()
-            try:
-                resultado = mapping["departamentos"][ubicacion]
-            except KeyError:
-                try:
-                    resultado = mapping["provincias"][ubicacion]
-                except KeyError:
-                    try:
-                        resultado = mapping["distritos"][ubicacion]
-                    except KeyError:
-                        resultado = assert_error(
-                            on_error,
-                            ubicacion,
-                            message="No se encontró el lugar {} en la base de datos de provincias o distritos",
+                    if fuzzy_match:
+                        resultado = fuzzy_validate(
+                            prov_limpio,
+                            list(mapping.keys()),
+                            limit=1
                         )
-                        return resultado
+                        out.append(resultado)
+                        continue
+                    resultado = assert_error(
+                        on_error,
+                        evaluated=prov_limpio,
+                        message="No se ha encontrado la provincia {}",
+                    )
+                    out.append(resultado)
+
+            return reconstruct_like(provincia, out)
+        else:
+            # ------------------------ Input: Singular ------------------------
+            if not isinstance(provincia, str):
+                try:
+                    str(provincia)
+                except TypeError:
+                    raise TypeError(
+                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(provincia)}"
+                    )
+
+            prov_limpio = eliminar_acentos(provincia).strip().upper()
+            try:
+                resultado = mapping[prov_limpio]
+            except KeyError:
+                resultado = assert_error(
+                    on_error,
+                    evaluated=prov_limpio,
+                    message="No se ha encontrado la provincia {}",
+                )
+                return resultado
 
             if not normalize:
                 return resultado
             else:
-                return eliminar_acentos(resultado).upper()
+                return eliminar_acentos(resultado).strip().upper()
+
+    @classmethod
+    def validate_distrito(
+        cls,
+        distrito: str | SeriesLike,
+        normalize: bool = False,
+        fuzzy_match: bool = True,
+        on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
+    ) -> str | SeriesLike:
+        cls._resources.cargar_diccionario("equivalencias")
+        mapping = cls._resources._loaded["equivalencias"]["distritos"]
+
+        # ---------------------- Input: Series-like ----------------------
+        if is_series_like(distrito):
+            mapping: dict[str, str] = (
+                {k: eliminar_acentos(v).upper() for k, v in mapping.items()}
+                if normalize
+                else mapping
+            )
+            out = []
+            for item in distrito:
+                if not isinstance(item, str) or item.isdigit():
+                    raise TypeError(
+                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(item)}"
+                    )
+
+                dist_limpio = eliminar_acentos(item).strip().upper()
+                try:
+                    out.append(mapping[dist_limpio])
+                except KeyError:
+                    if fuzzy_match:
+                        resultado = fuzzy_validate(
+                            dist_limpio,
+                            list(mapping.keys()),
+                            limit=1
+                        )
+                        out.append(resultado)
+                        continue
+                    resultado = assert_error(
+                        on_error,
+                        evaluated=dist_limpio,
+                        message="No se ha encontrado el distrito {}",
+                    )
+                    out.append(resultado)
+
+            return reconstruct_like(distrito, out)
+        else:
+            # ------------------------ Input: Singular ------------------------
+            if not isinstance(distrito, str):
+                try:
+                    str(distrito)
+                except TypeError:
+                    raise TypeError(
+                        f"No se permiten otros tipos de datos que no sean str, se insertó {type(distrito)}"
+                    )
+
+            dist_limpio = eliminar_acentos(distrito).strip().upper()
+            try:
+                resultado = mapping[dist_limpio]
+            except KeyError:
+                resultado = assert_error(
+                    on_error,
+                    evaluated=dist_limpio,
+                    message="No se ha encontrado el distrito {}",
+                )
+                return resultado
+
+            if not normalize:
+                return resultado
+            else:
+                return eliminar_acentos(resultado).strip().upper()
