@@ -1,6 +1,6 @@
-[build-system]
-requires = ["maturin>=1.0,<2.0"]
-build-backend = "maturin"
+# [build-system]
+# requires = ["maturin>=1.0,<2.0"]
+# build-backend = "maturin"
 
 [project]
 name = "ubigeos-peru"
@@ -21,10 +21,10 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/MichaelSuarez0/ubigeos_peru"
 
-[tool.maturin]
-module-name = "ubigeos_peru.ubigeos_rust"
-python-source = "src"
-manifest-path = "rust/Cargo.toml"
+# [tool.maturin]
+# module-name = "ubigeos_peru.ubigeos_rust"
+# python-source = "src"
+# manifest-path = "rust/Cargo.toml"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
