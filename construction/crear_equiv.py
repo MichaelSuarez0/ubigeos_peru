@@ -24,7 +24,7 @@ def crear_equivalencias():
     equivalencias_full["departamentos"]["CUZCO"] = "Cusco"
     equivalencias_full["departamentos"]["LIMA METROPOLITANA"] = "Lima Metropolitana"
     equivalencias_full["departamentos"]["LIMA REGION"] = "Lima Región"
-    equivalencias_full["departamentos"]["REGION LIMA"] = "Lima Región"
+    # equivalencias_full["departamentos"]["REGION LIMA"] = "Lima Región"
 
     # Provincias
     equivalencias_full["provincias"]["CUZCO"] = "Cusco"
@@ -32,8 +32,9 @@ def crear_equivalencias():
     equivalencias_full["provincias"]["NASCA"] = "Nasca"
     equivalencias_full["provincias"]["ANTONIO RAIMONDI"] = "Antonio Raymondi"
 
-    # Distritos
-    equivalencias_full["distritos"]["CUZCO"] = "Cusco"
+    # Distritos    equivalencias_full["distritos"]["CUZCO"] = "Cusco"
+    equivalencias_full["distritos"]["NAZCA"] = "Nazca"
+    equivalencias_full["distritos"]["NASCA"] = "Nasca"
     equivalencias_full["distritos"]["26 DE OCTUBRE"] = "Veintiséis de Octubre"
     equivalencias_full["distritos"]["27 DE NOVIEMBRE"] = "Veintisiete de Noviembre"
     equivalencias_full["distritos"]["ANDRES AVELINO CACERES"] = (
@@ -47,7 +48,6 @@ def crear_equivalencias():
     equivalencias_full["distritos"]["PALMAPAMPA"] = "Samugari"
     equivalencias_full["distritos"]["MILPUCC"] = "Milpuc"
     equivalencias_full["distritos"]["SAN FRANCISCO DE YESO"] = "San Francisco del Yeso"
-    equivalencias_full["distritos"]["SAN FRANCISCO DEL YESO"] = "San Francisco del Yeso"
     equivalencias_full["distritos"]["HUAYLLO"] = "Ihuayllo"
     equivalencias_full["distritos"]["HUAILLATI"] = "Huayllati"
     equivalencias_full["distritos"]["MARISCAL GAMARRA"] = "Mariscal Gamarra"
@@ -64,7 +64,7 @@ def crear_equivalencias():
     equivalencias_full["distritos"]["HUAYA"] = "Hualla"
     equivalencias_full["distritos"]["DANIEL ALOMIAS ROBLES"] = "Daniel Alomia Robles"
     equivalencias_full["distritos"]["AYAUCA"] = "ALLAUCA"
-    equivalencias_full["distritos"]["CARMEN DE LA LEGUA"] = "CARMEN DE LA LEGUA REYNOSO"
+    equivalencias_full["distritos"]["CARMEN DE LA LEGUA"] = "Carmen de la Legua Reynoso"
 
 
     # Sortear subniveles por última vez
