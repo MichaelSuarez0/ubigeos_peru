@@ -19,15 +19,13 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from ._utils import SeriesLike
-from .departamento import Departamento
+from .validations import Validations
 from .resource_manager import ResourceManager
-from .ubigeo import Ubigeo
+from .ubigeo_converter import UbigeoConverter
 
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
 # ------------------------------------------------------------------
-
-# TODO: Mergear con SeriesLike de _utils
 
 
 def get_departamento(
@@ -37,55 +35,55 @@ def get_departamento(
     normalize: bool = False,
 ) -> str | SeriesLike:
     """
-     Obtiene el nombre de un departamento a partir de su código de ubigeo.
+    Obtiene el nombre de un departamento a partir de su código de ubigeo.
 
-     Parameters
-     ----------
-     ubigeo : str, int, SeriesLike
-         Código de ubigeo o columna de un DataFrame con códigos de ubigeo.
-     institucion : {"inei", "reniec", "sunat"}, default "inei"
-         Institución a utilizar como fuente de datos de ubigeo.
-     divide_lima : bool, default False
-         Si es True, se diferencia Lima Región y Lima Metropolitana (el ubigeo debe incluir el código de provincia, mínimo 3 caracteres).
-     normalize : bool, default False
-         Si es True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN).
+    Parameters
+    ----------
+    ubigeo : str, int, SeriesLike
+        Código de ubigeo o columna de un DataFrame con códigos de ubigeo.
+    institucion : {"inei", "reniec", "sunat"}, default "inei"
+        Institución a utilizar como fuente de datos de ubigeo.
+    divide_lima : bool, default False
+        Si es True, se diferencia Lima Región y Lima Metropolitana (el ubigeo debe incluir el código de provincia, mínimo 3 caracteres).
+    normalize : bool, default False
+        Si es True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN).
 
-     Returns
-     -------
-     str | SeriesLike
-         Nombre del departamento o columna de un DataFrame con nombres de departamentos, normalizados si normalize=True.
+    Returns
+    -------
+    str | SeriesLike
+        Nombre del departamento o columna de un DataFrame con nombres de departamentos, normalizados si normalize=True.
 
-     Raises
-     ------
-     TypeError
-         Si el código no es str/int/SeriesLike
-     ValueError
-         Si el código no contiene el código de provincia (más de 2 caracteres) y se señala with_lima_metro o with_lima_region.
-     KeyError
-         Si el código no existe en la base de datos.
+    Raises
+    ------
+    TypeError
+        Si el código no es str/int/SeriesLike
+    ValueError
+        Si el código no contiene el código de provincia (más de 2 caracteres) y se señala with_lima_metro o with_lima_region.
+    KeyError
+        Si el código no existe en la base de datos.
 
-     Notes
-     -----
-     - El subcódigo para departamento se toma de los primeros 2 caracteres del código validado.
-     - Para códigos de longitud impar (1, 3 o 5), se asume que falta un cero inicial y se añadirá.
-     - El input puede ser int o str, o una columna de un DataFrame. Se recomienda este último para mayor eficiencia y legibilidad.
+    Notes
+    -----
+    - El subcódigo para departamento se toma de los primeros 2 caracteres del código validado.
+    - Para códigos de longitud impar (1, 3 o 5), se asume que falta un cero inicial y se añadirá.
+    - El input puede ser int o str, o una columna de un DataFrame. Se recomienda este último para mayor eficiencia y legibilidad.
 
-     Examples
-     --------
+    Examples
+    --------
 
-     Consultas rápidas individuales (sin importar el formato de entrada)
+    Consultas rápidas individuales (sin importar el formato de entrada)
 
-     >>> import ubigeos_peru as ubg
-     >>> ubg.get_departamento("010101")
-     "Amazonas"
-     >>> ubg.get_departamento(10101)
-     "Amazonas"
-     >>> ubg.get_departamento(22)
-     "San Martín"
-     >>> ubg.get_departamento("22", normalize=True)
-     "SAN MARTIN"
+    >>> import ubigeos_peru as ubg
+    >>> ubg.get_departamento("010101")
+    "Amazonas"
+    >>> ubg.get_departamento(10101)
+    "Amazonas"
+    >>> ubg.get_departamento(22)
+    "San Martín"
+    >>> ubg.get_departamento("22", normalize=True)
+    "SAN MARTIN"
 
-     **Integración con Pandas: insertar una columna (Serie) de departamentos**
+    **Integración con Pandas: insertar una columna (Serie) de departamentos**
 
     Ejemplo con un DataFrame de prueba
 
@@ -142,7 +140,7 @@ def get_departamento(
     4  220101      0     SAN MARTIN
     
     """
-    return Ubigeo.get_departamento(ubigeo, institucion, divide_lima, normalize)
+    return UbigeoConverter.get_departamento(ubigeo, institucion, divide_lima, normalize)
 
 
 def get_provincia(
@@ -249,7 +247,7 @@ def get_provincia(
     Name: PROVINCIA, dtype: object
 
     """
-    return Ubigeo.get_provincia(ubigeo, institucion, on_error, normalize)
+    return UbigeoConverter.get_provincia(ubigeo, institucion, on_error, normalize)
 
 
 def get_distrito(
@@ -355,7 +353,7 @@ def get_distrito(
     3  150140      0   SANTIAGO DE SURCO
     4  200701      1             PARINAS
     """
-    return Ubigeo.get_distrito(ubigeo, institucion, on_error, normalize)
+    return UbigeoConverter.get_distrito(ubigeo, institucion, on_error, normalize)
 
 
 def get_macrorregion(
@@ -392,7 +390,7 @@ def get_macrorregion(
     - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
     - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
     """
-    return Ubigeo.get_macrorregion(departamento_o_ubigeo, institucion, normalize)
+    return UbigeoConverter.get_macrorregion(departamento_o_ubigeo, institucion, normalize)
 
 
 def get_ubigeo(
@@ -454,7 +452,7 @@ def get_ubigeo(
         ...
     KeyError: 'Nombre no encontrado: "ciudad inexistente"'
     """
-    return Ubigeo.get_ubigeo(ubicacion, level, institucion)
+    return UbigeoConverter.get_ubigeo(ubicacion, level, institucion)
 
 
 def validate_departamento(
@@ -549,7 +547,7 @@ def validate_departamento(
     3        CUSCO      1
     4      HUANUCO      0
     """
-    return Departamento.validate_departamento(departamento, normalize, fuzzy_match, on_error)
+    return Validations.validate_departamento(departamento, normalize, fuzzy_match, on_error)
 
 
 def validate_provincia(
@@ -635,7 +633,7 @@ def validate_provincia(
     3     MARANON
     4    URUBAMBA
     """
-    return Departamento.validate_provincia(provincia, normalize, fuzzy_match, on_error)
+    return Validations.validate_provincia(provincia, normalize, fuzzy_match, on_error)
 
 
 def validate_distrito(
@@ -721,7 +719,7 @@ def validate_distrito(
     3     CHOLON
     4  CHINCHERO
     """
-    return Departamento.validate_distrito(distrito, normalize, fuzzy_match, on_error)
+    return Validations.validate_distrito(distrito, normalize, fuzzy_match, on_error)
 
 
 def get_metadato(
@@ -758,7 +756,7 @@ def get_metadato(
     - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
     - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
     """
-    return Ubigeo.get_metadato(codigo_o_ubicacion, level, key)
+    return UbigeoConverter.get_metadato(codigo_o_ubicacion, level, key)
 
 
 def cargar_diccionario(
@@ -786,7 +784,8 @@ __all__ = [
     "get_ubigeo",
     "get_metadato",
     "validate_departamento",
-    "validate_ubicacion",
+    "validate_provincia",
+    "validate_distrito",
     "cargar_diccionario",
 ]
 

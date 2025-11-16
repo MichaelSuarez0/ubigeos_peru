@@ -1,6 +1,6 @@
 from .core import (
-    Departamento,
-    Ubigeo,
+    Validations,
+    UbigeoConverter,
     cargar_diccionario,
     get_departamento,
     get_distrito,
@@ -14,8 +14,8 @@ from .core import (
 from .core.resource_manager import ResourceManager
 
 __all__ = [
-    "Departamento",
-    "Ubigeo",
+    "Validations",
+    "UbigeoConverter",
     "ResourceManager",
     "validate_departamento",
     "validate_provincia",

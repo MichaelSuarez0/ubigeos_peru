@@ -7,17 +7,17 @@ from ._utils import (
     is_series_like,
     reconstruct_like,
 )
-from .departamento import Departamento
+from .validations import Validations
 from .resource_manager import ResourceManager
 
 
-class Ubigeo:
+class UbigeoConverter:
     _instance = None
     _resources = ResourceManager()
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(Ubigeo, cls).__new__(cls)
+            cls._instance = super(UbigeoConverter, cls).__new__(cls)
         return cls._instance
 
     @classmethod
@@ -257,7 +257,7 @@ class Ubigeo:
                 if isinstance(item, str):
                     if not item[0].isdigit():
                         # Se asume que es el input es un string con el nombre del departamento
-                        departamento = Departamento.validate_departamento(
+                        departamento = Validations.validate_departamento(
                             item, normalize=False
                         )
                     else:
@@ -281,7 +281,7 @@ class Ubigeo:
             if isinstance(departamento_o_ubigeo, str):
                 if not departamento_o_ubigeo[0].isdigit():
                     # Se asume que es el input es un string con el nombre del departamento
-                    departamento = Departamento.validate_departamento(
+                    departamento = Validations.validate_departamento(
                         departamento_o_ubigeo, normalize=False
                     )
                 else:
@@ -346,7 +346,7 @@ class Ubigeo:
                     )
 
                 try:
-                    lugar_clean = Departamento.validate_ubicacion(ubicacion_normalized)
+                    lugar_clean = Validations.validate_ubicacion(ubicacion_normalized)
                     out.append(mapping[lugar_clean])
                 except KeyError:
                     raise KeyError(
@@ -395,7 +395,7 @@ class Ubigeo:
                 if isinstance(item, str):
                     if not item[0].isdigit():
                         # Se asume que el input es un string con el nombre del departamento
-                        ubicacion = Departamento.validate_ubicacion(
+                        ubicacion = Validations.validate_ubicacion(
                             item, normalize=False, on_error="ignore"
                         )
                     else:
@@ -429,7 +429,7 @@ class Ubigeo:
             if isinstance(codigo_o_ubicacion, str):
                 if not codigo_o_ubicacion[0].isdigit():
                     # Se asume que el input es un string con el nombre del departamento
-                    ubicacion = Departamento.validate_ubicacion(
+                    ubicacion = Validations.validate_ubicacion(
                         codigo_o_ubicacion, normalize=False
                     )
                 else:
