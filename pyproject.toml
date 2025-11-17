@@ -4,7 +4,7 @@
 
 [project]
 name = "ubigeos-peru"
-version = "0.1.0"
+version = "0.2.0"
 description = "Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa, además de información suplementaria."
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
