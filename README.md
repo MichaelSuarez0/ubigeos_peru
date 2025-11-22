@@ -1,21 +1,28 @@
 # Ubigeos Perú
 
-Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para consultar macrorregiones, capitales y validar nombres oficiales. Se integra fácilmente con pandas para procesar bases como la ENAHO, permitiendo aplicar transformaciones masivas de ubigeos en menos de un segundo.
+Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para limpiar y validar nombres oficiales, consultar macrorregiones, coordenadas geográficas, etc. Se integra fácilmente con pandas y polars para procesar bases de datos peruanas como la ENAHO.
 
-
+Las fuentes o bases de datos de ubigeos:
+- **[ubigeos_inei_2025](https://github.com/MichaelSuarez0/ubigeos_peru/blob/main/databases/ubigeo_inei_2025.csv)**: 
+  - Fuente: limpieza del Directorio Nacional de Gobiernos Regionales, Municipalidades Provinciales, Distritales y de Centros Poblados 2025 (Cuadros en Excel).
+  - [Script y detalles aquí](https://github.com/MichaelSuarez0/ubigeos_peru/blob/main/construction/crear_ubigeo_inei.py)
+  
+- **[ubigeos_reniec_2025](https://github.com/MichaelSuarez0/ubigeos_peru/blob/main/databases/ubigeo_reniec_2025.csv)**: 
+  - Fuente: solicitud de acceso a la información pública. SOLICITUD DE REGISTRO Nº 1931-2025.
+  - [Script y detalles aquí](https://github.com/MichaelSuarez0/ubigeos_peru/blob/main/construction/crear_ubigeo_reniec.py)
 
 ## Características Principales
 
-- **Soporte Multi-institucional**: Soporte para consultar códigos de ubigeo de INEI, RENIEC y SUNAT.
+- **Soporte Multi-institucional**: Soporte para consultar códigos de ubigeo de INEI y Reniec.
 - **Normalización Inteligente**: Manejo automático de acentos y mayúsculas para validar ubicaciones.
-- **Optimizado para Big Data**: 500 000 consultas en 0.25-0.65 segundos
-- **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton
+- **Optimizado para Big Data**: 1 000 000 consultas en 0.25-0.65 segundos
+- **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton.
 - **Metadatos Geográficos**: Acceso a información adicional como capital, altitud, superficie y coordenadas
 
-## Por agregar
+## Roadmap
 1) Métodos para exportar las bases de datos (por ejemplo lista de Departamentos)
-2) Agregar tests para diferenciar Lima de Lima Metropolitana (como arg)
-3) Args para personalizar el output (int o str, zfill)
+2) Args para personalizar el output (int o str, zfill)
+3) Agregar tests para diferenciar Lima de Lima Metropolitana (como arg)
 
 ## Instalación
 
