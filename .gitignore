@@ -161,7 +161,7 @@ cython_debug/
 /ubigeos_peru/databases
 scripts/
 *.ipynb
-docs/
+doc/
 *.xlsx
 *.xls
 
