@@ -109,7 +109,7 @@ ubigeo;departamento;provincia;distrito
 020315;Áncash;Bolognesi;Pacllón
 020317;Áncash;Bolognesi;San Miguel de Corpanqui
 020320;Áncash;Bolognesi;Ticllos
-020321;Áncash;Bolognesi;ANTONIO RAYMONDI
+020321;Áncash;Bolognesi;Antonio Raymondi
 020322;Áncash;Bolognesi;Canis
 020323;Áncash;Bolognesi;Colquioc
 020324;Áncash;Bolognesi;La Primavera
@@ -888,7 +888,7 @@ ubigeo;departamento;provincia;distrito
 090321;Huánuco;Dos de Mayo;Shunqui
 090322;Huánuco;Dos de Mayo;Sillapata
 090323;Huánuco;Dos de Mayo;Yanas
-090324;Huánuco;Dos de Mayo;APARICIO POMARES
+090324;Huánuco;Dos de Mayo;Aparicio Pomares
 090325;Huánuco;Dos de Mayo;Baños
 090326;Huánuco;Dos de Mayo;Cahuac
 090327;Huánuco;Dos de Mayo;Chacabamba
@@ -959,7 +959,7 @@ ubigeo;departamento;provincia;distrito
 100208;Ica;Chincha;Tambo de Mora
 100209;Ica;Chincha;Alto Laran
 100211;Ica;Chincha;San Juan de Yánac
-100301;Ica;Nasca;CAMINACA
+100301;Ica;Nasca;Nazca
 100302;Ica;Nasca;Changuillo
 100303;Ica;Nasca;El Ingenio
 100304;Ica;Nasca;Marcona
@@ -1387,7 +1387,7 @@ ubigeo;departamento;provincia;distrito
 150601;Loreto;Mariscal Ramón Castilla;Ramón Castilla
 150602;Loreto;Mariscal Ramón Castilla;Pebas
 150603;Loreto;Mariscal Ramón Castilla;Yavari
-150605;Loreto;Mariscal Ramón Castilla;ANTA
+150605;Loreto;Mariscal Ramón Castilla;Santa Rosa de Loreto
 150801;Loreto;Coronel Portillo;Masisea
 150902;Loreto;Putumayo;Rosa Panduro
 150904;Loreto;Putumayo;Yaguas
@@ -1427,7 +1427,7 @@ ubigeo;departamento;provincia;distrito
 180105;Pasco;Pasco;Huayllay
 180106;Pasco;Pasco;Ninacaca
 180107;Pasco;Pasco;Pallanchacra
-180109;Pasco;Pasco;SAN FRANCISCO DE ASIS DE YARUSYACAN
+180109;Pasco;Pasco;San Francisco de Asís de Yarusyacán
 180110;Pasco;Pasco;Simón Bolívar
 180111;Pasco;Pasco;Ticlacayan
 180112;Pasco;Pasco;Tinyahuarco
@@ -1506,7 +1506,7 @@ ubigeo;departamento;provincia;distrito
 190803;Piura;Sechura;Bernal
 190804;Piura;Sechura;Bellavista de La Unión
 190805;Piura;Sechura;Cristo Nos Valga
-190806;Piura;Sechura;RINCONADA LLICUAR
+190806;Piura;Sechura;Rinconada Llicuar
 200101;Puno;Puno;Puno
 200102;Puno;Puno;Acora
 200103;Puno;Puno;Atuncolla
@@ -1598,7 +1598,7 @@ ubigeo;departamento;provincia;distrito
 201105;Puno;San Antonio de Putina;Sina
 201201;Puno;El Collao;Ilave
 201202;Puno;El Collao;Pilcuyo
-201204;Puno;El Collao;CAPAZO
+201204;Puno;El Collao;Capazo
 201205;Puno;El Collao;Conduriri
 201301;Puno;Moho;Moho
 201302;Puno;Moho;Conima
@@ -1662,7 +1662,7 @@ ubigeo;departamento;provincia;distrito
 210804;San Martín;Tocache;Shunte
 210805;San Martín;Tocache;Uchiza
 210901;San Martín;Picota;Picota
-210903;San Martín;Picota;CASPISAPA
+210903;San Martín;Picota;Caspisapa
 210904;San Martín;Picota;Pilluana
 210905;San Martín;Picota;Pucacaca
 210907;San Martín;Picota;San Hilarión
@@ -1686,7 +1686,7 @@ ubigeo;departamento;provincia;distrito
 220201;Tacna;Tarata;Tarata
 220205;Tacna;Tarata;Héroes Albarracín
 220206;Tacna;Tarata;Estique
-220207;Tacna;Tarata;ESTIQUE-PAMPA
+220207;Tacna;Tarata;Estique-Pampa
 220210;Tacna;Tarata;Sitajara
 220211;Tacna;Tarata;Susapaya
 220212;Tacna;Tarata;Tarucachi
@@ -1715,7 +1715,7 @@ ubigeo;departamento;provincia;distrito
 230304;Tumbes;Zarumilla;Aguas Verdes
 240101;Callao;Callao;Callao
 240103;Callao;Callao;La Punta
-240104;Callao;Callao;CARMEN DE LA LEGUA REYNOSO
+240104;Callao;Callao;Carmen de La Legua Reynoso
 240105;Callao;Callao;La Perla
 240106;Callao;Callao;Ventanilla
 240107;Callao;Callao;Mi Perú
@@ -1737,4 +1737,4 @@ ubigeo;departamento;provincia;distrito
 250303;Ucayali;Atalaya;Yurua
 250304;Ucayali;Atalaya;Sepahua
 250401;Ucayali;Purús;Purús
-300102;Tacna;ICA;TARICA
+300102;Tacna;Ica;Arica

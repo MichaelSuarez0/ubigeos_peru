@@ -42,11 +42,14 @@ def crear_ubigeos_reniec():
     )
 
     df = df.with_columns(
-        ubg.validate_departamento(df["departamento"], on_error="warn").alias("departamento"),
+        ubg.validate_departamento(df["departamento"], on_error="warn").alias(
+            "departamento"
+        ),
         ubg.validate_provincia(df["provincia"], on_error="warn").alias("provincia"),
         ubg.validate_distrito(df["distrito"], on_error="warn").alias("distrito"),
     )
-
+    # SANTA ROSA DE LORETO -> ANTA
+    # ARICA -> TARICA
     df.write_csv(DATABASES_PATH / "ubigeo_reniec_2025.csv", separator=";")
     return df
 
