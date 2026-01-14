@@ -458,7 +458,7 @@ def get_ubigeo(
 def validate_departamento(
     departamento: str | SeriesLike,
     normalize: bool = False,
-    fuzzy_match: bool = True,
+    fuzzy_match: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
@@ -553,7 +553,7 @@ def validate_departamento(
 def validate_provincia(
     provincia: str | SeriesLike,
     normalize: bool = False,
-    fuzzy_match: bool = True,
+    fuzzy_match: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
@@ -639,7 +639,7 @@ def validate_provincia(
 def validate_distrito(
     distrito: str | SeriesLike,
     normalize: bool = False,
-    fuzzy_match: bool = True,
+    fuzzy_match: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike:
     """
@@ -777,6 +777,8 @@ def cargar_diccionario(
 # Lo que se exporta al hacer `from ubigeos_peru.core import *`
 # ------------------------------------------------------------------
 __all__ = [
+    "UbigeoConverter",
+    "Validations",
     "get_departamento",
     "get_provincia",
     "get_distrito",
