@@ -167,3 +167,5 @@ doc/
 
 target/
 *.txt
+
+tests_misc/
