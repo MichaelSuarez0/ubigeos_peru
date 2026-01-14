@@ -1,6 +1,4 @@
-from typing import TYPE_CHECKING, Literal, overload
-
-from pyparsing import Any
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -355,3 +353,4 @@ def cargar_diccionario(
         "inverted",
     ],
 ) -> dict[str, Any]: ...
+

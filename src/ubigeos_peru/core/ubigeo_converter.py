@@ -7,9 +7,10 @@ from ._utils import (
     is_series_like,
     reconstruct_like,
 )
-from .validations import Validations
 from .resource_manager import ResourceManager
+from .validations import Validations
 
+Levels = Literal["departamentos", "provincias", "distritos"]
 
 class UbigeoConverter:
     _instance = None
@@ -40,12 +41,7 @@ class UbigeoConverter:
         return codigo
 
     @classmethod
-    def _validate_level(cls, level: str) -> str:
-        if not isinstance(level, str):
-            raise TypeError(
-                'Solo se aceptan "departamentos", "distritos", "provincias" como argumentos para el nivel (level)'
-            )
-
+    def _validate_level(cls, level: Levels) -> Levels:
         if isinstance(level, str) and not level.endswith("s"):
             level += "s"
 
@@ -325,7 +321,7 @@ class UbigeoConverter:
     def get_ubigeo(
         cls,
         ubicacion: str | SeriesLike,
-        level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
+        level: Levels,
         institucion: Literal["inei", "reniec", "sunat"] = "inei",
     ) -> str | SeriesLike:
         level = cls._validate_level(level)
@@ -344,14 +340,22 @@ class UbigeoConverter:
                     raise TypeError(
                         "El lugar debe ser un str, no se aceptan números u otros tipos de datos"
                     )
-
-                try:
-                    lugar_clean = Validations.validate_ubicacion(ubicacion_normalized)
-                    out.append(mapping[lugar_clean])
-                except KeyError:
-                    raise KeyError(
-                        f"El lugar '{item}' no se encontró en la base de datos de '{level}'"
-                    )
+                if level == "provincias":
+                    try:
+                        lugar_clean = Validations.validate_provincia(ubicacion_normalized)
+                        out.append(mapping[lugar_clean])
+                    except KeyError:
+                        raise KeyError(
+                            f"La provincia '{item}' no se encontró en la base de datos de '{level}'"
+                        )
+                elif level == "distritos":
+                    try:
+                        lugar_clean = Validations.validate_distrito(ubicacion_normalized)
+                        out.append(mapping[lugar_clean])
+                    except KeyError:
+                        raise KeyError(
+                            f"El distrito '{item}' no se encontró en la base de datos de '{level}'"
+                        )
             return reconstruct_like(ubicacion, out)
 
         else:
@@ -369,7 +373,7 @@ class UbigeoConverter:
     def get_metadato(
         cls,
         codigo_o_ubicacion: str | int | SeriesLike,
-        level: Literal["departamentos", "provincias", "distritos"],
+        level: Levels,
         key: Literal[
             "altitud", "capital", "latitud", "longitud", "superficie"
         ] = "capital",
@@ -395,9 +399,19 @@ class UbigeoConverter:
                 if isinstance(item, str):
                     if not item[0].isdigit():
                         # Se asume que el input es un string con el nombre del departamento
-                        ubicacion = Validations.validate_ubicacion(
+                        if level == "departamentos":
+                            ubicacion = Validations.validate_departamento(
                             item, normalize=False, on_error="ignore"
                         )
+                        elif level == "provincias":
+                            ubicacion = Validations.validate_provincia(
+                            item, normalize=False, on_error="ignore"
+                        )
+                        if level == "distritos":
+                            ubicacion = Validations.validate_distrito(
+                            item, normalize=False, on_error="ignore"
+                        )
+                            
                     else:
                         # Se asume que el input es un string con el código de ubigeo
                         ubicacion = cls.get_ubigeo(item, level)
@@ -429,8 +443,17 @@ class UbigeoConverter:
             if isinstance(codigo_o_ubicacion, str):
                 if not codigo_o_ubicacion[0].isdigit():
                     # Se asume que el input es un string con el nombre del departamento
-                    ubicacion = Validations.validate_ubicacion(
-                        codigo_o_ubicacion, normalize=False
+                    if level == "departamentos":
+                        ubicacion = Validations.validate_departamento(
+                        codigo_o_ubicacion, normalize=False, on_error="ignore"
+                    )
+                    elif level == "provincias":
+                        ubicacion = Validations.validate_provincia(
+                        codigo_o_ubicacion, normalize=False, on_error="ignore"
+                    )
+                    if level == "distritos":
+                        ubicacion = Validations.validate_distrito(
+                        codigo_o_ubicacion, normalize=False, on_error="ignore"
                     )
                 else:
                     # Se asume que el input es un string con el código de ubigeo

@@ -14,7 +14,9 @@ def test_get_departamento_inei(db_enaho_2024):
     # ORIGINAL: Solo validar la columna esperada (DPTO_HECHO) para tener
     # ambas columnas en el mismo formato antes de la comparación.
     df_modified["DEPARTAMENTO"] = ubg.get_departamento(df_modified["UBIGEO"])
-    deps_modified = df_modified.drop_duplicates(subset="DEPARTAMENTO")["DEPARTAMENTO"].to_list()
+    deps_modified = df_modified.drop_duplicates(subset="DEPARTAMENTO")[
+        "DEPARTAMENTO"
+    ].to_list()
     deps_expected = list(ubg.cargar_diccionario("departamentos")["inei"].values())
 
     for dep_modified, dep_expected in zip(deps_modified, deps_expected):
@@ -22,6 +24,11 @@ def test_get_departamento_inei(db_enaho_2024):
 
 
 def test_get_departamento(db_mininter):
+    """
+    La idea es aplicar la función get_departamento a "UBIGEO_HECHO" para
+    obtener la columna "DEPARTAMENTO", y comparar los resultados con la columna
+    ya existente "DPTO_HECHO".
+    """
     # Crear una copia del dataset para comparar
     db_copia = db_mininter.copy()
 
@@ -49,6 +56,9 @@ def test_get_departamento(db_mininter):
 
 
 def test_get_provincia(db_mininter):
+    """
+    Misma lógica que test_get_departamento, pero con provincias.
+    """
     # Crear una copia del dataset para comparar
     db_copia = db_mininter.copy()
 
@@ -62,9 +72,9 @@ def test_get_provincia(db_mininter):
 
     # Comparar cada provincia calculada con el esperado.
     for clean, expected in zip(db_copia["PROVINCIA"], db_mininter["PROV_HECHO"]):
-        # get_ubigeo devuelve "Nasca", siendo el nombre oficial del INEI, 
+        # get_ubigeo devuelve "Nasca", siendo el nombre oficial del INEI,
         # Sin embargo, el dataset lo escribe como "Nazca"
-        if clean == "Nasca": 
+        if clean == "Nasca":
             continue
         assert clean == expected
 
@@ -80,7 +90,7 @@ def test_get_distrito(db_mininter):
 
     # ORIGINAL: Solo validar la columna esperada (DIST_HECHO)
     db_mininter["DIST_HECHO"] = ubg.validate_distrito(
-        db_mininter["DIST_HECHO"], fuzzy_match=True, on_error="coerce"
+        db_mininter["DIST_HECHO"], fuzzy_match=False, on_error="coerce"
     )
 
     # Comparar cada distrito calculada con el esperado.
@@ -88,10 +98,36 @@ def test_get_distrito(db_mininter):
         db_copia["DISTRITO"],
         db_mininter["DIST_HECHO"],
     ):
-        # El Muyo es un centro poblado; no aparece en la lista de distritos
-        # 150144 ubigeo no existe. En el dataset aparece como Pueblo Libre
-        # pero el ubigeo de Pueblo Libre es 150121 (incluso lo colocaron bien antes)
-        if expected == "EL MUYO" or expected == "Bagua" or clean == "150144":
+        ### ============================================
+        ### Algunas observaciones en la base de datos:
+        ### ============================================
+        # 1) 010207 no existe, en el dataset aparece como El Muyo, pero este es un centro poblado, no un distrito.
+        # 2) 150144 no existe. En el dataset aparece como Pueblo Libre.
+        # 2) El ubigeo de Pueblo Libre es 150121 (incluso lo colocaron bien antes).
+        # 3) Aparece 80912 como Kumpirushiato, pero lo correcto es 080915 (el otro pertenece a Villa Virgen).
+        # 4) Aparece 10201 como La Peca, pero el correcto es 10206 (el otro pertenece a Bagua).
+        # 5) A propósito, 10206 aparece como Bagua, pero lo correcto es La Peca.
+        # 6) get_distrito devuelve "Nasca", siendo el nombre oficial del INEI; sin embargo, el dataset lo escribe como "Nazca"
+        # 7) 250305 aparece correctamente como A.VON.HUMBOLDT, pero get_distrito devuelve Alexander Von Humboldt.
+        # 8) 100607 aparece como Castillo Grande, pero el correcto es 100608 (el otro pertenece a Pucayacu)
+        # 9) 160109 no existe (en el INEI al menos, en la Sunat sí le pertenece a Putumayo)
+        # 10) 80911 aparece como Megantoni, pero lo correcto es Inkawasi
+        # 11) Santa Lucía aparece sin tilde en el dataset
+        if (
+            expected == "EL MUYO"
+            or expected == "Bagua"
+            or expected == "La Peca"
+            or expected == "Nazca"
+            or expected == "Kumpirushiato"
+            or clean == "150144"
+            or clean == "010207"
+            or clean == "Alexander Von Humboldt"
+            or clean == "Pucayacu"
+            or clean == "160109"
+            or clean == "Pueblo Libre"
+            or clean == "Inkawasi"
+            or expected == "Santa Lucia"
+        ):
             continue
         assert clean == expected
 

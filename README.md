@@ -19,17 +19,18 @@ Las fuentes o bases de datos de ubigeos:
 - **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton.
 - **Metadatos Geográficos**: Acceso a información adicional como capital, altitud, superficie y coordenadas
 
-## Roadmap
-1) Métodos para exportar las bases de datos (por ejemplo lista de Departamentos)
-2) Args para personalizar el output (int o str, zfill)
-3) Agregar tests para diferenciar Lima de Lima Metropolitana (como arg)
-
 ## Instalación
 
 Ejecutar en una terminal
 
 ```bash
 pip install ubigeos-peru
+```
+
+Con uv
+
+```bash
+uv add ubigeos-peru
 ```
 
 ## Uso Básico
@@ -128,7 +129,7 @@ df = pd.DataFrame({
 })
 
 # Agregar información geográfica
-df["DEPARTAMENTO"] = df["UBIGEO"].apply(ubg.get_departamento)
+df["DEPARTAMENTO"] = ubg.get_departamento(df["UBIGEO"])
 ```
 Esto generará el siguiente DataFrame:
 
@@ -144,7 +145,7 @@ Esto generará el siguiente DataFrame:
 También se pueden pasar argumentos con una función lambda
 ```python
 # Agregar información geográfica
-df["PROVINCIA"] = df["UBIGEO"].apply(lambda x: ubg.get_provincia(x, normalize= True))
+df["PROVINCIA"] = ubg.get_provinciadf(df["UBIGEO"], normalize= True)
 ```
 Esto generará el siguiente DataFrame:
 
@@ -161,27 +162,32 @@ Esto generará el siguiente DataFrame:
 
 ## Contribución
 
-¿Encontraste información faltante o incorrecta? Esta sección te guía paso a paso para contribuir a la mejora de la librería.
+Por favor, contáctame si encuentras alguno de los siguientes:
 
-### Cuándo contribuir
+- **Base de datos de la SUNAT actualizada**: Es la única que me falta.
+- **Errores en el uso de la librería**: Funciones que dan error cuando no deberían.
+- **Códigos incorrectos**: Códigos INEI o RENIEC incorrectos.
+- **Nombres incorrectos**: Ubicaciones que no siguen el nombre oficial.
+- **Ubicaciones faltantes**: Provincias o distritos que no están en la base de datos.
 
-Puedes contribuir cuando encuentres:
-- **Ubicaciones faltantes**: Provincias o distritos que no están en la base de datos
-- **Nombres incorrectos**: Ubicaciones que no siguen el nombre oficial
-- **Errores de escritura**: Nombres mal escritos o con caracteres incorrectos
-- **Códigos faltantes**: Códigos INEI, RENIEC o SUNAT que no están mapeados
+📧 michael-salvador@hotmail.com
 
-### Cómo contribuir
+## Cómo contribuir
 
 #### 1. Preparar el entorno
 Debes clonar o hacer fork del repositorio para tener acceso a las carpetas /construction y /resources_readable
+
 ```bash
 # Clona o haz fork del repositorio
 git clone https://github.com/username/repo-name.git
 cd repo-name
 
-# La única dependencia es orjson, no olvides instalarla
-pip install orjson
+# Si usas uv
+uv sync
+uv pip install -e .
+
+# Si usas pip
+pip install -e .
 ```
 
 #### 2. Identificar el recurso a actualizar
@@ -195,55 +201,7 @@ Los recursos disponibles son:
 - `macrorregiones`-> departamento : { macrorregion }
 - `otros`-> Ubicación : capital, superficie, altitud, etc
 
-#### 3. Actualizar el recurso
-
-Edita el archivo `insert_entries.py` y agrega tus entradas según la estructura de cada recurso.
-
-**Para distritos:**
-```python
-distritos = {
-    'inei': {
-        '070107': 'Mi Perú'
-    },
-    'reniec': {
-        '240107': 'Mi Perú'
-    },
-    'sunat': {
-        "120124": "Pariahuanca",
-        "080807": "Suyckutambo",
-        "080903": "Huayopata",
-        "080905": "Ocobamba",
-        "010199": "Distrito de Ejemplo"  # Nueva entrada
-    }
-}
-```
-
-#### 4. Ejecutar la actualización
-
-La función update_all se encarga de actualizar entradas en /resources y /resources_readable
-```python
-if __name__ == "__main__":
-    update_all(distritos, "distritos")
-```
-
-#### 5. Verificar los cambios
-
-Dirígite a tests y verifica que pase todas las pruebas.
-
-Luego, puedes enviar un pull request.
-
-### Contacto
-
-Para preguntas adicionales sobre cómo contribuir, dudas técnicas o sugerencias:
-
-📧 michael-salvador@hotmail.com
 
 ## Licencia
 
 Esta librería utiliza datos oficiales de instituciones públicas peruanas y está destinada para uso académico y de investigación.
-
-
-## Fuentes
- - Nombres oficiales: https://github.com/ernestorivero/Ubigeo-Peru
- - Códigos de ubigeo por instituciones: https://github.com/CONCYTEC/ubigeo-peru/blob/master/equivalencia-ubigeos-oti-concytec.csv
- - Otros datos (capital, altitud, latitud, longitud): https://github.com/jmcastagnetto/ubigeo-peru-aumentado/blob/main/ubigeo_departamento.csv
