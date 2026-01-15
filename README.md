@@ -145,7 +145,7 @@ Esto generará el siguiente DataFrame:
 También se pueden pasar argumentos con una función lambda
 ```python
 # Agregar información geográfica
-df["PROVINCIA"] = ubg.get_provinciadf(df["UBIGEO"], normalize= True)
+df["PROVINCIA"] = ubg.get_provincia(df["UBIGEO"], normalize=True)
 ```
 Esto generará el siguiente DataFrame:
 
