@@ -170,7 +170,7 @@ Por favor, contáctame si encuentras alguno de los siguientes:
 - **Nombres incorrectos**: Ubicaciones que no siguen el nombre oficial.
 - **Ubicaciones faltantes**: Provincias o distritos que no están en la base de datos.
 
-📧 a20180264@pucp.edu.com
+📧 a20180264@pucp.edu.com  
 [Mi Linkedin](https://www.linkedin.com/in/michael-su%C3%A1rez-1734a2211/)
 
 ## Cómo contribuir
