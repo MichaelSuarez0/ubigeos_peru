@@ -1,3 +1,0 @@
-# MANIFEST.in
-include Cargo.toml
-recursive-include rust *.rs
