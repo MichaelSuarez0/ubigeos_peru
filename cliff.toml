@@ -52,7 +52,7 @@ commit_preprocessors = [
     # Replace issue numbers with FULL absolute link templates.
     # Captures any prefix text before #number (e.g. "closes #35",
     # "relates to #35", or just "#35") and preserves only the #number part.
-    { pattern = '\(([^#\)]*)#([0-9]+)\)', replace = "([#${2}](https://github.com/c2-circulo-desarrolladores/c2-cli/issues/${2}))" },
+    { pattern = '\(([^#\)]*)#([0-9]+)\)', replace = "([#${2}](https://github.com/MichaelSuarez0/ubigeos_peru/issues/${2}))" },
     # Check spelling of the commit message using https://github.com/crate-ci/typos.
     # If the spelling is incorrect, it will be fixed automatically.
     #{ pattern = '.*', replace_command = 'typos --write-changes -' },
