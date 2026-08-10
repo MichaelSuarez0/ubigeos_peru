@@ -22,14 +22,19 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Install git-cliff
+        uses: taiki-e/install-action@v2
+        with:
+          tool: git-cliff
+
       - name: Get changelog
         id: changelog
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
-            uv run cz changelog --dry-run "$PREV_TAG..${GITHUB_REF_NAME}" > /tmp/changelog.md
+            git-cliff --config cliff.toml "$PREV_TAG..${GITHUB_REF_NAME}" > /tmp/changelog.md
           else
-            uv run cz changelog --dry-run > /tmp/changelog.md
+            git-cliff --config cliff.toml "${GITHUB_REF_NAME}" > /tmp/changelog.md
           fi
           echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
           cat /tmp/changelog.md >> $GITHUB_OUTPUT
