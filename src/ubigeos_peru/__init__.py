@@ -29,7 +29,7 @@ __all__ = [
     "cargar_diccionario",
 ]
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __version_info__ = (0, 2, 2)
 __author__ = "Michael Suárez"
 __email__ = "michael-salvador@hotmail.com"
