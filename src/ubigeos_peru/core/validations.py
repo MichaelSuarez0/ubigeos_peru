@@ -129,12 +129,12 @@ class Validations:
 
             item_limpio = eliminar_acentos(value).strip().upper()
             resultado = None
-            
+
             # Intentar búsqueda directa
             try:
                 resultado = mapping[item_limpio]
             except KeyError:
-            # Intentar fuzzy matching si no se encontró
+                # Intentar fuzzy matching si no se encontró
                 if fuzzy_match:
                     resultado_fuzzy = fuzzy_validate(
                         item_limpio, list(mapping.keys()), limit=1
@@ -142,7 +142,7 @@ class Validations:
                     if resultado_fuzzy:
                         resultado_limpio = eliminar_acentos(resultado_fuzzy).upper()
                         resultado = mapping[resultado_limpio]
-            
+
             # Si no se encontró resultado, manejar error
             if resultado is None:
                 resultado = assert_error(
@@ -150,7 +150,7 @@ class Validations:
                     evaluated=item_limpio,
                     message=error_message,
                 )
-            
+
             # Aplicar normalización si se requiere
             if resultado and normalize:
                 return eliminar_acentos(resultado).strip().upper()

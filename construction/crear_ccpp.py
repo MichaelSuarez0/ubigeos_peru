@@ -2,9 +2,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from _utils import DATABASES_PATH
 
 import ubigeos_peru as ubg
-from _utils import DATABASES_PATH
 
 centros_poblados = Path(DATABASES_PATH / "municipalidades_centros_poblados_2025")
 
@@ -58,7 +58,10 @@ def clean_directorio():
         sort=False,
     )
     directorio_cp.to_csv(
-        OUTPUT_DIR / "directorio_centros_poblados.csv", index=False, sep=";", encoding="utf-8-sig"
+        OUTPUT_DIR / "directorio_centros_poblados.csv",
+        index=False,
+        sep=";",
+        encoding="utf-8-sig",
     )
 
 

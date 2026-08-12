@@ -26,15 +26,15 @@ source:
 
 import json
 from pathlib import Path
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
+
 import duckdb
+import pandas as pd
+import requests
+from _utils import DATABASES_PATH
+from bs4 import BeautifulSoup
 
 import ubigeos_peru as ubg
 from ubigeos_peru.core._utils import eliminar_acentos
-
-from _utils import DATABASES_PATH
 
 
 def _clean_ubigeo_reniec(df: pd.DataFrame):
@@ -43,7 +43,7 @@ def _clean_ubigeo_reniec(df: pd.DataFrame):
     except KeyError:
         print("['N°'] not found in axis")
 
-    df["COD_DEP"]  = df["COD_DEP"].astype(str).str.zfill(2)
+    df["COD_DEP"] = df["COD_DEP"].astype(str).str.zfill(2)
     df["COD_PROV"] = df["COD_PROV"].astype(str).str.zfill(2)
     df["COD_DIST"] = df["COD_DIST"].astype(str).str.zfill(2)
 
@@ -56,23 +56,21 @@ def _clean_ubigeo_reniec(df: pd.DataFrame):
         "",
         regex=True,
     )
-    df["Distrito"] = df["Distrito"].replace(
-        {"SAN ISI": "SAN ISIDRO"},
-        regex=False
-    )
+    df["Distrito"] = df["Distrito"].replace({"SAN ISI": "SAN ISIDRO"}, regex=False)
 
     df["Departamento"] = ubg.validate_departamento(df["Departamento"])
     df["Provincia"] = ubg.validate_ubicacion(df["Provincia"], on_error="raise")
     df["Distrito"] = ubg.validate_ubicacion(df["Distrito"], on_error="warn")
 
-
     return df
+
 
 def _write_ubigeo_reniec(df: pd.DataFrame):
     df.to_csv(
         DATABASES_PATH / "ubigeo_reniec_2025.csv", encoding="utf-8-sig", index=False
     )
     print("Se creó ubigeo_reniec_2025.csv")
+
 
 def _leer_ubigeo_reniec():
     df = pd.read_csv(DATABASES_PATH / "ubigeo_reniec_2025.csv", encoding="utf-8-sig")
@@ -95,7 +93,7 @@ def crear_ubigeo_reniec():
     else:
         cache = {}
 
-    conn = duckdb.connect() 
+    conn = duckdb.connect()
     query = "SELECT DISTINCT provincia FROM read_csv_auto(?) WHERE departamento = '{}'"
 
     departamentos = list(ubg.cargar_diccionario("departamentos")["inei"].values())
@@ -103,13 +101,16 @@ def crear_ubigeo_reniec():
     departamentos.remove("CALLAO")
 
     all_rows = []
-    for dep in departamentos:     
+    for dep in departamentos:
         print(f"Obteniendo para {dep}")
         query_provincia = query.format(ubg.validate_departamento(dep))
         print(query_provincia)
 
         result = conn.execute(query_provincia, [str(UBIGEOS_PATH)]).fetchdf()
-        provincias = [eliminar_acentos(provincia).upper() for provincia in result["provincia"].to_list()]
+        provincias = [
+            eliminar_acentos(provincia).upper()
+            for provincia in result["provincia"].to_list()
+        ]
         correcciones = {
             "ANTONIO RAYMONDI": "ANTONIO RAIMONDI",
             "MARANON": "MARAÑON",
@@ -121,29 +122,29 @@ def crear_ubigeo_reniec():
 
         provincias = [correcciones.get(p, p) for p in provincias]
         for prov in provincias:
-            
             if prov in ("NINABAMBA", "PUTUMAYO"):
                 continue
 
             if prov in cache:
                 html = cache[prov]
                 print(f"Obteniendo para {dep} de {prov} (cached)")
-                
+
             else:
                 print(f"Obteniendo para {dep} de {prov} (request)")
                 payload = {
                     "cmbSeleccionado": "4",
                     "noDepartamento": dep,
-                    "noProvincia" : prov
+                    "noProvincia": prov,
                 }
 
                 resp = requests.post(URL, data=payload, headers=HEADERS)
                 resp.raise_for_status()
                 html = resp.text
-            
-                cache[prov] = html
-                CACHE_PATH.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
 
+                cache[prov] = html
+                CACHE_PATH.write_text(
+                    json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
 
             soup = BeautifulSoup(html, "html.parser")
             table = soup.find("table")
@@ -156,15 +157,22 @@ def crear_ubigeo_reniec():
 
             all_rows.extend(rows)
 
-    df = pd.DataFrame(all_rows, columns=[
-        "N°", "COD_DEP", "COD_PROV", "COD_DIST",
-        "Departamento", "Provincia", "Distrito"
-    ])
+    df = pd.DataFrame(
+        all_rows,
+        columns=[
+            "N°",
+            "COD_DEP",
+            "COD_PROV",
+            "COD_DIST",
+            "Departamento",
+            "Provincia",
+            "Distrito",
+        ],
+    )
 
     df = _clean_ubigeo_reniec(df)
 
     _write_ubigeo_reniec(df)
-
 
 
 if __name__ == "__main__":

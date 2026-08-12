@@ -245,7 +245,6 @@ def get_ubigeo(
 #     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 # ) -> str | SeriesLike: ...
 
-
 @overload
 def validate_departamento(
     departamento: str,
@@ -253,7 +252,6 @@ def validate_departamento(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
-
 @overload
 def validate_departamento(
     departamento: pd.Series,
@@ -261,7 +259,6 @@ def validate_departamento(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
-
 @overload
 def validate_departamento(
     departamento: pl.Series,
@@ -269,7 +266,6 @@ def validate_departamento(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
-
 def validate_departamento(
     departamento: str | SeriesLike,
     normalize: bool = False,
@@ -285,7 +281,6 @@ def validate_provincia(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
-
 @overload
 def validate_provincia(
     provincia: pd.Series,
@@ -293,7 +288,6 @@ def validate_provincia(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
-
 @overload
 def validate_provincia(
     provincia: pl.Series,
@@ -301,7 +295,6 @@ def validate_provincia(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
-
 def validate_provincia(
     provincia: str | SeriesLike,
     normalize: bool = False,
@@ -317,7 +310,6 @@ def validate_distrito(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
-
 @overload
 def validate_distrito(
     distrito: pd.Series,
@@ -325,7 +317,6 @@ def validate_distrito(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pd.Series: ...
-
 @overload
 def validate_distrito(
     distrito: pl.Series,
@@ -333,7 +324,6 @@ def validate_distrito(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> pl.Series: ...
-
 def validate_distrito(
     distrito: str | SeriesLike,
     normalize: bool = False,
@@ -353,4 +343,3 @@ def cargar_diccionario(
         "inverted",
     ],
 ) -> dict[str, Any]: ...
-

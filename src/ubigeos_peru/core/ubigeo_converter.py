@@ -12,6 +12,7 @@ from .validations import Validations
 
 Levels = Literal["departamentos", "provincias", "distritos"]
 
+
 class UbigeoConverter:
     _instance = None
     _resources = ResourceManager()
@@ -342,7 +343,9 @@ class UbigeoConverter:
                     )
                 if level == "provincias":
                     try:
-                        lugar_clean = Validations.validate_provincia(ubicacion_normalized)
+                        lugar_clean = Validations.validate_provincia(
+                            ubicacion_normalized
+                        )
                         out.append(mapping[lugar_clean])
                     except KeyError:
                         raise KeyError(
@@ -350,7 +353,9 @@ class UbigeoConverter:
                         )
                 elif level == "distritos":
                     try:
-                        lugar_clean = Validations.validate_distrito(ubicacion_normalized)
+                        lugar_clean = Validations.validate_distrito(
+                            ubicacion_normalized
+                        )
                         out.append(mapping[lugar_clean])
                     except KeyError:
                         raise KeyError(
@@ -401,17 +406,17 @@ class UbigeoConverter:
                         # Se asume que el input es un string con el nombre del departamento
                         if level == "departamentos":
                             ubicacion = Validations.validate_departamento(
-                            item, normalize=False, on_error="ignore"
-                        )
+                                item, normalize=False, on_error="ignore"
+                            )
                         elif level == "provincias":
                             ubicacion = Validations.validate_provincia(
-                            item, normalize=False, on_error="ignore"
-                        )
+                                item, normalize=False, on_error="ignore"
+                            )
                         if level == "distritos":
                             ubicacion = Validations.validate_distrito(
-                            item, normalize=False, on_error="ignore"
-                        )
-                            
+                                item, normalize=False, on_error="ignore"
+                            )
+
                     else:
                         # Se asume que el input es un string con el código de ubigeo
                         ubicacion = cls.get_ubigeo(item, level)
@@ -445,16 +450,16 @@ class UbigeoConverter:
                     # Se asume que el input es un string con el nombre del departamento
                     if level == "departamentos":
                         ubicacion = Validations.validate_departamento(
-                        codigo_o_ubicacion, normalize=False, on_error="ignore"
-                    )
+                            codigo_o_ubicacion, normalize=False, on_error="ignore"
+                        )
                     elif level == "provincias":
                         ubicacion = Validations.validate_provincia(
-                        codigo_o_ubicacion, normalize=False, on_error="ignore"
-                    )
+                            codigo_o_ubicacion, normalize=False, on_error="ignore"
+                        )
                     if level == "distritos":
                         ubicacion = Validations.validate_distrito(
-                        codigo_o_ubicacion, normalize=False, on_error="ignore"
-                    )
+                            codigo_o_ubicacion, normalize=False, on_error="ignore"
+                        )
                 else:
                     # Se asume que el input es un string con el código de ubigeo
                     ubicacion = cls.get_ubigeo(codigo_o_ubicacion, level)

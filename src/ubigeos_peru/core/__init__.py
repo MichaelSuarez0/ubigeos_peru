@@ -19,9 +19,9 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from ._utils import SeriesLike
-from .validations import Validations
 from .resource_manager import ResourceManager
 from .ubigeo_converter import UbigeoConverter
+from .validations import Validations
 
 # ------------------------------------------------------------------
 # Envuelve los métodos de clase de Ubigeo en funciones top-level
@@ -100,7 +100,7 @@ def get_departamento(
     3  170101      1
     4  220101      0
 
-    Simplemente pasamos una columna (Serie) como argumento. 
+    Simplemente pasamos una columna (Serie) como argumento.
     Lo guardamos en una columna de nuestro DataFramepara obtener los departamentos
 
     >>> df["DPTO"] = ubg.get_departamento(df["UBIGEO"])
@@ -122,9 +122,9 @@ def get_departamento(
     2  150101      0           LIMA
     3  170101      1  MADRE DE DIOS
     4  220101      0     SAN MARTIN
-    
+
      La función acepta como input Series de Pandas, pero también acepta valores individuales.
-     En ese sentido, los siguientes son válidos, pero no recomendados, ya que son más lentos 
+     En ese sentido, los siguientes son válidos, pero no recomendados, ya que son más lentos
      y menos intuitivos que pasar la Serie.
 
      >>> df["DPTO"] = df["UBIGEO"].apply(get_departamento)
@@ -138,7 +138,7 @@ def get_departamento(
     2  150101      0           LIMA
     3  170101      1  MADRE DE DIOS
     4  220101      0     SAN MARTIN
-    
+
     """
     return UbigeoConverter.get_departamento(ubigeo, institucion, divide_lima, normalize)
 
@@ -190,11 +190,11 @@ def get_provincia(
     "Huaral"
     >>> ubg.get_provincia(101, normalize=True)
     "CHACHAPOYAS"
-    
+
     **Integración con Pandas: insertar una columna (Serie) de provincias**
-    
+
     Ejemplo con un DataFrame de prueba
-    
+
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...     "UBIGEO": [0805, 1508, 1703, 2101, 2109],
@@ -208,9 +208,9 @@ def get_provincia(
     2    1703      0    Tahuamanu
     3    2101      1     Azángaro
     4    2109      0    San Román
-    
+
     Podemos personalizar el output con parámetros adicionales
-    
+
     >>> df["PROVINCIA"] = ubg.get_provincia(df["UBIGEO"], normalize=True)
        UBIGEO  P1144     PROVINCIA
     0    0805      1      TAYACAJA
@@ -218,11 +218,11 @@ def get_provincia(
     2    1703      0     TAHUAMANU
     3    2101      1      AZANGARO
     4    2109      0     SAN ROMAN
-    
+
     La función acepta como input Series de Pandas, pero también acepta valores individuales.
     En ese sentido, los siguientes son válidos, pero no recomendados, ya que son más lentos
     y menos intuitivos que pasar la Serie directamente.
-    
+
     >>> df["PROVINCIA"] = df["UBIGEO"].apply(get_provincia)
     >>> df["PROVINCIA"] = df["UBIGEO"].apply(
     ...     lambda x: get_provincia(x, normalize=True)
@@ -234,9 +234,9 @@ def get_provincia(
     2    1703      0     TAHUAMANU
     3    2101      1      AZANGARO
     4    2109      0     SAN ROMAN
-    
+
     Accediendo a la Serie resultante directamente
-    
+
     >>> provincias = ubg.get_provincia(df["UBIGEO"])
     >>> print(provincias)
     0     San Román
@@ -289,7 +289,7 @@ def get_distrito(
     Examples
     --------
     Ejemplos básicos de obtención de distritos
-    
+
     >>> import ubigeos_peru as ubg
     >>> ubg.get_distrito("010516")
     'San Cristóbal'
@@ -297,11 +297,11 @@ def get_distrito(
     'Santiago de Surco'
     >>> ubg.get_distrito(200701, normalize=True)
     'PARINAS'
-    
+
     **Integración con Pandas: insertar una columna (Serie) de distritos**
-    
+
     Ejemplo con un DataFrame de prueba
-    
+
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...     "UBIGEO": [10516, 40118, 90111, 150140, 200701],
@@ -314,9 +314,9 @@ def get_distrito(
     2   90111      1
     3  150140      0
     4  200701      1
-    
+
     Añadimos una columna para obtener los distritos
-    
+
     >>> df["DISTRITO"] = ubg.get_distrito(df["UBIGEO"])
     >>> print(df)
        UBIGEO  P1144             DISTRITO
@@ -325,9 +325,9 @@ def get_distrito(
     2   90111      1     Mariscal Cáceres
     3  150140      0    Santiago de Surco
     4  200701      1              Pariñas
-    
+
     Podemos personalizar el output con parámetros adicionales
-    
+
     >>> df["DISTRITO"] = ubg.get_distrito(df["UBIGEO"], normalize=True)
     >>> print(df)
        UBIGEO  P1144            DISTRITO
@@ -336,11 +336,11 @@ def get_distrito(
     2   90111      1    MARISCAL CACERES
     3  150140      0   SANTIAGO DE SURCO
     4  200701      1             PARINAS
-    
+
     La función acepta como input Series de Pandas, pero también acepta valores individuales.
     En ese sentido, los siguientes son válidos, pero no recomendados, ya que son más lentos
     y menos intuitivos que pasar la Serie directamente.
-    
+
     >>> df["DISTRITO"] = df["UBIGEO"].apply(get_distrito)
     >>> df["DISTRITO"] = df["UBIGEO"].apply(
     ...     lambda x: get_distrito(x, normalize=True)
@@ -390,7 +390,9 @@ def get_macrorregion(
     - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
     - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
     """
-    return UbigeoConverter.get_macrorregion(departamento_o_ubigeo, institucion, normalize)
+    return UbigeoConverter.get_macrorregion(
+        departamento_o_ubigeo, institucion, normalize
+    )
 
 
 def get_ubigeo(
@@ -463,7 +465,7 @@ def validate_departamento(
 ) -> str | SeriesLike:
     """
     Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
-    
+
     Parameters
     ----------
     departamento : str | SeriesLike
@@ -479,23 +481,23 @@ def validate_departamento(
         - `ignore`: Omite el nombre sin generar error.
         - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
         - `coerce`: Devuelve None.
-    
+
     Returns
     -------
     str | SeriesLike
         Nombre oficial del departamento.
-    
+
     Raises
     ------
     TypeError
         Si `departamento` no es un str o SeriesLike
     KeyError
         Si `departamento` no coincide con ningún nombre en la base de datos y on_error = `raise`
-    
+
     Notes
     -----
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
-    
+
     Examples
     --------
     >>> # Validación simple de nombres
@@ -507,7 +509,7 @@ def validate_departamento(
     >>>
     >>> validate_departamento("NACIONAL", on_error="capitalize")
     'Nacional'
-    
+
     **Integración con Pandas**
 
     Creamos un DataFrame de prueba
@@ -547,7 +549,9 @@ def validate_departamento(
     3        CUSCO      1
     4      HUANUCO      0
     """
-    return Validations.validate_departamento(departamento, normalize, fuzzy_match, on_error)
+    return Validations.validate_departamento(
+        departamento, normalize, fuzzy_match, on_error
+    )
 
 
 def validate_provincia(
@@ -558,7 +562,7 @@ def validate_provincia(
 ) -> str | SeriesLike:
     """
     Valida el nombre de una provincia escrita con gramática variable y devuelve el nombre oficial.
-    
+
     Parameters
     ----------
     provincia : str | SeriesLike
@@ -574,23 +578,23 @@ def validate_provincia(
         - `ignore`: Omite el nombre sin generar error.
         - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
         - `coerce`: Devuelve None.
-    
+
     Returns
     -------
     str | SeriesLike
         Nombre oficial de la provincia.
-    
+
     Raises
     ------
     TypeError
         Si `provincia` no es un str o SeriesLike
     KeyError
         Si `provincia` no coincide con ningún nombre en la base de datos y on_error = `raise`
-    
+
     Notes
     -----
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
-    
+
     Examples
     --------
     >>> # Validación simple de nombres
@@ -644,7 +648,7 @@ def validate_distrito(
 ) -> str | SeriesLike:
     """
     Valida el nombre de un distrito escrito con gramática variable y devuelve el nombre oficial.
-    
+
     Parameters
     ----------
     distrito : str | SeriesLike
@@ -660,23 +664,23 @@ def validate_distrito(
         - `ignore`: Omite el nombre sin generar error.
         - `capitalize`: Devuelve el nombre capitalizado (primera letra en mayúscula).
         - `coerce`: Devuelve None.
-    
+
     Returns
     -------
     str | SeriesLike
         Nombre oficial del distrito.
-    
+
     Raises
     ------
     TypeError
         Si `distrito` no es un str o SeriesLike
     KeyError
         Si `distrito` no coincide con ningún nombre en la base de datos y on_error = `raise`
-    
+
     Notes
     -----
     - La búsqueda es **case-insensitive** y se normalizan automáticamente los caracteres como acentos.
-    
+
     Examples
     --------
     >>> # Validación simple de nombres
