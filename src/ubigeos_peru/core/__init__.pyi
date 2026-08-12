@@ -1,8 +1,6 @@
-from typing import TYPE_CHECKING, Any, Literal, overload
+from typing import Any, Literal, overload
 
-if TYPE_CHECKING:
-    import pandas as pd
-    import polars as pl
+from narwhals.typing import IntoSeriesT
 
 from ._utils import SeriesLike
 
@@ -12,14 +10,6 @@ from ._utils import SeriesLike
 
 @overload
 def get_departamento(
-    ubigeo: str | int | SeriesLike,
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    divide_lima: bool = False,
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
-@overload
-def get_departamento(
     ubigeo: str,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
@@ -36,31 +26,16 @@ def get_departamento(
 ) -> str: ...
 @overload
 def get_departamento(
-    ubigeo: pd.Series,
+    ubigeo: IntoSeriesT,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-@overload
+) -> IntoSeriesT: ...
 def get_departamento(
-    ubigeo: pl.Series,
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    divide_lima: bool = False,
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-def get_departamento(
-    ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    divide_lima: bool = False,
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
-@overload
-def get_provincia(
     ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
+    divide_lima: bool = False,
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
@@ -80,26 +55,12 @@ def get_provincia(
 ) -> str: ...
 @overload
 def get_provincia(
-    ubigeo: pd.Series,
+    ubigeo: IntoSeriesT,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-@overload
+) -> IntoSeriesT: ...
 def get_provincia(
-    ubigeo: pl.Series,
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-def get_provincia(
-    ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
-@overload
-def get_distrito(
     ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
@@ -121,28 +82,14 @@ def get_distrito(
 ) -> str: ...
 @overload
 def get_distrito(
-    ubigeo: pd.Series,
+    ubigeo: IntoSeriesT,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-@overload
+) -> IntoSeriesT: ...
 def get_distrito(
-    ubigeo: pl.Series,
+    ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-def get_distrito(
-    ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
-@overload
-def get_macrorregion(
-    departamento_o_ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
@@ -162,29 +109,15 @@ def get_macrorregion(
 ) -> str: ...
 @overload
 def get_macrorregion(
-    departamento_o_ubigeo: pd.Series,
+    departamento_o_ubigeo: IntoSeriesT,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     normalize: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-@overload
+) -> IntoSeriesT: ...
 def get_macrorregion(
-    departamento_o_ubigeo: pl.Series,
+    departamento_o_ubigeo: str | int | SeriesLike,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-def get_macrorregion(
-    departamento_o_ubigeo: str | SeriesLike,
-    institucion: Literal["inei", "minsa", "ceplan"] = "inei",
-    normalize: bool = False,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike: ...
-@overload
-def get_ubigeo(
-    ubicacion: str | SeriesLike,
-    level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
 @overload
@@ -196,56 +129,17 @@ def get_ubigeo(
 ) -> str: ...
 @overload
 def get_ubigeo(
-    ubicacion: pd.Series,
+    ubicacion: IntoSeriesT,
     level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-@overload
-def get_ubigeo(
-    ubicacion: pl.Series,
-    level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
-    institucion: Literal["inei", "reniec", "sunat"] = "inei",
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
+) -> IntoSeriesT: ...
 def get_ubigeo(
     ubicacion: str | SeriesLike,
     level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-# @overload
-# def get_metadato(
-#     codigo_ubigeo: str | SeriesLike,
-#     campo: Literal["departamento", "provincia", "distrito", "macrorregion"],
-#     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-# ) -> str | SeriesLike: ...
-# @overload
-# def get_metadato(
-#     codigo_ubigeo: str,
-#     campo: Literal["departamento", "provincia", "distrito", "macrorregion"],
-#     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-# ) -> str: ...
-# @overload
-# def get_metadato(
-#     codigo_ubigeo: pd.Series,
-#     campo: Literal["departamento", "provincia", "distrito", "macrorregion"],
-#     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-# ) -> pd.Series: ...
-# @overload
-# def get_metadato(
-#     codigo_ubigeo: pl.Series,
-#     campo: Literal["departamento", "provincia", "distrito", "macrorregion"],
-#     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-# ) -> pl.Series: ...
-# def get_metadato(
-#     codigo_ubigeo: str | SeriesLike,
-#     campo: Literal["departamento", "provincia", "distrito", "macrorregion"],
-#     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-# ) -> str | SeriesLike: ...
-
-
 @overload
 def validate_departamento(
     departamento: str,
@@ -253,31 +147,19 @@ def validate_departamento(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
-
 @overload
 def validate_departamento(
-    departamento: pd.Series,
+    departamento: IntoSeriesT,
     normalize: bool = False,
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-
-@overload
-def validate_departamento(
-    departamento: pl.Series,
-    normalize: bool = False,
-    fuzzy_match: bool = True,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-
+) -> IntoSeriesT: ...
 def validate_departamento(
     departamento: str | SeriesLike,
     normalize: bool = False,
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-# ==================== validate_provincia ====================
 @overload
 def validate_provincia(
     provincia: str,
@@ -285,31 +167,19 @@ def validate_provincia(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
-
 @overload
 def validate_provincia(
-    provincia: pd.Series,
+    provincia: IntoSeriesT,
     normalize: bool = False,
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-
-@overload
-def validate_provincia(
-    provincia: pl.Series,
-    normalize: bool = False,
-    fuzzy_match: bool = True,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-
+) -> IntoSeriesT: ...
 def validate_provincia(
     provincia: str | SeriesLike,
     normalize: bool = False,
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-# ==================== validate_distrito ====================
 @overload
 def validate_distrito(
     distrito: str,
@@ -317,31 +187,19 @@ def validate_distrito(
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str: ...
-
 @overload
 def validate_distrito(
-    distrito: pd.Series,
+    distrito: IntoSeriesT,
     normalize: bool = False,
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pd.Series: ...
-
-@overload
-def validate_distrito(
-    distrito: pl.Series,
-    normalize: bool = False,
-    fuzzy_match: bool = True,
-    on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> pl.Series: ...
-
+) -> IntoSeriesT: ...
 def validate_distrito(
     distrito: str | SeriesLike,
     normalize: bool = False,
     fuzzy_match: bool = True,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
 ) -> str | SeriesLike: ...
-
-# ==================== cargar_diccionario ====================
 def cargar_diccionario(
     resource_name: Literal[
         "departamentos",
@@ -353,4 +211,3 @@ def cargar_diccionario(
         "inverted",
     ],
 ) -> dict[str, Any]: ...
-

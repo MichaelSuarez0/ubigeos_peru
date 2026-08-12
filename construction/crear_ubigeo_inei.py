@@ -52,9 +52,11 @@ source:
 
 from pathlib import Path
 from typing import Literal
+
 import polars as pl
+from _utils import DATABASES_PATH, dms_to_dd, update_to_readable, update_to_resources
+
 import ubigeos_peru as ubg
-from _utils import update_to_readable, update_to_resources, DATABASES_PATH, dms_to_dd
 
 columns = [
     "Ubigeo",
@@ -279,16 +281,21 @@ def crear_ubigeo_inei():
 
     # limpiar algunos nombres
     df = df.with_columns(
-        pl.when(pl.col("ubigeo") == "040302").then(pl.lit("Acarí"))
-        .when(pl.col("ubigeo") == "250307").then(pl.lit("Boquerón"))
-        .when(pl.col("ubigeo") == "061306").then(pl.lit("Ninabamba"))
-        .when(pl.col("ubigeo") == "060414").then(pl.lit("Pion"))
+        pl.when(pl.col("ubigeo") == "040302")
+        .then(pl.lit("Acarí"))
+        .when(pl.col("ubigeo") == "250307")
+        .then(pl.lit("Boquerón"))
+        .when(pl.col("ubigeo") == "061306")
+        .then(pl.lit("Ninabamba"))
+        .when(pl.col("ubigeo") == "060414")
+        .then(pl.lit("Pion"))
         .otherwise(pl.col("distrito"))
         .alias("distrito")
     )
 
     df = df.with_columns(
-        pl.when(pl.col("ubigeo") == "061306").then(pl.lit("Ninabamba"))
+        pl.when(pl.col("ubigeo") == "061306")
+        .then(pl.lit("Ninabamba"))
         .otherwise(pl.col("provincia"))
         .alias("provincia")
     )
@@ -296,7 +303,12 @@ def crear_ubigeo_inei():
     # escribir
     df = df.to_pandas()
     df["ubigeo"] = df["ubigeo"].astype(str)
-    df.to_csv(DATABASES_PATH / "ubigeo_inei_2025.csv", encoding="utf-8-sig", index=False, sep=";")
+    df.to_csv(
+        DATABASES_PATH / "ubigeo_inei_2025.csv",
+        encoding="utf-8-sig",
+        index=False,
+        sep=";",
+    )
 
     return df
 

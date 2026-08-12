@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Literal
 
 import polars as pl
@@ -24,6 +23,7 @@ columns = [
 DB_INEI = DATABASES_PATH / "ubigeo_inei_2025.csv"
 DB_RENIEC = DATABASES_PATH / "ubigeo_reniec_2019.csv"
 
+
 def crear_provincias(institucion: Literal["inei", "reniec"]):
     provincias = {}
     final_dict = {}
@@ -33,11 +33,7 @@ def crear_provincias(institucion: Literal["inei", "reniec"]):
     elif institucion == "reniec":
         DB = DB_RENIEC
 
-    df = pl.read_csv(
-        DB,
-        separator=";",
-        schema_overrides={"ubigeo": pl.Utf8}
-    )
+    df = pl.read_csv(DB, separator=";", schema_overrides={"ubigeo": pl.Utf8})
 
     unique = set()
     for row in df.iter_rows(named=True):
@@ -51,6 +47,7 @@ def crear_provincias(institucion: Literal["inei", "reniec"]):
     update_to_resources(final_dict, variable_name="provincias")
     return final_dict
 
+
 def crear_distritos(institucion: Literal["inei", "reniec"]):
     provincias = {}
     final_dict = {}
@@ -60,11 +57,7 @@ def crear_distritos(institucion: Literal["inei", "reniec"]):
     elif institucion == "reniec":
         DB = DB_RENIEC
 
-    df = pl.read_csv(
-        DB,
-        separator=";",
-        schema_overrides={"ubigeo": pl.Utf8}
-    )
+    df = pl.read_csv(DB, separator=";", schema_overrides={"ubigeo": pl.Utf8})
 
     unique = set()
     for row in df.iter_rows(named=True):

@@ -52,7 +52,9 @@ def crear_equivalencias():
     equivalencias_full["distritos"]["HUAILLATI"] = "Huayllati"
     equivalencias_full["distritos"]["MARISCAL GAMARRA"] = "Mariscal Gamarra"
     equivalencias_full["distritos"]["SANTA RITA DE SIHUAS"] = "Santa Rita de Siguas"
-    equivalencias_full["distritos"]["SAN FRANCISCO DE RAVACAYCO"] = "San Francisco de Rivacayco"
+    equivalencias_full["distritos"]["SAN FRANCISCO DE RAVACAYCO"] = (
+        "San Francisco de Rivacayco"
+    )
     equivalencias_full["distritos"]["PION"] = "Pion"
     equivalencias_full["distritos"]["HUALLAY-GRANDE"] = "Huallay Grande"
     equivalencias_full["distritos"]["QUITO ARMA"] = "Quito-Arma"
@@ -60,12 +62,13 @@ def crear_equivalencias():
     equivalencias_full["distritos"]["SAN JUAN DE YSCOS"] = "San Juan de Iscos"
     equivalencias_full["distritos"]["HUAY HUAY"] = "Huay-Huay"
     equivalencias_full["distritos"]["CASTA"] = "San Pedro de Casta"
-    equivalencias_full["distritos"]["SAN JOSE DE LOS CHORRILLOS"] = "San José de los Chorrillos"
+    equivalencias_full["distritos"]["SAN JOSE DE LOS CHORRILLOS"] = (
+        "San José de los Chorrillos"
+    )
     equivalencias_full["distritos"]["HUAYA"] = "Hualla"
     equivalencias_full["distritos"]["DANIEL ALOMIAS ROBLES"] = "Daniel Alomia Robles"
     equivalencias_full["distritos"]["AYAUCA"] = "ALLAUCA"
     equivalencias_full["distritos"]["CARMEN DE LA LEGUA"] = "Carmen de la Legua Reynoso"
-
 
     # Sortear subniveles por última vez
     for nivel, dicc in equivalencias_full.items():

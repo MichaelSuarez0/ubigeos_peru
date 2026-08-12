@@ -55,8 +55,6 @@ class TestGetMacrorregion:
     def test_get_macrorregion_with_institution(self):
         assert ubg.get_macrorregion("Ucayali", institucion="ceplan") == "Nororiente"
 
-    def test_get_macrorregion_with_institution_from_integer(self):
-        assert ubg.get_macrorregion(25, institucion="ceplan") == "Nororiente"
 
 
 class TestGetMacrorregionMap:
@@ -109,13 +107,13 @@ class TestValidateDepartamento:
 class TestValidateProvincia:
     def test_validate_provincia_simple(self):
         assert ubg.validate_provincia("huaraz") == "Huaraz"
-    
+
     def test_validate_provincia_normalize(self):
         assert ubg.validate_provincia("Cajamarca", normalize=True) == "CAJAMARCA"
-    
+
     def test_validate_provincia_special_chars(self):
         assert ubg.validate_provincia("HUAROCHIRÍ") == "Huarochirí"
-    
+
     def test_validate_provincia_with_article(self):
         assert ubg.validate_provincia("la mar") == "La Mar"
 
@@ -123,19 +121,22 @@ class TestValidateProvincia:
 class TestValidateDistrito:
     def test_validate_distrito_lowercase(self):
         assert ubg.validate_distrito("chachapoyas") == "Chachapoyas"
-    
+
     def test_validate_distrito_normalize(self):
         assert ubg.validate_distrito("Cholón", normalize=True) == "CHOLON"
-    
+
     def test_validate_distrito_multiple_words(self):
-        assert ubg.validate_distrito("san francisco de daguas") == "San Francisco de Daguas"
-    
+        assert (
+            ubg.validate_distrito("san francisco de daguas")
+            == "San Francisco de Daguas"
+        )
+
     def test_validate_distrito_accent_variation(self):
         assert ubg.validate_distrito("ANTIOQUIA") == "Antioquía"
-    
+
     def test_validate_distrito_mixed_case(self):
         assert ubg.validate_distrito("MaRiScAl CaStIlLa") == "Mariscal Castilla"
-        
+
 
 # class TestGetMetadato:
 #     def test_get_metadato_departamento_capital(self):

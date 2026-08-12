@@ -6,12 +6,12 @@ from .core import (
     get_provincia,
     get_ubigeo,
     validate_departamento,
+    validate_distrito,
     validate_provincia,
-    validate_distrito
 )
 from .core.resource_manager import ResourceManager
-from .core.validations import Validations
 from .core.ubigeo_converter import UbigeoConverter
+from .core.validations import Validations
 
 __all__ = [
     "Validations",

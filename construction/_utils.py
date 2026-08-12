@@ -1,15 +1,14 @@
+import importlib.util
 import os
-from pathlib import Path
-import re
+import pprint
 import sys
 import unicodedata
-from natsort import natsorted
-import orjson
-from typing import Literal, Optional
-import importlib.util
+from pathlib import Path
+from typing import Literal
 
 import black
-import pprint
+import orjson
+from natsort import natsorted
 
 SCRIPT_DIR = Path(__file__).parent
 RESOURCES_PATH = SCRIPT_DIR.parent / "src" / "ubigeos_peru" / "resources"
@@ -48,7 +47,7 @@ def eliminar_acentos(texto: str) -> str:
 #                  .replace("″", " ")
 #                  .replace(",", ".")
 #         )
-        
+
 #         # Separar en partes y limpiar espacios
 #         parts = [p.strip() for p in re.split(r"\s+", clean.strip()) if p.strip()]
 
@@ -65,6 +64,7 @@ def eliminar_acentos(texto: str) -> str:
 #         return round(dd, 8)  # Redondear a 8 decimales para precisión    except Exception as e:
 #         print(f"Error convirtiendo coordenada '{coord}': {e}")
 #         return None
+
 
 def write_to_resources(
     final_dict: dict,
@@ -129,7 +129,7 @@ def update_to_resources(
         "macrorregiones",
         "otros",
         "provincias",
-        "global"
+        "global",
     ],
 ) -> None:
     output_path = RESOURCES_PATH / f"{variable_name}.json"
@@ -148,7 +148,7 @@ def update_to_resources(
 
     with open(output_path, mode="wb") as f:
         f.write(orjson.dumps(merged_dicts))
-        
+
     print(f"[INFO] Se actualizó {variable_name} en resources")
 
 
@@ -162,7 +162,7 @@ def update_to_readable(
         "macrorregiones",
         "otros",
         "provincias",
-        "global"
+        "global",
     ],
 ) -> None:
     output_path = RESOURCES_READABLE_PATH / f"{variable_name}.py"
@@ -186,9 +186,7 @@ def update_to_readable(
     # Combinar diccionarios
     merged_dicts = deep_merge_dicts(existing_data, final_dict)
     for institucion, values in merged_dicts.items():
-        merged_dicts[institucion] = dict(
-            natsorted(values.items(), key=lambda x: x[0])
-        )
+        merged_dicts[institucion] = dict(natsorted(values.items(), key=lambda x: x[0]))
 
     # Formatear con black
     code_str = f"{variable_name.upper()} = {pprint.pformat(merged_dicts)}"
