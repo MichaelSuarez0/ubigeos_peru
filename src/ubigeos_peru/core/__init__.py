@@ -18,7 +18,8 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from ._utils import SeriesLike
+from narwhals.typing import IntoSeriesT
+
 from .resource_manager import ResourceManager
 from .ubigeo_converter import UbigeoConverter
 from .validations import Validations
@@ -29,17 +30,17 @@ from .validations import Validations
 
 
 def get_departamento(
-    ubigeo: str | int | SeriesLike,
+    ubigeo: str | int | IntoSeriesT,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     divide_lima: bool = False,
     normalize: bool = False,
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Obtiene el nombre de un departamento a partir de su código de ubigeo.
 
     Parameters
     ----------
-    ubigeo : str, int, SeriesLike
+    ubigeo : str, int, IntoSeriesT
         Código de ubigeo o columna de un DataFrame con códigos de ubigeo.
     institucion : {"inei", "reniec", "sunat"}, default "inei"
         Institución a utilizar como fuente de datos de ubigeo.
@@ -50,13 +51,13 @@ def get_departamento(
 
     Returns
     -------
-    str | SeriesLike
+    str | IntoSeriesT
         Nombre del departamento o columna de un DataFrame con nombres de departamentos, normalizados si normalize=True.
 
     Raises
     ------
     TypeError
-        Si el código no es str/int/SeriesLike
+        Si el código no es str/int/IntoSeriesT
     ValueError
         Si el código no contiene el código de provincia (más de 2 caracteres) y se señala with_lima_metro o with_lima_region.
     KeyError
@@ -140,21 +141,26 @@ def get_departamento(
     4  220101      0     SAN MARTIN
 
     """
-    return UbigeoConverter.get_departamento(ubigeo, institucion, divide_lima, normalize)
+    return UbigeoConverter.get_departamento(
+        ubigeo,
+        institucion=institucion,
+        divide_lima=divide_lima,
+        normalize=normalize,
+    )
 
 
 def get_provincia(
-    ubigeo: str | int | SeriesLike,
+    ubigeo: str | int | IntoSeriesT,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     on_error: Literal["raise", "warn", "coerce", "ignore", "capitalize"] = "raise",
     normalize: bool = False,
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Obtiene el nombre de una provincia a partir de su código de ubigeo.
 
     Parameters
     ----------
-    ubigeo : str, int, SeriesLike
+    ubigeo : str, int, IntoSeriesT
         Código de ubigeo o columna de un DataFrame con códigos de ubigeo (entre 3 y 6 caracteres).
     institucion : {"inei", "reniec", "sunat"}, default "inei"
         Institución a utilizar como fuente de datos de ubigeo.
@@ -163,13 +169,13 @@ def get_provincia(
 
     Returns
     -------
-    str | SeriesLike
+    str | IntoSeriesT
         Nombre de la provincia o columna de un DataFrame con nombres de provincias, normalizados si normalize=True.
 
     Raises
     ------
     TypeError
-        Si el código no es str/int/SeriesLike
+        Si el código no es str/int/IntoSeriesT
     ValueError
         Si el código tiene menos de 4 caracteres o supera los 6 caracteres.
     KeyError
@@ -247,15 +253,20 @@ def get_provincia(
     Name: PROVINCIA, dtype: object
 
     """
-    return UbigeoConverter.get_provincia(ubigeo, institucion, on_error, normalize)
+    return UbigeoConverter.get_provincia(
+        ubigeo,
+        institucion=institucion,
+        on_error=on_error,
+        normalize=normalize,
+    )
 
 
 def get_distrito(
-    ubigeo: str | int | SeriesLike,
+    ubigeo: str | int | IntoSeriesT,
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
     on_error: Literal["raise", "warn", "coerce", "ignore", "capitalize"] = "raise",
     normalize: bool = False,
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Obtiene el nombre de un distrito a partir de su código de ubigeo.
 
@@ -353,14 +364,19 @@ def get_distrito(
     3  150140      0   SANTIAGO DE SURCO
     4  200701      1             PARINAS
     """
-    return UbigeoConverter.get_distrito(ubigeo, institucion, on_error, normalize)
+    return UbigeoConverter.get_distrito(
+        ubigeo,
+        institucion=institucion,
+        on_error=on_error,
+        normalize=normalize,
+    )
 
 
 def get_macrorregion(
-    departamento_o_ubigeo: str | int | SeriesLike,
+    departamento_o_ubigeo: str | int | IntoSeriesT,
     institucion: Literal["inei", "minsa", "ceplan"] = "inei",
     normalize: bool = False,
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Obtiene el nombre de una macrorregión a partir de su código o nombre de departamento.
 
@@ -391,15 +407,17 @@ def get_macrorregion(
     - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
     """
     return UbigeoConverter.get_macrorregion(
-        departamento_o_ubigeo, institucion, normalize
+        departamento_o_ubigeo,
+        institucion=institucion,
+        normalize=normalize,
     )
 
 
 def get_ubigeo(
-    ubicacion: str | SeriesLike,
+    ubicacion: str | IntoSeriesT,
     level: Literal["departamentos", "distritos", "provincias"] = "departamentos",
     institucion: Literal["inei", "reniec", "sunat"] = "inei",
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Obtiene el ubigeo de cierta ubicación (departamentos, distritos o provincias) a partir de su nombre.
 
@@ -454,22 +472,29 @@ def get_ubigeo(
         ...
     KeyError: 'Nombre no encontrado: "ciudad inexistente"'
     """
-    return UbigeoConverter.get_ubigeo(ubicacion, level, institucion)
+    return UbigeoConverter.get_ubigeo(
+        ubicacion,
+        level=level,
+        institucion=institucion,
+    )
 
 
 def validate_departamento(
-    departamento: str | SeriesLike,
+    departamento: str | IntoSeriesT,
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     fuzzy_match: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Valida el nombre de un departamento escrito con gramática variable y devuelve el nombre oficial.
 
     Parameters
     ----------
-    departamento : str | SeriesLike
+    departamento : str | IntoSeriesT
         Nombre del departamento que se busca validar y normalizar.
+    institucion : {"inei", "reniec", "sunat"}, optional
+        Institución a utilizar como fuente de datos, usada en el mensaje de error (por defecto "inei").
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. JUNIN), por defecto False.
     fuzzy_match : bool, optional
@@ -484,13 +509,13 @@ def validate_departamento(
 
     Returns
     -------
-    str | SeriesLike
+    str | IntoSeriesT
         Nombre oficial del departamento.
 
     Raises
     ------
     TypeError
-        Si `departamento` no es un str o SeriesLike
+        Si `departamento` no es un str o IntoSeriesT
     KeyError
         Si `departamento` no coincide con ningún nombre en la base de datos y on_error = `raise`
 
@@ -550,23 +575,30 @@ def validate_departamento(
     4      HUANUCO      0
     """
     return Validations.validate_departamento(
-        departamento, normalize, fuzzy_match, on_error
+        departamento,
+        institucion=institucion,
+        normalize=normalize,
+        fuzzy_match=fuzzy_match,
+        on_error=on_error,
     )
 
 
 def validate_provincia(
-    provincia: str | SeriesLike,
+    provincia: str | IntoSeriesT,
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     fuzzy_match: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Valida el nombre de una provincia escrita con gramática variable y devuelve el nombre oficial.
 
     Parameters
     ----------
-    provincia : str | SeriesLike
+    provincia : str | IntoSeriesT
         Nombre de la provincia que se busca validar y normalizar.
+    institucion : {"inei", "reniec", "sunat"}, optional
+        Institución a utilizar como fuente de datos, usada en el mensaje de error (por defecto "inei").
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. HUAROCHIRI), por defecto False.
     fuzzy_match : bool, optional
@@ -581,13 +613,13 @@ def validate_provincia(
 
     Returns
     -------
-    str | SeriesLike
+    str | IntoSeriesT
         Nombre oficial de la provincia.
 
     Raises
     ------
     TypeError
-        Si `provincia` no es un str o SeriesLike
+        Si `provincia` no es un str o IntoSeriesT
     KeyError
         Si `provincia` no coincide con ningún nombre en la base de datos y on_error = `raise`
 
@@ -637,22 +669,31 @@ def validate_provincia(
     3     MARANON
     4    URUBAMBA
     """
-    return Validations.validate_provincia(provincia, normalize, fuzzy_match, on_error)
+    return Validations.validate_provincia(
+        provincia,
+        institucion=institucion,
+        normalize=normalize,
+        fuzzy_match=fuzzy_match,
+        on_error=on_error,
+    )
 
 
 def validate_distrito(
-    distrito: str | SeriesLike,
+    distrito: str | IntoSeriesT,
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
     normalize: bool = False,
     fuzzy_match: bool = False,
     on_error: Literal["raise", "warn", "ignore", "capitalize", "coerce"] = "raise",
-) -> str | SeriesLike:
+) -> str | IntoSeriesT:
     """
     Valida el nombre de un distrito escrito con gramática variable y devuelve el nombre oficial.
 
     Parameters
     ----------
-    distrito : str | SeriesLike
+    distrito : str | IntoSeriesT
         Nombre del distrito que se busca validar y normalizar.
+    institucion : {"inei", "reniec", "sunat"}, optional
+        Institución a utilizar como fuente de datos, usada en el mensaje de error (por defecto "inei").
     normalize : bool, optional
         Si se cambia a True, retorna el nombre en mayúsculas y sin acentos (ex. ANTIOQUIA), por defecto False.
     fuzzy_match : bool, optional
@@ -667,13 +708,13 @@ def validate_distrito(
 
     Returns
     -------
-    str | SeriesLike
+    str | IntoSeriesT
         Nombre oficial del distrito.
 
     Raises
     ------
     TypeError
-        Si `distrito` no es un str o SeriesLike
+        Si `distrito` no es un str o IntoSeriesT
     KeyError
         Si `distrito` no coincide con ningún nombre en la base de datos y on_error = `raise`
 
@@ -723,14 +764,21 @@ def validate_distrito(
     3     CHOLON
     4  CHINCHERO
     """
-    return Validations.validate_distrito(distrito, normalize, fuzzy_match, on_error)
+    return Validations.validate_distrito(
+        distrito,
+        institucion=institucion,
+        normalize=normalize,
+        fuzzy_match=fuzzy_match,
+        on_error=on_error,
+    )
 
 
 def get_metadato(
-    codigo_o_ubicacion: str | int | SeriesLike,
+    codigo_o_ubicacion: str | int | IntoSeriesT,
     level: Literal["departamentos", "provincias", "distritos"],
     key: Literal["altitud", "capital", "latitud", "longitud", "superficie"] = "capital",
-) -> str | SeriesLike:
+    institucion: Literal["inei", "reniec", "sunat"] = "inei",
+) -> str | IntoSeriesT:
     """
     Consultar otros datos (como capital o superficie) de la ubicación a partir de su código de ubigeo o nombre.
 
@@ -742,6 +790,8 @@ def get_metadato(
         Nivel administrativo de la ubicación (por defecto "departamentos").
     key : {"altitud", "capital", "latitud", "longitud", "superficie"}, optional
         Metadato que se desea obtener (por defecto "capital").
+    institucion : {"inei", "reniec", "sunat"}, optional
+        Institución a utilizar como fuente de datos de ubigeo (por defecto "inei").
 
     Returns
     -------
@@ -760,7 +810,12 @@ def get_metadato(
     - Si se proporciona un nombre de departamento, este será convertido a minúsculas, normalizado y usado para la búsqueda.
     - Se recomienda usar strings de 2 o 6 caracteres para códigos de ubigeo.
     """
-    return UbigeoConverter.get_metadato(codigo_o_ubicacion, level, key)
+    return UbigeoConverter.get_metadato(
+        codigo_o_ubicacion,
+        level=level,
+        key=key,
+        institucion=institucion,
+    )
 
 
 def cargar_diccionario(

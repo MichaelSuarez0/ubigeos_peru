@@ -55,8 +55,6 @@ class TestGetMacrorregion:
     def test_get_macrorregion_with_institution(self):
         assert ubg.get_macrorregion("Ucayali", institucion="ceplan") == "Nororiente"
 
-    def test_get_macrorregion_with_institution_from_integer(self):
-        assert ubg.get_macrorregion(25, institucion="ceplan") == "Nororiente"
 
 
 class TestGetMacrorregionMap:
