@@ -8,31 +8,32 @@ version = "0.2.3"
 description = "Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa, además de información suplementaria."
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
-authors = [
-  { name = "Michael Suárez", email = "michael-salvador@hotmail.com" }
+authors = [{ name = "Michael Suárez", email = "michael-salvador@hotmail.com" }]
+keywords = [
+  "ubigeo",
+  "peru",
+  "departamentos",
+  "provincias",
+  "distritos",
+  "enaho",
 ]
-keywords = ["ubigeo", "peru", "departamentos", "provincias", "distritos", "enaho"]
 license = "MIT"
-dependencies = [
-  "narwhals>=2.21.0",
-  "orjson",
-  "rapidfuzz",
-]
+dependencies = ["narwhals>=2.21.0", "orjson", "rapidfuzz"]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Education",
-    "Intended Audience :: Science/Research",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
 
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-    "Typing :: Typed",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Typing :: Typed",
 
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Natural Language :: Spanish",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Natural Language :: Spanish",
 ]
 
 [build-system]
@@ -54,22 +55,22 @@ ignore = ["E501"]
 
 [dependency-groups]
 dev = [
-    "black>=24.8.0",
-    "fastexcel>=0.12.1",
-    "natsort>=8.4.0",
-    "numpy>=1.26",
-    "openpyxl>=3.1.5",
-    "pandas>=2.3.2",
-    "polars>=1.8.2",
-    "pyarrow>=17.0.0",
-    "pytest>=8.3.5",
-    "xlrd>=2.0.2",
-    "duckdb>=1.4.1",
-    "beautifulsoup4>=4.14.2",
-    "mkdocs-material>=9.6.23",
-    "git-cliff>=2.13.1",
-    "pre-commit>=4.3.0",
-    "ruff>=0.16.1",
+  "black>=24.8.0",
+  "fastexcel>=0.12.1",
+  "natsort>=8.4.0",
+  "numpy>=1.26",
+  "openpyxl>=3.1.5",
+  "pandas>=2.3.2",
+  "polars>=1.8.2",
+  "pyarrow>=17.0.0",
+  "pytest>=8.3.5",
+  "xlrd>=2.0.2",
+  "duckdb>=1.4.1",
+  "beautifulsoup4>=4.14.2",
+  "mkdocs-material>=9.6.23",
+  "git-cliff>=2.13.1",
+  "pre-commit>=4.3.0",
+  "ruff>=0.16.1",
 ]
 
 [tool.bumpversion]
@@ -98,3 +99,10 @@ replace = 'version = "{new_version}"'
 filename = "src/ubigeos_peru/__init__.py"
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
+
+[project.urls]
+Homepage = "https://github.com/MichaelSuarez0/ubigeos_peru"
+Repository = "https://github.com/MichaelSuarez0/ubigeos_peru"
+Documentation = "https://michaelsuarez0.github.io/ubigeos_peru/"
+Changelog = "https://github.com/MichaelSuarez0/ubigeos_peru/blob/main/CHANGELOG.md"
+Issues = "https://github.com/MichaelSuarez0/ubigeos_peru/issues"
