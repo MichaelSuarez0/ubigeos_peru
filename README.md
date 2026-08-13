@@ -1,6 +1,50 @@
 # Ubigeos Perú
 
-Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para limpiar y validar nombres oficiales, consultar macrorregiones, coordenadas geográficas, etc. Se integra fácilmente con pandas y polars para procesar bases de datos peruanas como la ENAHO.
+[![PyPI version](https://img.shields.io/pypi/v/ubigeos-peru?color=blue)](https://pypi.org/project/ubigeos-peru/)
+[![Downloads](https://img.shields.io/pypi/dm/ubigeos-peru)](https://pypi.org/project/ubigeos-peru/)
+[![GitHub stars](https://img.shields.io/github/stars/MichaelSuarez0/ubigeos_peru?style=social)](https://github.com/MichaelSuarez0/ubigeos_peru/stargazers)
+
+Librería de Python que convierte códigos de ubigeo en su correspondiente departamento, provincia o distrito, y viceversa. Incluye métodos clave para limpiar y validar nombres oficiales, consultar macrorregiones, coordenadas geográficas, etc. 
+
+Se integra fácilmente con `pandas` y `polars` para procesar bases de datos peruanas como la **ENAHO**.
+
+## Ejemplo rápido
+
+Un caso típico: tienes un módulo de la ENAHO con la columna `UBIGEO` y quieres 
+saber a qué departamento y provincia pertenece cada observación:
+
+```py
+import pandas as pd
+import ubigeos_peru as ubg
+
+# Módulo 100 de la ENAHO
+df = pd.read_csv("enaho01-2024-100.csv")
+
+df["DEPARTAMENTO"] = ubg.get_departamento(df["UBIGEO"])
+df["PROVINCIA"] = ubg.get_provincia(df["UBIGEO"])
+
+print(df[["UBIGEO", "DEPARTAMENTO", "PROVINCIA"]].head())
+```
+
+```
+   UBIGEO DEPARTAMENTO    PROVINCIA
+0   10101     Amazonas  Chachapoyas
+1  150101         Lima         Lima
+2  080101        Cusco        Cusco
+3  100101      Huánuco      Huánuco
+```
+
+La librería también permite normalizar automáticamente los nombres oficiales:
+
+```python
+ubg.validate_departamento("HUANUCO")          # "Huánuco"
+ubg.validate_departamento(df["DEPARTAMENTO"]) # Normaliza todos
+```
+
+Sin `ubigeos_peru`, tendrías que descargar un diccionario de ubigeos aparte y 
+hacer el merge manualmente, lidiando con inconsistencias de versiones, instituciones, tildes o mayúsculas. 
+
+## Bases de datos
 
 Las fuentes o bases de datos de ubigeos:
 - **[ubigeos_inei_2025](https://github.com/MichaelSuarez0/ubigeos_peru/blob/main/databases/ubigeo_inei_2025.csv)**: 
@@ -15,22 +59,22 @@ Las fuentes o bases de datos de ubigeos:
 
 - **Soporte Multi-institucional**: Soporte para consultar códigos de ubigeo de INEI y Reniec.
 - **Normalización Inteligente**: Manejo automático de acentos y mayúsculas para validar ubicaciones.
-- **Optimizado para Big Data**: 1 000 000 consultas en 0.25-0.65 segundos
+- **Optimizado para Big Data**: 1 000 000 consultas en menos de 1 segundo.
 - **Carga Diferida**: Optimización de memoria mediante lazy loading de recursos y patrón singleton.
-- **Metadatos Geográficos**: Acceso a información adicional como capital, altitud, superficie y coordenadas
+
 
 ## Instalación
 
 Ejecutar en una terminal
 
 ```bash
-pip install ubigeos-peru
+pip install ubigeos_peru
 ```
 
 Con uv
 
 ```bash
-uv add ubigeos-peru
+uv add ubigeos_peru
 ```
 
 ## Uso Básico
@@ -43,76 +87,46 @@ Se recomienda importar de la siguiente manera:
 import ubigeos_peru as ubg
 ```
 La clase siempre tendrá una única instancia para evitar cargar recursos dos veces.
+### Consultar información de Ubigeo
 
-## Consultar información de Ubigeo
 ```python
-# Departamento
-departamento = ubg.get_departamento("1")                 # "Amazonas" (código corto)
-departamento = ubg.get_departamento("010101")            # "Amazonas" (código completo)
-departamento = ubg.get_departamento(10101)               # "Amazonas" (integer)
-departamento = ubg.get_departamento(10101, normalize=True) # "AMAZONAS"
-
-# Provincia
-provincia = ubg.get_provincia("1201")                    # "Huancayo"
-provincia = ubg.get_provincia(10101, normalize = True)   # "CHACHAPOYAS"
-
-# Distrito
-distrito = ubg.get_distrito("50110")                     # "San Juan Bautista"
-distrito = ubg.get_distrito(150110)                      # "Comas"
+departamento = ubg.get_departamento("010101") # "Amazonas"
+provincia = ubg.get_provincia("1201")         # "Huancayo"
+distrito = ubg.get_distrito("150110")         # "Comas"
 ```
-## Obtener Ubigeo a partir de ubicación
+
+#### Validación y Normalización
+
+```python
+ubg.validate_departamento("HUANUCO")              # "Huánuco"
+ubg.validate_ubicacion("Mi peru")                 # "Mi Perú"
+```
+
+#### A partir de ubicación
+
 ```python
 codigo_dept = ubg.get_ubigeo("Madre de dios", "departamentos") # "17"
-codigo_prov = ubg.get_ubigeo("Huaral", "provincia")            # "1506"
-codigo_dist = ubg.get_ubigeo("Lince", "distritos")             # "150116"
-codigo_dist = ubg.get_ubigeo("Mi peru", "distritos", "reniec") # "240107"
+codigo_dist = ubg.get_ubigeo("Lince", "distritos")              # "150116"
 ```
 
-## Validación y Normalización ("agregar" o quitar tildes)
-```python
-ubg.validate_departamento("HUANUCO")                     # "Huánuco"
-ubg.validate_departamento("HUÁNUCO", normalize=True)     # "HUANUCO"
-ubicacion = ubg.validate_ubicacion("SAN MARTIN")         # "San Martín"
 
-# Validar y agregar tildes o mayúsculas a cualquier ubicación geográfica
-ubicacion = ubg.validate_ubicacion("Mi peru")            # "Mi Perú"
-ubicacion = ubg.validate_ubicacion("Madre de dios")      # "Madre de Dios"
-```
+#### Metadatos Geográficos
 
-## Macrorregiones
+(No preparada para producción)
 
 ```python
-# Obtener macrorregión - múltiples formatos
-macro = ubg.get_macrorregion("Amazonas")                 # "Oriente"
-macro = ubg.get_macrorregion("AMAZONAS")                 # "Oriente" (mayúsculas)
-macro = ubg.get_macrorregion("01")                       # "Oriente" (código string)
-macro = ubg.get_macrorregion(1)                          # "Oriente" (entero)
+capital = ubg.get_metadato(
+  "La Libertad",
+  level="departamentos", 
+  key="capital"
+)  # -> "Trujillo"
 
-# Con institución específica
-macro_ceplan = ubg.get_macrorregion(25, institucion="ceplan")          # "Nororiente"
-macro_ceplan = ubg.get_macrorregion("Ucayali", institucion="ceplan")   # "Nororiente"
-
-# Mapeo completo de macrorregiones
-mapa_macro = ubg.get_macrorregion_map()
+altitud = ubg.get_metadato(
+  "Cusco",
+  level="departamentos",
+  key="altitud"
+) # -> "3439"
 ```
-
-## Metadatos Geográficos
-
-```python
-# Capitales
-capital_dept = ubg.get_metadato("La libertad", level="departamentos", key="capital") # "Trujillo"
-capital_prov = ubg.get_metadato("Huarochiri", level="provincias", key="capital")     # "Matucana"
-
-# Altitudes
-altitud_dept = ubg.get_metadato("Cusco", level="departamento", key="altitud")       # "3439"
-altitud_prov = ubg.get_metadato("Huarochiri", level="provincia", key="altitud")     # "2395"
-
-# Superficies
-sup1 = ubg.get_metadato("Lince", level="distritos", key="superficie")               # "3.03"
-sup2 = ubg.get_metadato("San Isidro", level="distritos", key="superficie")          # "11.1"
-
-```
-
 ---
 
 ## Integración con Pandas
@@ -142,12 +156,12 @@ Esto generará el siguiente DataFrame:
 4   210101      45983    Puno
 5   220101      87564    San Martín
 ```
-También se pueden pasar argumentos con una función lambda
+También se pueden pasar argumentos
+
 ```python
 # Agregar información geográfica
 df["PROVINCIA"] = ubg.get_provincia(df["UBIGEO"], normalize=True)
 ```
-Esto generará el siguiente DataFrame:
 
 ```
     UBIGEO  POBLACION DEPARTAMENTO  PROVINCIA
@@ -170,7 +184,7 @@ Por favor, contáctame si encuentras alguno de los siguientes:
 - **Nombres incorrectos**: Ubicaciones que no siguen el nombre oficial.
 - **Ubicaciones faltantes**: Provincias o distritos que no están en la base de datos.
 
-📧 a20180264@pucp.edu.com  
+📧 a20180264@pucp.edu.pe
 [Mi Linkedin](https://www.linkedin.com/in/michael-su%C3%A1rez-1734a2211/)
 
 ## Cómo contribuir
@@ -180,15 +194,11 @@ Debes clonar o hacer fork del repositorio para tener acceso a las carpetas /cons
 
 ```bash
 # Clona o haz fork del repositorio
-git clone https://github.com/username/repo-name.git
-cd repo-name
+git clone https://github.com/username/ubigeos_peru.git
+cd ubigeos_peru
 
 # Si usas uv
 uv sync
-uv pip install -e .
-
-# Si usas pip
-pip install -e .
 ```
 
 #### 2. Identificar el recurso a actualizar
