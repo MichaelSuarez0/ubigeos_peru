@@ -41,8 +41,8 @@ ubg.validate_departamento("HUANUCO")          # "Huánuco"
 ubg.validate_departamento(df["DEPARTAMENTO"]) # Normaliza todos
 ```
 
-Sin `ubigeos_peru`, tendrías que descargar un diccionario de ubigeos aparte y 
-hacer el merge manualmente, lidiando con inconsistencias de versiones, instituciones, tildes o mayúsculas. 
+Sin `ubigeos_peru`, tendrías que descargar un diccionario de ubigeos y 
+hacer el merge manualmente, lidiando con inconsistencias de versiones desactualizadas o de diferentes instituciones, caracteres no normalizados, etc. 
 
 ## Bases de datos
 
